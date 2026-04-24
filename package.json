@@ -1,0 +1,54 @@
+{
+  "name": "agentlens",
+  "version": "0.1.0",
+  "description": "Local-first AI developer analytics — parse, classify, cost-track, and optimize your AI coding sessions.",
+  "type": "module",
+  "main": "dist/core/engine.js",
+  "bin": {
+    "agentlens": "./dist/apps/cli/index.js",
+    "agentlens-tui": "./dist/apps/tui/index.js"
+  },
+  "scripts": {
+    "dev": "node --import tsx src/apps/cli/index.ts",
+    "tui": "node --import tsx src/apps/tui/index.ts",
+    "build": "tsc",
+    "build:all": "tsc && cd src/apps/web && npm run build",
+    "prepublishOnly": "npm run build:all",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "dashboard": "cd src/apps/web && npm run dev"
+  },
+  "keywords": [
+    "ai",
+    "analytics",
+    "developer-tools",
+    "claude",
+    "cursor",
+    "codex",
+    "copilot",
+    "cost-tracking",
+    "token-usage"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^25.6.0",
+    "@types/node-notifier": "^8.0.5",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.4"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.9.0",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "ink": "^7.0.1",
+    "node-notifier": "^10.0.1",
+    "react": "^19.2.5"
+  }
+}

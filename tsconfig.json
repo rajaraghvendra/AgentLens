@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "jsx": "react",
+    "jsxFactory": "React.createElement",
+    "jsxFragmentFactory": "React.Fragment",
+    "paths": {
+      "@agentlens/core/*": ["./src/core/*"],
+      "@agentlens/providers/*": ["./src/providers/*"],
+      "@agentlens/types": ["./src/types/index.ts"],
+      "@agentlens/config": ["./src/config/env.ts"],
+      "@agentlens/utils/*": ["./src/utils/*"],
+      "@agentlens/adapters/*": ["./src/adapters/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "tests", "src/apps/web", "src/apps/tui"]
+}
