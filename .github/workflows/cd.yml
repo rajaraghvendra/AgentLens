@@ -1,0 +1,114 @@
+name: CD (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_npm:
+        description: 'Publish to npmjs.com'
+        required: false
+        default: 'false'
+        type: boolean
+      publish_marketplace:
+        description: 'Publish to VS Code Marketplace'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Build Web Dashboard
+        run: cd src/apps/web && npm ci && npm run build
+
+      - name: Build VS Code extension
+        run: cd src/apps/vscode && npm ci && npm run build
+
+      - name: Package VS Code extension
+        run: npm run package
+        working-directory: src/apps/vscode
+
+      - name: Create Release
+        if: github.event.inputs.publish_npm != 'true'
+        run: |
+          gh release create "v${{ github.run_number }}" \
+            --title "AgentLens v0.1.0 (${{ github.run_number }})" \
+            --notes "Build ${{ github.run_number }} - Manual CD triggered" \
+            --draft \
+            src/apps/vscode/agentlens-0.1.0.vsix
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload release asset
+        if: github.event.inputs.publish_npm != 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: src/apps/vscode/agentlens-0.1.0.vsix
+          asset_name: agentlens-0.1.0.vsix
+          asset_content_type: application/octet-stream
+
+  publish-npm:
+    needs: build
+    if: github.event.inputs.publish_npm == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-marketplace:
+    needs: build
+    if: github.event.inputs.publish_marketplace == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install VSCE
+        run: npm install -g @vscode/vsce
+
+      - name: Publish to Marketplace
+        run: vsce publish
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        working-directory: src/apps/vscode

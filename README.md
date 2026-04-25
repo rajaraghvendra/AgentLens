@@ -36,7 +36,7 @@ npx agentlens <command>
 
 ### From source
 ```bash
-git clone https://github.com/anomalyco/agentlens.git
+git clone https://github.com/rajaraghvendra/agentlens.git
 cd agentlens
 npm install
 npm run build
@@ -482,6 +482,29 @@ Then publish:
 ```bash
 npm publish --access public
 ```
+
+---
+
+## CI/CD
+
+### GitHub Actions
+
+| Workflow | Trigger | Description |
+|----------|---------|-------------|
+| **CI** | Push to `main` / PR | Runs build, test, lint automatically |
+| **CD** | Manual dispatch | Build + optional npm/Marketplace publish |
+
+### Running CD Manually
+
+1. Go to [Actions → CD (Manual)](https://github.com/rajaraghvendra/AgentLens/actions/workflows/cd.yml)
+2. Click **Run workflow**
+3. Select options:
+   - `publish_npm`: Publish to npmjs.com
+   - `publish_marketplace`: Publish to VS Code Marketplace
+4. Click **Run workflow**
+
+To build without publishing:
+- Leave both checkboxes unchecked → creates a draft release with `.vsix`
 
 ---
 
