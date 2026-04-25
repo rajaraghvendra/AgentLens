@@ -43,15 +43,7 @@ export function getDataDir(appName: string): string {
 export function getCacheDir(appName: string): string {
   const home = homedir();
   
-  if (isWindows()) {
-    return join(process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'), appName, 'Cache');
-  }
-  
-  if (isMac()) {
-    return join(home, 'Library', 'Caches', appName);
-  }
-  
-  // Linux
+  // All platforms: use .cache for POSIX compatibility
   return join(home, '.cache', appName);
 }
 
