@@ -576,69 +576,15 @@ function BudgetBar({ budget, spent, currency }: { budget: number; spent: number;
               </div>
 )}
         </div>
-
-        {/* Budget Settings Modal */}
-        <BudgetSettings isOpen={showBudgetSettings} onClose={() => setShowBudgetSettings(false)} />
       </div>
+
+      {/* Budget Settings Modal - rendered as sibling to main content */}
+      <BudgetSettings isOpen={showBudgetSettings} onClose={() => setShowBudgetSettings(false)} />
     </div>
   );
 }
 
-function MetricCard({ title, value, subtitle, icon, highlight = false }: { 
-  title: string, value: string|number, subtitle: string, icon: React.ReactNode, highlight?: boolean 
-}) {
-  return (
-    <div className={`glass-card rounded-2xl p-5 transition-all hover:-translate-y-0.5 ${highlight ? 'border-primary/30' : ''}`}>
-      <div className="flex justify-between items-start mb-3">
-        <h3 className="text-text-secondary text-xs font-medium uppercase tracking-wider">{title}</h3>
-        <div className="p-1.5 bg-background/50 rounded-lg">
-          {icon}
-        </div>
-      </div>
-      <div className={`font-bold ${highlight ? 'text-3xl text-emerald-400' : 'text-2xl'}`}>{value}</div>
-      <div className="text-xs text-text-secondary mt-1">{subtitle}</div>
-    </div>
-  );
-}
-
-function DailyChart({ data }: { data: any[] }) {
-  if (!data || data.length === 0) {
-    return <p className="text-text-secondary text-sm text-center py-8">No daily data available</p>;
-  }
-
-  const maxCost = Math.max(...data.map((d: any) => d.costUSD), 1);
-  const maxBars = 14;
-  const displayData = data.slice(-maxBars);
-
-  return (
-    <div className="flex items-end justify-between gap-2 h-32">
-      {displayData.map((day: any, idx: number) => {
-        const height = (day.costUSD / maxCost) * 100;
-        const date = new Date(day.date);
-        const dayLabel = date.toLocaleDateString('en-US', { weekday: 'short' });
-        
-        return (
-          <div key={idx} className="flex-1 flex flex-col items-center gap-1">
-            <div className="w-full flex flex-col items-center justify-end h-24">
-              <div 
-                className="w-full max-w-8 rounded-t bg-gradient-to-t from-primary to-accent transition-all hover:opacity-80 relative group"
-                style={{ height: `${Math.max(height, 2)}%` }}
-              >
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-background px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                  ${day.costUSD.toFixed(2)}
-                </div>
-              </div>
-            </div>
-            <span className="text-xs text-text-secondary">{dayLabel}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// Budget bar display component
-function BudgetBar({ budget, spent, currency }: { budget: number; spent: number; currency: string }) {
+// Budget bar display component - used inside dashboard
   const percentage = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
   const isOver = spent > budget && budget > 0;
   const isWarning = percentage >= 75 && percentage < 100;
