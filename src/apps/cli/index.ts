@@ -492,12 +492,24 @@ program
   .option('--daily <amount>', 'Daily budget amount')
   .option('--monthly <amount>', 'Monthly budget amount')
   .option('--currency <code>', 'Currency code (e.g. USD)')
+  .option('--claude <amount>', 'Claude Code daily budget')
+  .option('--opencode <amount>', 'OpenCode daily budget')
+  .option('--codex <amount>', 'Codex daily budget')
+  .option('--cursor <amount>', 'Cursor daily budget')
+  .option('--copilot <amount>', 'Copilot daily budget')
   .action(async (opts) => {
     try {
       const daily = opts.daily ? parseFloat(opts.daily) : undefined;
       const monthly = opts.monthly ? parseFloat(opts.monthly) : undefined;
       const currency = opts.currency || undefined;
-      await setBudget({ daily, monthly, currency });
+      const providers: Record<string, number> = {};
+      if (opts.claude) providers.claude = parseFloat(opts.claude);
+      if (opts.opencode) providers.opencode = parseFloat(opts.opencode);
+      if (opts.codex) providers.codex = parseFloat(opts.codex);
+      if (opts.cursor) providers.cursor = parseFloat(opts.cursor);
+      if (opts.copilot) providers.copilot = parseFloat(opts.copilot);
+      
+      await setBudget({ daily, monthly, currency, providers: Object.keys(providers).length > 0 ? providers : undefined });
       console.log(colorize(`Budget updated: daily=${daily ?? 'unchanged'} monthly=${monthly ?? 'unchanged'} ${currency ? 'currency='+currency : ''}`, 'green'));
     } catch (err: any) {
       console.error(colorize(`Failed to set budget: ${err.message}`, 'red'));
