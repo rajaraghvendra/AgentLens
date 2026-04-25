@@ -4,6 +4,9 @@
 
 AgentLens parses, classifies, and tracks your AI coding sessions directly from your local disk. It supports multiple providers (Claude Code, Cursor, Codex, Pi, Opencode, GitHub Copilot), calculates exact costs, detects token-wasting patterns, and provides one-shot success rate tracking.
 
+[![GitHub](https://img.shields.io/badge/GitHub-rajaraghvendra%2FAgentLens-blue.svg)](https://github.com/rajaraghvendra/AgentLens)
+[![VS Code Extension](https://img.shields.io/badge/VS%20Code-AgentLens-purple.svg)](https://marketplace.visualstudio.com)
+
 ## Features
 
 - 💸 **Exact Cost Tracking:** Uses live LiteLLM pricing data to accurately track input, output, and caching costs.
@@ -117,7 +120,33 @@ agentlens currency --reset        # Reset to USD
 
 ---
 
-## Web Dashboard
+## Screenshots
+
+### Web Dashboard
+![Dashboard](docs/screenshots/dashboard.png)
+*Main dashboard with metrics, charts, and project breakdown*
+
+### Optimize Tab
+![Optimize](docs/screenshots/optimize.png)
+*Health Grade and optimization findings*
+
+### Compare Tab
+![Compare](docs/screenshots/compare.png)
+*Model comparison and cost analysis*
+
+### TUI (Terminal UI)
+![TUI](docs/screenshots/tui.png)
+*Interactive terminal dashboard with keyboard navigation*
+
+### VS Code Extension
+![VS Code](docs/screenshots/vscode.png)
+*Status bar showing live cost with budget alerts*
+
+---
+
+## Screenshots Setup
+
+To add screenshots, see [docs/screenshots/README.md](docs/screenshots/README.md)
 
 Start the Next.js dashboard:
 ```bash
@@ -417,7 +446,7 @@ Ensure your `package.json` has the correct details:
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/agentlens.git"
+    "url": "https://github.com/rajaraghvendra/AgentLens.git"
   },
   "keywords": ["ai", "analytics", "claude", "cursor", "codex"],
   "author": "Your Name",
