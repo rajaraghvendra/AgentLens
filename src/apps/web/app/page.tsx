@@ -585,6 +585,7 @@ function BudgetBar({ budget, spent, currency }: { budget: number; spent: number;
 }
 
 // Budget bar display component - used inside dashboard
+function BudgetBar({ budget, spent, currency }: { budget: number; spent: number; currency: string }) {
   const percentage = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
   const isOver = spent > budget && budget > 0;
   const isWarning = percentage >= 75 && percentage < 100;
