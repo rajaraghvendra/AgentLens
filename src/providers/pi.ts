@@ -6,9 +6,9 @@ import { IProvider } from './base.js';
 import type { Session, DateRange, Message, ToolUsage } from '../types/index.js';
 import { accessSync, constants, readdirSync, statSync, readFileSync } from 'fs';
 import { join, basename } from 'path';
-import { homedir } from 'os';
 import { streamJsonlFile } from '../utils/fs-stream.js';
 import { isWithinRange } from '../utils/dates.js';
+import { getPiDataDir } from '../utils/paths.js';
 
 interface PiEntry {
   type: string;
@@ -56,7 +56,7 @@ export class PiProvider implements IProvider {
   readonly id = 'pi';
   readonly name = 'Pi';
 
-  private sessionsDir = join(homedir(), '.pi', 'agent', 'sessions');
+  private sessionsDir = getPiDataDir();
 
   isAvailable(): boolean {
     try {

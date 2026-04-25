@@ -6,8 +6,8 @@ import { IProvider } from './base.js';
 import type { Session, DateRange, Message, ToolUsage } from '../types/index.js';
 import { existsSync } from 'fs';
 import { join } from 'path';
-import { homedir } from 'os';
 import { openReadonly } from '../adapters/sqlite.js';
+import { getOpencodeDataDir } from '../utils/paths.js';
 
 interface OpencodeMessageData {
   role: string;
@@ -31,7 +31,7 @@ export class OpencodeProvider implements IProvider {
   readonly id = 'opencode';
   readonly name = 'Opencode (Deepmind)';
 
-  private dbPath = join(homedir(), '.local', 'share', 'opencode', 'opencode.db');
+  private dbPath = join(getOpencodeDataDir(), 'opencode.db');
 
   isAvailable(): boolean {
     return existsSync(this.dbPath);

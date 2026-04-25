@@ -2,8 +2,8 @@ import { IProvider } from './base.js';
 import type { Session, DateRange, Message, ToolUsage, TokenUsage } from '../types/index.js';
 import { readdirSync, statSync, readFileSync, existsSync } from 'fs';
 import { join, basename } from 'path';
-import { homedir } from 'os';
 import { isWithinRange } from '../utils/dates.js';
+import { getCopilotDataDir } from '../utils/paths.js';
 
 interface CopilotEvent {
   type: string;
@@ -17,7 +17,7 @@ export class CopilotProvider implements IProvider {
   readonly id = 'copilot';
   readonly name = 'GitHub Copilot';
 
-  private sessionStateDir = join(homedir(), '.copilot', 'session-state');
+  private sessionStateDir = getCopilotDataDir();
 
   isAvailable(): boolean {
     try {
