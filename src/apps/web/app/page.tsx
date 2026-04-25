@@ -245,7 +245,7 @@ export default function Dashboard() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <MetricCard title="Total Cost" value={`$${(overview.totalCostLocal ?? 0).toFixed(2)}`} subtitle={overview.localCurrency ?? "USD"} icon={<DollarSign className="text-emerald-400" />} highlight />
-              <MetricCard title="Sessions" value={overview.sessionsCount ?? 0} subtitle={`Avg $${(overview.avgCostPerSession ?? 0).toFixed(2)}/session`} icon={<Activity className="text-purple-400" />} />
+              <MetricCard title="Sessions" value={overview.sessionsCount ?? 0} subtitle={`Avg $${(overview.avgCostPerSession ?? 0).toFixed(2)}/session`} icon={<Activity className="text-primary-400" />} />
               <MetricCard title="Total Tokens" value={`${(((overview.totalTokens ?? 0) / 1_000_000).toFixed(2))}M`} subtitle="Processed" icon={<Database className="text-blue-400" />} />
               <MetricCard title="Cache Efficiency" value={(overview.cacheHitRate ?? 0) > 0 ? `${(overview.cacheHitRate ?? 0).toFixed(1)}%` : "N/A"} subtitle={refreshing ? "Refreshing..." : "Context hit rate"} icon={<Zap className="text-yellow-400" />} />
             </div>
@@ -395,7 +395,7 @@ export default function Dashboard() {
                 title="Health Grade"
                 value={optimizeHealthGrade ?? "--"}
                 subtitle="A (best) to F (worst)"
-                icon={<Activity className="text-purple-400" />}
+icon={<Activity className="text-primary-400" />}
               />
               <MetricCard
                 title="Findings"

@@ -22,7 +22,7 @@ export function ActivityBreakdown({ activities }: ActivityBreakdownProps) {
             </div>
             <div className="w-full bg-border rounded-full h-2.5 overflow-hidden">
               <div
-                className="h-2.5 rounded-full bg-gradient-to-r from-primary to-accent"
+                className="h-2.5 rounded-full bg-gradient-to-r from-primary-500 to-primary-300"
                 style={{ width: `${act.percentage}%` }}
               ></div>
             </div>

@@ -1,13 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0a0a0f;
-  --color-surface: #13131a;
-  --color-border: #1f1f2e;
-  --color-primary: #6366f1;
-  --color-accent: #8b5cf6;
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #94a3b8;
+  /* Dark theme with cyan/teal accent - fresh and modern */
+  --color-background: #0d1117;
+  --color-surface: #161b22;
+  --color-border: #21262d;
+  --color-primary: #22d3ee;
+  --color-primary-dim: #0891b2;
+  --color-accent: #a78bfa;
+  --color-text-primary: #f0f6fc;
+  --color-text-secondary: #8b949e;
+  
+  /* Status colors */
+  --color-success: #3fb950;
+  --color-warning: #d29922;
+  --color-error: #f85149;
 }
 
 body {
@@ -20,17 +27,17 @@ body {
 
 /* Glassmorphism utility */
 .glass {
-  background: rgba(19, 19, 26, 0.7);
+  background: rgba(22, 27, 34, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border);
 }
 
 .glass-card {
-  background: linear-gradient(145deg, rgba(30,30,40,0.6) 0%, rgba(20,20,30,0.4) 100%);
+  background: linear-gradient(145deg, rgba(22, 27, 34, 0.9) 0%, rgba(13, 17, 23, 0.8) 100%);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
 
 /* Scrollbar */

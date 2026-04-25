@@ -34,7 +34,7 @@ export function MetricsGrid({ overview }: MetricsGridProps) {
         title="Active Sessions"
         value={overview.sessionsCount}
         subtitle={`Avg $${overview.avgCostPerSession.toFixed(2)}/session`}
-        icon={<Activity className="text-purple-400" />}
+        icon={<Activity className="text-primary-400" />}
       />
       <MetricCard
         title="Cache Efficiency"

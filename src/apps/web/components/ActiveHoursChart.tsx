@@ -39,22 +39,21 @@ export default function ActiveHoursChart({ hourly }: ActiveHoursChartProps) {
         />
         <Tooltip
           contentStyle={{ 
-            backgroundColor: '#1e293b', 
-            border: '1px solid #334155', 
+            backgroundColor: '#161b22', 
+            border: '1px solid #21262d', 
             borderRadius: '8px',
             fontSize: '12px'
           }}
-          labelStyle={{ color: '#fff' }}
+          labelStyle={{ color: '#22d3ee' }}
           formatter={(value: number) => [value.toString(), 'Messages']}
           labelFormatter={(label) => `Hour: ${label}:00`}
         />
         <Bar dataKey="messages" radius={[4, 4, 0, 0]}>
           {data.map((entry, index) => {
             const intensity = entry.messages / maxMessages;
-            const hue = 250; // Purple hue
-            const saturation = 70;
-            const lightness = Math.max(20, Math.min(60, 70 - intensity * 50));
-            return <Cell key={entry.hour} fill={`hsl(${hue}, ${saturation}%, ${lightness}%)`} />;
+            // Cyan gradient based on intensity
+            const lightness = Math.max(30, Math.min(70, 80 - intensity * 50));
+            return <Cell key={entry.hour} fill={`hsl(187, 70%, ${lightness}%)`} />;
           })}
         </Bar>
       </BarChart>
