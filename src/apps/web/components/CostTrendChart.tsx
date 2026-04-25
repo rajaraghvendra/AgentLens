@@ -50,11 +50,14 @@ export function CostTrendChart({ data }: CostTrendChartProps) {
         <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
         <XAxis
           dataKey="date"
-          tick={{ fill: '#94a3b8' }}
+          tick={{ fill: '#94a3b8', fontSize: 11 }}
+          tickLine={false}
         />
         <YAxis
-          tick={{ fill: '#94a3b8' }}
+          tick={{ fill: '#94a3b8', fontSize: 11 }}
           tickFormatter={(value) => `$${value}`}
+          tickLine={false}
+          axisLine={false}
         />
         <Tooltip content={<CustomTooltip />} />
         <Legend />
@@ -64,8 +67,8 @@ export function CostTrendChart({ data }: CostTrendChartProps) {
           name="Cost (USD)"
           stroke="#10b981"
           strokeWidth={2}
-          dot={{ r: 4 }}
-          activeDot={{ r: 6 }}
+          dot={{ r: 3, fill: '#10b981' }}
+          activeDot={{ r: 5, fill: '#34d399' }}
         />
       </LineChart>
     </ResponsiveContainer>

@@ -50,6 +50,13 @@ export default function BudgetSettings({ isOpen, onClose }: BudgetSettingsProps)
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const normalizeBudgetData = (raw: any): BudgetData => ({
+    daily: Number(raw?.daily ?? 0),
+    monthly: Number(raw?.monthly ?? 0),
+    currency: typeof raw?.currency === "string" ? raw.currency : "USD",
+    providers: raw?.providers && typeof raw.providers === "object" ? raw.providers : {},
+  });
+
   useEffect(() => {
     if (isOpen) {
       fetchBudget();
@@ -60,7 +67,7 @@ export default function BudgetSettings({ isOpen, onClose }: BudgetSettingsProps)
     setLoading(true);
     try {
       const res = await fetch("/api/settings");
-      const data = await res.json();
+      const data = normalizeBudgetData(await res.json());
       setBudget(data);
       setFormData(data);
     } catch (err) {
@@ -208,7 +215,7 @@ export default function BudgetSettings({ isOpen, onClose }: BudgetSettingsProps)
                         type="number"
                         min="0"
                         step="0.01"
-                        value={formData.providers[provider.key] || ""}
+                        value={formData.providers?.[provider.key] || ""}
                         onChange={(e) => updateProviderBudget(provider.key, parseFloat(e.target.value) || 0)}
                         placeholder="0.00"
                         className="w-32 bg-[#0f172a] border border-[#334155] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-primary"

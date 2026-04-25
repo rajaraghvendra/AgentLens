@@ -7,14 +7,13 @@ interface ModelUsageChartProps {
 }
 
 const COLORS = [
+  "#6366f1", // indigo
+  "#818cf8", // indigo-400
+  "#a78bfa", // violet
+  "#c4b5fd", // violet-300
   "#22d3ee", // cyan
   "#06b6d4", // cyan-500
-  "#0891b2", // cyan-600
-  "#14b8a6", // teal
-  "#0d9488", // teal-600
-  "#22d3a2", // emerald-300
-  "#34d399", // emerald
-  "#10b981", // emerald-500
+  "#10b981", // emerald
 ];
 
 export function ModelUsageChart({ data }: ModelUsageChartProps) {
