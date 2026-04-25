@@ -115,6 +115,7 @@ export class CoreEngine {
     const { sessions, metrics } = await this.run(periodDays, 'USD', filters);
 
     const dailyMap = new Map<string, { costUSD: number; sessions: number; tokens: number }>();
+    const projectMap = new Map<string, { cost: number; sessions: number }>();
 
     for (const session of sessions) {
       const day = new Date(session.timestamp).toISOString().split('T')[0];
@@ -123,31 +124,26 @@ export class CoreEngine {
       }
       const dayData = dailyMap.get(day)!;
       dayData.sessions++;
+
+      const proj = projectMap.get(session.project) || { cost: 0, sessions: 0 };
+      proj.sessions++;
+
       for (const msg of session.messages) {
         if (msg.tokens && msg.model) {
           const { cost } = PricingEngine.calculateMessageCost(msg.model, msg.tokens);
+          const msgTokens = msg.tokens.input + msg.tokens.output;
           dayData.costUSD += cost;
-          dayData.tokens += msg.tokens.input + msg.tokens.output;
+          dayData.tokens += msgTokens;
+          proj.cost += cost;
         }
       }
+      projectMap.set(session.project, proj);
     }
 
     const byDay = Array.from(dailyMap.entries())
       .map(([date, data]) => ({ date, costUSD: data.costUSD, sessions: data.sessions, tokens: data.tokens }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
-    const projectMap = new Map<string, { cost: number; sessions: number }>();
-    for (const session of sessions) {
-      const proj = projectMap.get(session.project) || { cost: 0, sessions: 0 };
-      proj.sessions++;
-      for (const msg of session.messages) {
-        if (msg.tokens && msg.model) {
-          const { cost } = PricingEngine.calculateMessageCost(msg.model, msg.tokens);
-          proj.cost += cost;
-        }
-      }
-      projectMap.set(session.project, proj);
-    }
     const byProject = Array.from(projectMap.entries())
       .map(([name, data]) => ({ name, cost: data.cost, sessions: data.sessions }))
       .sort((a, b) => b.cost - a.cost);

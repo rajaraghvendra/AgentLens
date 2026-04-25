@@ -1,7 +1,9 @@
 import { spawn } from 'child_process';
-import { resolve as pathResolve } from 'path';
+import { dirname, resolve as pathResolve } from 'path';
+import { fileURLToPath } from 'url';
 
-const AGENTLENS_ROOT = '/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens';
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const AGENTLENS_ROOT = pathResolve(scriptDir, '../../..');
 const CLI_PATH = pathResolve(AGENTLENS_ROOT, 'src/apps/cli/index.ts');
 
 const args = process.argv.slice(2);

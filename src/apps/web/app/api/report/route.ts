@@ -1,24 +1,15 @@
 import { NextResponse } from 'next/server';
-import { execSync } from 'child_process';
-
-const AGENTLENS_ROOT = '/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens';
-const CLI_BIN = AGENTLENS_ROOT + '/dist/apps/cli/index.js';
+import { runAgentLensCliJson, sanitizePeriod, sanitizeProvider } from '../../../lib/agentlens-cli';
 
 async function GET(request: Request): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(request.url);
-    const period = searchParams.get('period') || '7';
-    const provider = searchParams.get('provider');
-    
-    const cmd = `node "${CLI_BIN}" report -p ${period} --format json --minimal` + 
-      (provider && provider !== 'all' ? ` --provider ${provider}` : '');
-    
-    const stdout = execSync(cmd, {
-      cwd: AGENTLENS_ROOT,
-      encoding: 'utf-8',
-    });
+    const period = sanitizePeriod(searchParams.get('period'), '7');
+    const provider = sanitizeProvider(searchParams.get('provider'));
+    const args = ['report', '-p', period, '--format', 'json', '--minimal'];
+    if (provider) args.push('--provider', provider);
 
-    const result = JSON.parse(stdout.trim());
+    const result = await runAgentLensCliJson<any>(args);
     const { metrics, findings, insights, providers, daily, projects } = result;
 
     return NextResponse.json({

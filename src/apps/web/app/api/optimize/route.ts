@@ -1,24 +1,15 @@
 import { NextResponse } from 'next/server';
-import { execSync } from 'child_process';
-
-const AGENTLENS_ROOT = '/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens';
-const CLI_BIN = AGENTLENS_ROOT + '/dist/apps/cli/index.js';
+import { runAgentLensCliJson, sanitizePeriod, sanitizeProvider } from '../../../lib/agentlens-cli';
 
 async function GET(request: Request): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(request.url);
-    const period = searchParams.get('period') || '30';
-    const provider = searchParams.get('provider');
+    const period = sanitizePeriod(searchParams.get('period'), '30');
+    const provider = sanitizeProvider(searchParams.get('provider'));
+    const args = ['optimize', '-p', period, '--format', 'json'];
+    if (provider) args.push('--provider', provider);
 
-    const cmd = `node "${CLI_BIN}" optimize -p ${period} --format json` +
-      (provider && provider !== 'all' ? ` --provider ${provider}` : '');
-
-    const stdout = execSync(cmd, {
-      cwd: AGENTLENS_ROOT,
-      encoding: 'utf-8',
-    });
-
-    return NextResponse.json(JSON.parse(stdout.trim()));
+    return NextResponse.json(await runAgentLensCliJson(args));
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

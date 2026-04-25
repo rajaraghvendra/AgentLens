@@ -12,21 +12,23 @@ export function analyzeInefficiencies(sessions: Session[]): WasteFinding[] {
 
   // Trackers
   const allBashOutputs: number[] = [];
-  let continuousEdits = 0;
-  let maxContinuousEdits = 0;
+  let continuousEditTurns = 0;
+  let maxContinuousEditTurns = 0;
   let mcpUses = 0;
   let mcpErrors = 0;
   let currentFileEditTarget = '';
-  let readWithoutEditCount = 0;
-  let maxReadsWithoutEdit = 0;
+  let maxReadOnlyTurns = 0;
 
   for (const session of sessions) {
-    let sessionReadCount = 0;
+    let sessionReadOnlyTurns = 0;
 
     for (const msg of session.messages) {
       if (!msg.tools) continue;
+      const tools = msg.tools;
+      const hasEdit = tools.some(t => t.name === 'Edit' || t.name === 'Write');
+      const hasRead = tools.some(t => t.name === 'Read');
 
-      for (const tool of msg.tools) {
+      for (const tool of tools) {
         const tName = tool.name;
 
         // Rule 1 Tracker
@@ -35,18 +37,15 @@ export function analyzeInefficiencies(sessions: Session[]): WasteFinding[] {
         }
 
         // Rule 2 Tracker (Edit retries)
-        if (tName === 'Edit' && tool.input && typeof tool.input === 'object' && (tool.input as any).path) {
-          const path = (tool.input as any).path;
+        if (hasEdit && tool.input && typeof tool.input === 'object' && (tool.input as any).path) {
+          const path = String((tool.input as any).path);
           if (path === currentFileEditTarget) {
-            continuousEdits++;
-            maxContinuousEdits = Math.max(maxContinuousEdits, continuousEdits);
+            continuousEditTurns++;
           } else {
             currentFileEditTarget = path;
-            continuousEdits = 1;
+            continuousEditTurns = 1;
           }
-          sessionReadCount = 0; // reset reads logic
-        } else {
-          continuousEdits = 0;
+          maxContinuousEditTurns = Math.max(maxContinuousEditTurns, continuousEditTurns);
         }
 
         // Rule 3 Tracker (MCP)
@@ -56,10 +55,18 @@ export function analyzeInefficiencies(sessions: Session[]): WasteFinding[] {
         }
 
         // Rule 4 Tracker (Excessive Reads)
-        if (tName === 'Read') {
-          sessionReadCount++;
-          maxReadsWithoutEdit = Math.max(maxReadsWithoutEdit, sessionReadCount);
-        }
+      }
+
+      if (!hasEdit) {
+        continuousEditTurns = 0;
+      }
+
+      // Read-only turn streak better reflects "lost in context" than raw tool-call count.
+      if (hasRead && !hasEdit) {
+        sessionReadOnlyTurns++;
+        maxReadOnlyTurns = Math.max(maxReadOnlyTurns, sessionReadOnlyTurns);
+      } else if (hasEdit) {
+        sessionReadOnlyTurns = 0;
       }
     }
   }
@@ -81,13 +88,13 @@ export function analyzeInefficiencies(sessions: Session[]): WasteFinding[] {
   }
 
   // Evaluate Rule 2: Edit Retry Loops
-  if (maxContinuousEdits > 3) {
+  if (maxContinuousEditTurns > 3) {
     findings.push({
       severity: 'High',
       title: 'Edit Retry Loops Detected',
-      description: `An agent edited the same file ${maxContinuousEdits} times in a row. This usually means it's stuck in a syntax error loop or failing to apply patches.`,
-      estimatedTokensWasted: maxContinuousEdits * 4000,
-      estimatedCostWastedUSD: (maxContinuousEdits * 4000 / 1_000_000) * 15.0,
+      description: `An agent edited the same file across ${maxContinuousEditTurns} consecutive turns. This usually means it's stuck in a syntax error loop or failing to apply patches.`,
+      estimatedTokensWasted: maxContinuousEditTurns * 4000,
+      estimatedCostWastedUSD: (maxContinuousEditTurns * 4000 / 1_000_000) * 15.0,
       suggestedFix: 'Break prompt into smaller chunks or use an MCP testing server to dry-run.'
     });
   }
@@ -105,13 +112,13 @@ export function analyzeInefficiencies(sessions: Session[]): WasteFinding[] {
   }
 
   // Evaluate Rule 4: Excessive File Reads
-  if (maxReadsWithoutEdit > 10) {
+  if (maxReadOnlyTurns > 10) {
     findings.push({
       severity: 'Medium',
       title: 'Context Blindness (High Reads)',
-      description: `An agent read files ${maxReadsWithoutEdit} consecutive times without making edits. It may be lost trying to understand undocumented architecture.`,
-      estimatedTokensWasted: maxReadsWithoutEdit * 3000,
-      estimatedCostWastedUSD: (maxReadsWithoutEdit * 3000 / 1_000_000) * 3.0,
+      description: `An agent produced ${maxReadOnlyTurns} read-only turns in a row without edits. It may be lost trying to understand undocumented architecture.`,
+      estimatedTokensWasted: maxReadOnlyTurns * 3000,
+      estimatedCostWastedUSD: (maxReadOnlyTurns * 3000 / 1_000_000) * 3.0,
       suggestedFix: 'Create a CLAUDE.md summarizing the architecture so the agent doesn\'t have to brute-force read.'
     });
   }
