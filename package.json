@@ -1,5 +1,5 @@
 {
-  "name": "agentlens",
+  "name": "@rajaraghvendra/agentlens",
   "version": "0.1.0",
   "description": "Local-first AI developer analytics — parse, classify, cost-track, and optimize your AI coding sessions.",
   "type": "module",
@@ -8,16 +8,9 @@
     "agentlens": "./dist/apps/cli/index.js",
     "agentlens-tui": "./dist/apps/tui/index.js"
   },
-  "scripts": {
-    "dev": "node --import tsx src/apps/cli/index.ts",
-    "tui": "node --import tsx src/apps/tui/index.ts",
-    "build": "tsc",
-    "build:all": "tsc && cd src/apps/web && npm run build",
-    "prepublishOnly": "npm run build:all",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "lint": "tsc --noEmit",
-    "dashboard": "cd src/apps/web && npm run dev"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rajaraghvendra/AgentLens.git"
   },
   "keywords": [
     "ai",
@@ -30,8 +23,19 @@
     "cost-tracking",
     "token-usage"
   ],
-  "author": "",
+  "author": "rajaraghvendra",
   "license": "MIT",
+  "scripts": {
+    "dev": "node --import tsx src/apps/cli/index.ts",
+    "tui": "node --import tsx src/apps/tui/index.ts",
+    "build": "tsc",
+    "build:all": "tsc && cd src/apps/web && npm run build",
+    "prepublishOnly": "npm run build:all",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "dashboard": "cd src/apps/web && npm run dev"
+  },
   "engines": {
     "node": ">=18.0.0"
   },

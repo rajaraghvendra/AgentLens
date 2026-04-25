@@ -5,7 +5,7 @@
 AgentLens parses, classifies, and tracks your AI coding sessions directly from your local disk. It supports multiple providers (Claude Code, Cursor, Codex, Pi, Opencode, GitHub Copilot), calculates exact costs, detects token-wasting patterns, and provides one-shot success rate tracking.
 
 [![GitHub](https://img.shields.io/badge/GitHub-rajaraghvendra%2FAgentLens-blue.svg)](https://github.com/rajaraghvendra/AgentLens)
-[![npm](https://img.shields.io/badge/npm-agentlens-orange.svg)](https://www.npmjs.com/package/agentlens)
+[![npm](https://img.shields.io/badge/npm-@rajaraghvendra%2Fagentlens-orange.svg)](https://www.npmjs.com/~rajaraghvendra)
 
 ## Features
 
@@ -36,12 +36,12 @@ AgentLens parses, classifies, and tracks your AI coding sessions directly from y
 
 ### Global (recommended)
 ```bash
-npm install -g agentlens
+npm install -g @rajaraghvendra/agentlens
 ```
 
 ### Or run without installing
 ```bash
-npx agentlens <command>
+npx @rajaraghvendra/agentlens <command>
 ```
 
 ### From source

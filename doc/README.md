@@ -217,7 +217,7 @@ The VS Code extension requires the AgentLens CLI to fetch data. You have two opt
 
 #### Option 2: Install CLI Globally
 ```bash
-npm install -g agentlens
+npm install -g @rajaraghvendra/agentlens
 ```
 Then configure the path in VS Code settings:
 ```json
