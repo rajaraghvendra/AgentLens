@@ -4,8 +4,9 @@ import { useEffect, useState, useCallback } from "react";
 import { 
   Activity, DollarSign, Database, BrainCircuit, Terminal, Settings, Copy, CheckCircle2, 
   Flame, TrendingUp, BarChart3, GitBranch, TerminalSquare, Code2, ChevronDown, ChevronUp, RefreshCw,
-  Layers, Cpu, Zap, Calendar, Filter, X, GitCompare, Gauge, AlertTriangle
+  Layers, Cpu, Zap, Calendar, Filter, X, GitCompare, Gauge, AlertTriangle, Wallet
 } from "lucide-react";
+import BudgetSettings from "../components/BudgetSettings";
 
 type TabType = "dashboard" | "optimize" | "compare";
 
@@ -37,6 +38,7 @@ export default function Dashboard() {
   const [showProviderDropdown, setShowProviderDropdown] = useState(false);
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("dashboard");
+  const [showBudgetSettings, setShowBudgetSettings] = useState(false);
 
   const fetchData = useCallback(async (silent = false) => {
     if (!silent) setRefreshing(true);
@@ -99,9 +101,40 @@ export default function Dashboard() {
           <RefreshCw className="mx-auto h-12 w-12 text-primary animate-spin" />
           <p className="text-text-secondary mt-4">Loading AgentLens data...</p>
         </div>
+</div>
+  );
+}
+
+// Additional sub-components and budget display
+function BudgetBar({ budget, spent, currency }: { budget: number; spent: number; currency: string }) {
+  const percentage = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
+  const isOver = spent > budget && budget > 0;
+  const isWarning = percentage >= 75 && percentage < 100;
+  
+  if (budget === 0) return null;
+  
+  return (
+    <div className="glass-card rounded-lg p-3">
+      <div className="flex justify-between text-xs mb-1">
+        <span className="text-text-secondary">Budget ({currency})</span>
+        <span className={isOver ? "text-red-400" : "text-text-secondary"}>
+          {spent.toFixed(2)} / {budget.toFixed(2)}
+        </span>
       </div>
-    );
-  }
+      <div className="h-2 bg-background rounded-full overflow-hidden">
+        <div 
+          className={`h-full transition-all ${
+            isOver ? "bg-red-500" : isWarning ? "bg-yellow-500" : "bg-primary"
+          }`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+      <div className="text-xs text-text-secondary mt-1 text-right">
+        {percentage.toFixed(0)}% used
+      </div>
+    </div>
+  );
+}
 
   const { overview } = data.metrics || {};
   const providers = data.providers || [];
@@ -184,6 +217,15 @@ export default function Dashboard() {
               <div className={`w-2 h-2 rounded-full ${refreshing ? "bg-yellow-400 animate-pulse" : "bg-emerald-400"}`}></div>
               {PERIOD_LABELS[period]}
             </div>
+
+            {/* Settings Button */}
+            <button
+              onClick={() => setShowBudgetSettings(true)}
+              className="glass p-2 rounded-full hover:bg-border/50 transition-colors"
+              title="Budget Settings"
+            >
+              <Wallet className="w-5 h-5 text-text-secondary" />
+            </button>
           </div>
         </header>
 
@@ -532,137 +574,11 @@ export default function Dashboard() {
                   ))}
                 </div>
               </div>
-            )}
-          </div>
+)}
         </div>
-        </>
-        )}
 
-        {/* Optimize Tab */}
-        {activeTab === "optimize" && optimizeData && (
-        <div className="space-y-6">
-          {/* Health Grade */}
-          <div className="glass-card rounded-2xl p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold ${
-                  (optimizeData.healthGrade === 'A' || optimizeData.healthGrade === 'B') 
-                    ? 'bg-emerald-500/20 text-emerald-400' :
-                  optimizeData.healthGrade === 'C'
-                    ? 'bg-yellow-500/20 text-yellow-400' :
-                    'bg-red-500/20 text-red-400'
-                }`}>
-                  {optimizeData.healthGrade || 'N/A'}
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold">Health Grade</h3>
-                  <p className="text-text-secondary">
-                    {optimizeData.findings?.length === 0 ? 'No issues detected' : 
-                      `${optimizeData.findings?.length} issue${optimizeData.findings?.length === 1 ? '' : 's'} found`}
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-3xl font-bold text-emerald-400">
-                  ${optimizeData.totalCost || '0.00'}
-                </p>
-                <p className="text-sm text-text-secondary">Period Total</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-card rounded-2xl p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-accent" />
-              Optimization Insights
-            </h3>
-            <div className="space-y-2">
-              {(optimizeData.insights || []).map((insight: string, idx: number) => (
-                <div key={idx} className="p-3 rounded-lg bg-background/50 text-sm flex items-start gap-2">
-                  <span className="text-primary">💡</span>
-                  <span className="text-text-secondary">{insight.replace(/\*\*/g, '')}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="glass-card rounded-2xl p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-primary" />
-              Findings ({optimizeData.findings?.length || 0})
-            </h3>
-            {(!optimizeData.findings || optimizeData.findings.length === 0) ? (
-              <p className="text-text-secondary text-sm">No findings detected</p>
-            ) : (
-              <div className="space-y-3">
-                {optimizeData.findings.map((finding: any, idx: number) => (
-                  <div key={idx} className={`p-4 rounded-lg border ${
-                    finding.severity === 'High' ? 'border-red-500/30 bg-red-500/10' :
-                    finding.severity === 'Medium' ? 'border-yellow-500/30 bg-yellow-500/10' :
-                    'border-border bg-background/50'
-                  }`}>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="font-medium">{finding.title}</h4>
-                        <p className="text-sm text-text-secondary mt-1">{finding.description}</p>
-                        {finding.occurrences && (
-                          <p className="text-xs text-text-secondary mt-2">
-                            {finding.occurrences} occurrences detected
-                          </p>
-                        )}
-                      </div>
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        finding.severity === 'High' ? 'bg-red-500/20 text-red-400' :
-                        finding.severity === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                        'bg-border text-text-secondary'
-                      }`}>
-                        {finding.severity}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-        )}
-
-        {/* Compare Tab */}
-        {activeTab === "compare" && compareData && (
-        <div className="space-y-6">
-          <div className="glass-card rounded-2xl p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <GitCompare className="w-5 h-5 text-primary" />
-              Model Comparison
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-3 px-4 text-text-secondary font-medium">Model</th>
-                    <th className="text-right py-3 px-4 text-text-secondary font-medium">Sessions</th>
-                    <th className="text-right py-3 px-4 text-text-secondary font-medium">Total Cost</th>
-                    <th className="text-right py-3 px-4 text-text-secondary font-medium">Cost %</th>
-                    <th className="text-right py-3 px-4 text-text-secondary font-medium">Tokens</th>
-                    <th className="text-right py-3 px-4 text-text-secondary font-medium">Avg Cost/Session</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(compareData.models || []).map((model: any, idx: number) => (
-                    <tr key={idx} className="border-b border-border/50">
-                      <td className="py-3 px-4 font-medium">{model.name}</td>
-                      <td className="py-3 px-4 text-right">{model.messageCount}</td>
-                      <td className="py-3 px-4 text-right text-emerald-400">${model.costUSD?.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-right">{compareData.totalCostUSD ? ((model.costUSD / compareData.totalCostUSD) * 100).toFixed(1) : 0}%</td>
-                      <td className="py-3 px-4 text-right">{(model.totalTokens / 1000)?.toFixed(1)}k</td>
-                      <td className="py-3 px-4 text-right">${(model.costUSD / model.messageCount)?.toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        )}
+        {/* Budget Settings Modal */}
+        <BudgetSettings isOpen={showBudgetSettings} onClose={() => setShowBudgetSettings(false)} />
       </div>
     </div>
   );
@@ -717,6 +633,37 @@ function DailyChart({ data }: { data: any[] }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// Budget bar display component
+function BudgetBar({ budget, spent, currency }: { budget: number; spent: number; currency: string }) {
+  const percentage = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
+  const isOver = spent > budget && budget > 0;
+  const isWarning = percentage >= 75 && percentage < 100;
+  
+  if (budget === 0) return null;
+  
+  return (
+    <div className="glass-card rounded-lg p-3">
+      <div className="flex justify-between text-xs mb-1">
+        <span className="text-text-secondary">Budget ({currency})</span>
+        <span className={isOver ? "text-red-400" : "text-text-secondary"}>
+          {spent.toFixed(2)} / {budget.toFixed(2)}
+        </span>
+      </div>
+      <div className="h-2 bg-background rounded-full overflow-hidden">
+        <div 
+          className={`h-full transition-all ${
+            isOver ? "bg-red-500" : isWarning ? "bg-yellow-500" : "bg-primary"
+          }`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+      <div className="text-xs text-text-secondary mt-1 text-right">
+        {percentage.toFixed(0)}% used
+      </div>
     </div>
   );
 }
