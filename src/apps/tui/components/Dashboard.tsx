@@ -53,7 +53,7 @@ export function Dashboard({ data, period }: DashboardProps) {
         />
         <MetricCard
           title="Cache Efficiency"
-          value={`${overview.cacheHitRate.toFixed(1)}%`}
+          value={overview.cacheHitRate > 0 ? `${overview.cacheHitRate.toFixed(1)}%` : "N/A"}
           subtitle="Context hit rate"
           color="#f59e0b"
         />

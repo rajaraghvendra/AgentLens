@@ -130,8 +130,9 @@ program
       console.log(colorize('└' + '─'.repeat(54) + '┘', 'cyan'));
       
       if (overview.sessionsCount > 0) {
+        const cacheDisplay = overview.cacheHitRate > 0 ? `${overview.cacheHitRate.toFixed(1)}%` : 'N/A';
         console.log(`  Avg/Session:  ${formatCurrency(overview.avgCostPerSession, 'USD')} (USD)`);
-        console.log(`  Cache Hit:    ${overview.cacheHitRate.toFixed(1)}%`);
+        console.log(`  Cache Hit:    ${cacheDisplay}`);
       }
 
       console.log('\n' + colorize('Top Activities:', 'blue'));
