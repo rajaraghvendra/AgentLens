@@ -38,3 +38,11 @@ temp/
 # AgentLens specific cache
 ~/.cache/agentlens/
 ~/.config/agentlens/
+
+# Build artifacts from web app
+.next/
+out/
+
+# Documentation (keep README.md but ignore other docs)
+docs/
+!docs/README.md

@@ -652,7 +652,7 @@ export default function Dashboard() {
                       <td className="py-3 px-4 font-medium">{model.name}</td>
                       <td className="py-3 px-4 text-right">{model.messageCount}</td>
                       <td className="py-3 px-4 text-right text-emerald-400">${model.costUSD?.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-right">{((model.costUSD / compareData.totalCostUSD) * 100)?.toFixed(1)}%</td>
+                      <td className="py-3 px-4 text-right">{compareData.totalCostUSD ? ((model.costUSD / compareData.totalCostUSD) * 100).toFixed(1) : 0}%</td>
                       <td className="py-3 px-4 text-right">{(model.totalTokens / 1000)?.toFixed(1)}k</td>
                       <td className="py-3 px-4 text-right">${(model.costUSD / model.messageCount)?.toFixed(2)}</td>
                     </tr>

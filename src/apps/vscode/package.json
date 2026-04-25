@@ -1,0 +1,70 @@
+{
+  "name": "agentlens",
+  "displayName": "AgentLens: AI Cost Tracker",
+  "description": "Live AI token and cost tracking in your VS Code status bar",
+  "version": "0.1.0",
+  "publisher": "anomalyco",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other",
+    "Developer Tools"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "agentlens.openDashboard",
+        "title": "Open AgentLens Dashboard"
+      },
+      {
+        "command": "agentlens.showOutput",
+        "title": "Show AgentLens Output"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "AgentLens",
+      "properties": {
+        "agentlens.pollingInterval": {
+          "type": "number",
+          "default": 15,
+          "minimum": 5,
+          "maximum": 300,
+          "description": "Polling interval in seconds to fetch live costs"
+        },
+        "agentlens.cliPath": {
+          "type": "string",
+          "default": "agentlens",
+          "description": "Path to the AgentLens binary (useful if not in PATH)"
+        },
+        "agentlens.onClickAction": {
+          "type": "string",
+          "default": "openDashboard",
+          "enum": [
+            "openDashboard",
+            "showOutput",
+            "none"
+          ],
+          "description": "Action when clicking the status bar"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "tsc -p ./tsconfig.json",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@vscode/vsce": "^3.2.1",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {}
+}

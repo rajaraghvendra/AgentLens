@@ -222,11 +222,29 @@ program
       
       const today = await CoreEngine.getQuickStats(1, filters);
       const period = await CoreEngine.getQuickStats(periodDays, filters);
+      
+      const budget = await getBudget();
+      const budgetCurrency = budget?.currency || 'USD';
+      const dailyBudget = budget?.daily || 0;
+      const isBudgetExceeded = dailyBudget > 0 && today.totalCostUSD >= dailyBudget;
+      const budgetUtilization = dailyBudget > 0 ? (today.totalCostUSD / dailyBudget) * 100 : 0;
 
       if (options.format === 'json') {
+        const activeProviders = (await import('../../providers/index.js')).getAllProviders()
+          .filter(p => p.isAvailable())
+          .map(p => p.name);
+          
         console.log(JSON.stringify({
-          today: { sessions: today.sessionsCount, tokens: today.totalTokens, cost: today.totalCostUSD },
-          period: { sessions: period.sessionsCount, tokens: period.totalTokens, cost: period.totalCostUSD, period: options.period }
+          period: options.period || 'today',
+          totalCostLocal: today.totalCostUSD,
+          totalCostUSD: today.totalCostUSD,
+          currencySymbol: '$',
+          totalTokens: today.totalTokens,
+          budgetCapLocal: budget?.daily || null,
+          budgetCapUSD: budget?.daily || null,
+          isBudgetExceeded,
+          budgetUtilizationPercentage: budgetUtilization,
+          activeProviders,
         }, null, 2));
         return;
       }
@@ -408,6 +426,7 @@ program
         .sort((a, b) => b.costUSD - a.costUSD);
 
       if (options.format === 'json') {
+        const totalCost = models.reduce((sum, m) => sum + m.costUSD, 0);
         const compare = models.map(m => ({
           name: m.model,
           costUSD: m.costUSD,
@@ -419,7 +438,7 @@ program
           messageCount: m.messageCount,
           isEstimated: m.isEstimated,
         }));
-        console.log(JSON.stringify({ models: compare, period: periodDays }));
+        console.log(JSON.stringify({ models: compare, totalCostUSD: totalCost, period: periodDays }));
         process.exit(0);
       }
 

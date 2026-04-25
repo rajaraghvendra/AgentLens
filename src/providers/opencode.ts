@@ -86,22 +86,20 @@ export class OpencodeProvider implements IProvider {
     try {
       const sessionId = identifier;
       
-      const projectRows = db.prepare(`
-        SELECT p.name FROM project p
-        JOIN session s ON s.project_id = p.id
-        WHERE s.id = ?
-      `).get(sessionId) as { name: string } | undefined;
-      
-      if (projectRows) {
-        project = projectRows.name;
-      }
-
       const sessionRows = db.prepare(`
-        SELECT time_created FROM session WHERE id = ?
-      `).get(sessionId) as { time_created: number } | undefined;
+        SELECT time_created, directory, title FROM session WHERE id = ?
+      `).get(sessionId) as { time_created: number; directory: string; title: string } | undefined;
       
       if (sessionRows) {
         sessionTimestamp = sessionRows.time_created;
+        // Use directory as project, fallback to title
+        if (sessionRows.directory) {
+          // Extract meaningful project name from path
+          const parts = sessionRows.directory.split('/');
+          project = parts.slice(-2, -1)[0] || sessionRows.title || 'opencode';
+        } else {
+          project = sessionRows.title || 'opencode';
+        }
       }
 
       const messageRows = db.prepare(`
