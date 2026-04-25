@@ -14,32 +14,51 @@ function isBashTool(name: string): boolean {
   return name === 'Bash' || name === 'bash' || name === 'exec_command';
 }
 
-function isOneShotSuccess(tools: ToolUsage[], allSessionTools: ToolUsage[]): boolean {
-  if (!tools || tools.length === 0) return false;
-  
-  const hasEdit = tools.some(t => isEditTool(t.name));
-  if (!hasEdit) return false;
-  
-  const editIndex = allSessionTools.findIndex(t => isEditTool(t.name));
-  if (editIndex < 0) return false;
-  
-  const subsequentTools = allSessionTools.slice(editIndex + 1, editIndex + 4);
-  
-  for (const tool of subsequentTools) {
-    if (isBashTool(tool.name)) {
-      const input = typeof tool.input === 'string' ? tool.input.toLowerCase() : '';
-      if (input.includes('error') || input.includes('fail') || tool.isError) {
-        return false;
-      }
-      const editAgain = subsequentTools.slice(subsequentTools.indexOf(tool) + 1).find(t => isEditTool(t.name));
-      if (editAgain) return false;
+function isToolFailureSignal(tool: ToolUsage): boolean {
+  if (tool.isError) return true;
+  const inputText = typeof tool.input === 'string' ? tool.input : '';
+  const outputText = typeof tool.output === 'string' ? tool.output : '';
+  const haystack = `${inputText}\n${outputText}`.toLowerCase();
+  return haystack.includes('error') || haystack.includes('fail');
+}
+
+function isOneShotSuccess(messages: Session['messages'], assistantIndex: number): boolean {
+  const current = messages[assistantIndex];
+  if (!current || current.role !== 'assistant') return false;
+
+  const currentTools = current.tools || [];
+  if (!currentTools.some(t => isEditTool(t.name))) return false;
+
+  // Only inspect the next few assistant turns to avoid session-wide cross-talk.
+  let checkedAssistantTurns = 0;
+  for (let i = assistantIndex + 1; i < messages.length; i++) {
+    const msg = messages[i];
+    if (msg.role !== 'assistant') continue;
+    checkedAssistantTurns++;
+    const tools = msg.tools || [];
+
+    if (tools.some(t => isEditTool(t.name))) {
+      return false;
     }
+
+    const hasFailingBash = tools.some(t => isBashTool(t.name) && isToolFailureSignal(t));
+    if (hasFailingBash) {
+      return false;
+    }
+
+    if (checkedAssistantTurns >= 3) break;
   }
-  
+
   return true;
 }
 
 export async function computeMetrics(sessions: Session[]): Promise<Metrics> {
+  // Initialize hourly buckets (0-23)
+  const hourly: Record<string, { messages: number; tokens: number; costUSD: number }> = {};
+  for (let h = 0; h < 24; h++) {
+    hourly[h.toString()] = { messages: 0, tokens: 0, costUSD: 0 };
+  }
+
   const metrics: Metrics = {
     overview: {
       totalCostUSD: 0,
@@ -52,6 +71,7 @@ export async function computeMetrics(sessions: Session[]): Promise<Metrics> {
     },
     byModel: {},
     byActivity: {},
+    hourly,
   };
 
   if (sessions.length === 0) return metrics;
@@ -61,11 +81,9 @@ export async function computeMetrics(sessions: Session[]): Promise<Metrics> {
 
   for (const session of sessions) {
     let lastUserMessage = '';
-    const allTools = session.messages.flatMap(m => m.tools || []);
-    let editTurnCount = 0;
-    let oneShotCount = 0;
 
-    for (const msg of session.messages) {
+    for (let idx = 0; idx < session.messages.length; idx++) {
+      const msg = session.messages[idx];
       if (msg.role === 'user') {
         lastUserMessage = msg.content;
       } else if (msg.role === 'assistant') {
@@ -74,12 +92,7 @@ export async function computeMetrics(sessions: Session[]): Promise<Metrics> {
         msg.classification = category;
 
         const isEditTurn = tools.some(t => isEditTool(t.name));
-        if (isEditTurn) {
-          editTurnCount++;
-          if (isOneShotSuccess(tools, allTools)) {
-            oneShotCount++;
-          }
-        }
+        const isOneShotTurn = isEditTurn && isOneShotSuccess(session.messages, idx);
 
         if (!metrics.byActivity[category]) {
           metrics.byActivity[category] = { 
@@ -99,7 +112,7 @@ export async function computeMetrics(sessions: Session[]): Promise<Metrics> {
         
         if (isEditTurn) {
           activity.editTurns++;
-          if (isOneShotSuccess(tools, allTools)) {
+          if (isOneShotTurn) {
             activity.oneShotTurns++;
           }
         }
@@ -141,6 +154,14 @@ export async function computeMetrics(sessions: Session[]): Promise<Metrics> {
           mod.costUSD += cost;
           mod.messageCount++;
           if (isEstimated) mod.isEstimated = true;
+
+          // Aggregate by hour
+          const hour = new Date(msg.timestamp).getHours().toString();
+          if (metrics.hourly[hour]) {
+            metrics.hourly[hour].messages++;
+            metrics.hourly[hour].tokens += totalMsgTokens;
+            metrics.hourly[hour].costUSD += cost;
+          }
         }
       }
     }

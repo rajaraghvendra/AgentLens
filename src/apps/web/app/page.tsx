@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { Activity, ChevronDown, Cpu, Database, DollarSign, Filter, Gauge, GitBranch, GitCompare, RefreshCw, TerminalSquare, Wallet, Wrench, Zap } from "lucide-react";
+import { Activity, ChevronDown, Cpu, Database, DollarSign, Filter, Gauge, GitBranch, GitCompare, RefreshCw, TerminalSquare, Wallet, Wrench, Zap, Clock } from "lucide-react";
 import BudgetSettings from "../components/BudgetSettings";
 import { CostTrendChart } from "../components/CostTrendChart";
 import { ActivityBreakdown } from "../components/ActivityBreakdown";
 import { ModelUsageChart } from "../components/ModelUsageChart";
 import { OptimizationFindings } from "../components/OptimizationFindings";
+import ActiveHoursChart from "../components/ActiveHoursChart";
 import { InsightsPanel } from "../components/InsightsPanel";
 
 type TabType = "dashboard" | "optimize" | "compare";
@@ -106,6 +107,7 @@ export default function Dashboard() {
   }
 
   const overview = report.metrics?.overview ?? {};
+  const hourly = report.metrics?.hourly ?? {};
   const findings = report.findings ?? [];
   const activities = Object.values(report.metrics?.byActivity ?? {}).sort((a: any, b: any) => b.costUSD - a.costUSD);
   const models = Object.values(report.metrics?.byModel ?? {}).sort((a: any, b: any) => b.costUSD - a.costUSD);
@@ -284,6 +286,18 @@ export default function Dashboard() {
                 <div className="h-64">
                   <ModelUsageChart data={models.slice(0, 8)} />
                 </div>
+              </div>
+            </div>
+
+            {/* Active Hours Chart */}
+            <div className="glass-card rounded-2xl p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-accent" />
+                Active Hours
+              </h3>
+              <p className="text-sm text-text-secondary mb-4">When you're most productive — optimize your AI sessions based on activity patterns.</p>
+              <div className="h-48">
+                <ActiveHoursChart hourly={hourly} />
               </div>
             </div>
 

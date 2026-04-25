@@ -98,6 +98,7 @@ export interface Metrics {
   overview: MetricsOverview;
   byModel: Record<string, ModelMetrics>;
   byActivity: Partial<Record<ActivityCategory, ActivityMetrics>>;
+  hourly: Record<string, { messages: number; tokens: number; costUSD: number }>;
 }
 
 export interface MetricsOverview {
