@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AgentLens Dashboard",
+  title: "AgentLens",
   description: "Local-first AI Developer Analytics",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

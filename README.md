@@ -14,6 +14,8 @@ AgentLens parses, classifies, and tracks your AI coding sessions directly from y
 - 💻 **CLI & TUI Dashboard:** Native terminal output with optional export to CSV/JSON.
 - 🌐 **Web Dashboard:** Next.js dashboard with Dashboard/Optimize/Compare tabs.
 - 💱 **Multi-Currency:** Display costs in USD, EUR, GBP, JPY, and 160+ currencies.
+- 📊 **VS Code Extension:** Live cost tracking in status bar with budget alerts.
+- 🔔 **Budget Notifications:** Per-provider and total budget tracking with alerts at 50%, 75%, 90%, 100%.
 
 ---
 
@@ -340,6 +342,62 @@ When running the web dashboard (`npm run dashboard`):
 Query parameters:
 - `period` - 7, 30, or number of days
 - `provider` - claude, codex, cursor, etc.
+
+---
+
+## VS Code Extension
+
+Install by dragging `agentlens-0.1.0.vsix` into VS Code Extensions panel or double-click the file.
+
+### Prerequisites
+The VS Code extension requires the AgentLens CLI to fetch data. You have two options:
+
+#### Option 1: Open AgentLens Project in VS Code (Recommended)
+1. Open the AgentLens project folder in VS Code (`File → Open Folder`)
+2. The extension will automatically find the CLI at `dist/apps/cli/index.js`
+3. Run `npm run build` if the `dist` folder doesn't exist
+
+#### Option 2: Install CLI Globally
+```bash
+npm install -g agentlens
+```
+Then configure the path in VS Code settings:
+```json
+"agentlens.cliPath": "agentlens"
+```
+
+### Commands
+- `agentlens.openDashboard` - Open web dashboard
+- `agentlens.showOutput` - Show output channel
+- `agentlens.setBudget` - Set budgets via quick pick
+
+### Settings (settings.json)
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `agentlens.pollingInterval` | number | 15 | Polling interval in seconds (5-300) |
+| `agentlens.cliPath` | string | agentlens | Path to CLI binary |
+| `agentlens.onClickAction` | enum | openDashboard | Action on click |
+| `agentlens.dailyBudget` | number | 0 | Daily total budget in USD (0=off) |
+| `agentlens.monthlyBudget` | number | 0 | Monthly total budget in USD (0=off) |
+| `agentlens.notifyOnBudgetWarning` | boolean | true | Show budget notifications |
+| `agentlens.claudeCodeBudget` | number | 0 | Claude Code daily budget |
+| `agentlens.opencodeBudget` | number | 0 | OpenCode daily budget |
+| `agentlens.codexBudget` | number | 0 | Codex daily budget |
+| `agentlens.cursorBudget` | number | 0 | Cursor daily budget |
+| `agentlens.copilotBudget` | number | 0 | Copilot daily budget |
+
+### Budget Notifications
+- Status bar icons: `$(flame)` (normal), `$(flame)` orange (90%), `$(error)` red (exceeded)
+- Notifications at 50%, 75%, 90%, 100% thresholds
+- Tooltip shows: Total cost, tokens, provider costs, budget utilization
+
+### Packaging
+```bash
+cd src/apps/vscode
+npm run build
+npx vsce package
+```
 
 ---
 

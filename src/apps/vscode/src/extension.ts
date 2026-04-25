@@ -18,7 +18,6 @@ function startPolling(): void {
     statusBarManager.update(status);
   }, intervalMs);
 
-  // Immediate first fetch
   (async () => {
     const status = await agentLensClient.getStatus();
     statusBarManager.update(status);
@@ -40,32 +39,96 @@ function showOutput(): void {
   agentLensClient.showOutput();
 }
 
+async function setBudget(): Promise<void> {
+  const options: vscode.QuickPickItem[] = [
+    { label: "Total Daily Budget", description: `Current: $${configManager.getDailyBudget()}` },
+    { label: "Total Monthly Budget", description: `Current: $${configManager.getMonthlyBudget()}` },
+    { label: "Claude Code Daily", description: `Current: $${configManager.getProviderBudget('claudeCode')}` },
+    { label: "OpenCode Daily", description: `Current: $${configManager.getProviderBudget('opencode')}` },
+    { label: "Codex Daily", description: `Current: $${configManager.getProviderBudget('codex')}` },
+    { label: "Cursor Daily", description: `Current: $${configManager.getProviderBudget('cursor')}` },
+    { label: "Copilot Daily", description: `Current: $${configManager.getProviderBudget('copilot')}` },
+  ];
+
+  const selected = await vscode.window.showQuickPick(options, {
+    placeHolder: "Select budget to set",
+  });
+
+  if (!selected) return;
+
+  const settingMap: Record<string, string> = {
+    "Total Daily Budget": "dailyBudget",
+    "Total Monthly Budget": "monthlyBudget",
+    "Claude Code Daily": "claudeCodeBudget",
+    "OpenCode Daily": "opencodeBudget",
+    "Codex Daily": "codexBudget",
+    "Cursor Daily": "cursorBudget",
+    "Copilot Daily": "copilotBudget",
+  };
+
+  const settingKey = settingMap[selected.label];
+  if (!settingKey) return;
+
+  const currentValue = settingKey.includes("dailyBudget") || settingKey.includes("monthlyBudget")
+    ? configManager.getDailyBudget()
+    : configManager.getProviderBudget(settingKey.replace("Budget", ""));
+
+  const value = await vscode.window.showInputBox({
+    prompt: "Enter budget amount (USD)",
+    placeHolder: "0 to disable",
+    value: String(currentValue || ""),
+  });
+
+  if (value === undefined) return;
+
+  const amount = parseFloat(value) || 0;
+  const config = vscode.workspace.getConfiguration("agentlens");
+  await config.update(settingKey, amount, true);
+
+  configManager.refresh();
+  statusBarManager.updateBudgetSettings(
+    configManager.getDailyBudget(),
+    configManager.getMonthlyBudget(),
+    (configManager as any).providerBudgets || {}
+  );
+  statusBarManager.clearNotifications();
+
+  vscode.window.showInformationMessage(`◊ AgentLens: ${selected.label} set to $${amount}`);
+}
+
 export function activate(context: vscode.ExtensionContext): void {
-  // Initialize managers
   configManager = new ConfigManager();
   agentLensClient = new AgentLensClient(configManager.get().cliPath);
   statusBarManager = new StatusBarManager();
 
-  // Register commands
-  context.subscriptions.push(
-    vscode.commands.registerCommand("agentlens.openDashboard", openDashboard),
-    vscode.commands.registerCommand("agentlens.showOutput", showOutput)
+  statusBarManager.updateBudgetSettings(
+    configManager.getDailyBudget(),
+    configManager.getMonthlyBudget(),
+    configManager.getProviderBudgets()
   );
 
-  // Start polling
+  context.subscriptions.push(
+    vscode.commands.registerCommand("agentlens.openDashboard", openDashboard),
+    vscode.commands.registerCommand("agentlens.showOutput", showOutput),
+    vscode.commands.registerCommand("agentlens.setBudget", setBudget)
+  );
+
   startPolling();
 
-  // Watch for config changes
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration("agentlens")) {
         configManager.refresh();
+        statusBarManager.updateBudgetSettings(
+          configManager.getDailyBudget(),
+          configManager.getMonthlyBudget(),
+          configManager.getProviderBudgets()
+        );
         startPolling();
       }
     })
   );
 
-  // Cleanup on deactivate
   context.subscriptions.push({
     dispose: () => {
       stopPolling();

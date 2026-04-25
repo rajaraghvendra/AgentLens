@@ -1,6 +1,6 @@
 {
   "name": "agentlens",
-  "displayName": "AgentLens: AI Cost Tracker",
+  "displayName": "◊ AgentLens: AI Cost Tracker",
   "description": "Live AI token and cost tracking in your VS Code status bar",
   "version": "0.1.0",
   "publisher": "anomalyco",
@@ -24,6 +24,10 @@
       {
         "command": "agentlens.showOutput",
         "title": "Show AgentLens Output"
+      },
+      {
+        "command": "agentlens.setBudget",
+        "title": "Set AgentLens Budget"
       }
     ],
     "configuration": {
@@ -39,8 +43,8 @@
         },
         "agentlens.cliPath": {
           "type": "string",
-          "default": "agentlens",
-          "description": "Path to the AgentLens binary (useful if not in PATH)"
+          "default": "",
+          "description": "Path to CLI (blank = auto-detect from workspace, or 'agentlens' for global install)"
         },
         "agentlens.onClickAction": {
           "type": "string",
@@ -51,6 +55,53 @@
             "none"
           ],
           "description": "Action when clicking the status bar"
+        },
+        "agentlens.dailyBudget": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Daily budget in USD (0 to disable)"
+        },
+        "agentlens.monthlyBudget": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Monthly budget in USD (0 to disable)"
+        },
+        "agentlens.notifyOnBudgetWarning": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show notification when budget threshold reached"
+        },
+        "agentlens.claudeCodeBudget": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Daily budget for Claude Code in USD"
+        },
+        "agentlens.opencodeBudget": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Daily budget for OpenCode in USD"
+        },
+        "agentlens.codexBudget": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Daily budget for Codex in USD"
+        },
+        "agentlens.cursorBudget": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Daily budget for Cursor in USD"
+        },
+        "agentlens.copilotBudget": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Daily budget for GitHub Copilot in USD"
         }
       }
     }

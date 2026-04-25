@@ -26,9 +26,9 @@ export function Header({ period, onPeriodChange, lastUpdated }: HeaderProps) {
       <Box justifyContent="space-between">
         <Box>
           <Text backgroundColor="#6366f1" color="white" bold>
-            {' AgentLens '}
+            ▸ AgentLens◊
           </Text>
-          <Text color="#94a3b8"> Local-first AI Developer Analytics</Text>
+          <Text color="#94a3b8">  AI Developer Analytics</Text>
         </Box>
         <Text color="#94a3b8">Updated: {formatDate(lastUpdated)}</Text>
       </Box>

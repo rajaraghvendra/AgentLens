@@ -122,7 +122,7 @@ program
       
       const periodLabel = options.period || 'week';
       
-      console.log('\n' + colorize('┌─ AgentLens Usage Report ─────────────────────────────┐', 'cyan'));
+      console.log('\n' + colorize('┌─◊ AgentLens Report ──────────────────────────────────┐', 'cyan'));
       console.log(colorize('│', 'cyan') + ` Period: ${periodLabel === 'week' ? 'Last 7 days' : periodLabel}`.padEnd(54) + colorize('│', 'cyan'));
       console.log(colorize('│', 'cyan') + ` Sessions: ${overview.sessionsCount}`.padEnd(54) + colorize('│', 'cyan'));
       console.log(colorize('│', 'cyan') + ` Tokens: ${(overview.totalTokens / 1_000_000).toFixed(2)}M`.padEnd(54) + colorize('│', 'cyan'));
@@ -224,7 +224,6 @@ program
       const period = await CoreEngine.getQuickStats(periodDays, filters);
       
       const budget = await getBudget();
-      const budgetCurrency = budget?.currency || 'USD';
       const dailyBudget = budget?.daily || 0;
       const isBudgetExceeded = dailyBudget > 0 && today.totalCostUSD >= dailyBudget;
       const budgetUtilization = dailyBudget > 0 ? (today.totalCostUSD / dailyBudget) * 100 : 0;
@@ -232,7 +231,7 @@ program
       if (options.format === 'json') {
         const activeProviders = (await import('../../providers/index.js')).getAllProviders()
           .filter(p => p.isAvailable())
-          .map(p => p.name);
+          .map(p => p.id);
           
         console.log(JSON.stringify({
           period: options.period || 'today',
@@ -245,6 +244,7 @@ program
           isBudgetExceeded,
           budgetUtilizationPercentage: budgetUtilization,
           activeProviders,
+          costsByProvider: { note: "Use agentlens report for detailed breakdown" }
         }, null, 2));
         return;
       }
@@ -283,7 +283,7 @@ program
         process.exit(0);
       }
 
-      console.log('\n' + colorize('┌─ AgentLens Optimizer ────────────────────────────┐', 'cyan'));
+      console.log('\n' + colorize('┌─◊ AgentLens Optimize ─────────────────────────────┐', 'cyan'));
       console.log(colorize('│', 'cyan') + ` Period: ${options.period || '30days'}`.padEnd(52) + colorize('│', 'cyan'));
       console.log(colorize('└' + '─'.repeat(52) + '┘', 'cyan'));
       

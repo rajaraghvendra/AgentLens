@@ -119,10 +119,10 @@ export default function Dashboard() {
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent inline-flex items-center gap-3">
-              <BrainCircuit className="text-primary h-8 w-8" />
+              <span className="bg-primary/20 p-2 rounded-lg">◊</span>
               AgentLens
             </h1>
-            <p className="text-text-secondary mt-1 ml-11">AI Developer Analytics Dashboard</p>
+            <p className="text-text-secondary mt-1 ml-11">AI Developer Analytics</p>
           </div>
           
           <div className="flex items-center gap-3 flex-wrap">

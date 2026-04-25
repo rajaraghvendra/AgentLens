@@ -1,20 +1,24 @@
 import * as vscode from "vscode";
-import type { StatusBarConfig } from "../types/index";
+import type { StatusBarConfig, BudgetConfig } from "../types/index";
 
-const DEFAULT_CONFIG: StatusBarConfig = {
+const DEFAULT_CONFIG: StatusBarConfig & BudgetConfig = {
   pollingInterval: 15,
   cliPath: "agentlens",
   onClickAction: "openDashboard",
+  dailyBudget: 0,
+  monthlyBudget: 0,
+  notifyOnBudgetWarning: true,
+  providerBudgets: {},
 };
 
 export class ConfigManager {
-  private config: StatusBarConfig;
+  private config: StatusBarConfig & BudgetConfig;
 
   constructor() {
     this.config = this.loadConfig();
   }
 
-  private loadConfig(): StatusBarConfig {
+  private loadConfig(): StatusBarConfig & BudgetConfig {
     const workspaceConfig = vscode.workspace.getConfiguration("agentlens");
 
     const pollingInterval = Math.max(
@@ -25,8 +29,7 @@ export class ConfigManager {
       )
     );
 
-    const cliPath =
-      workspaceConfig.get<string>("cliPath") ?? DEFAULT_CONFIG.cliPath;
+    const cliPath = workspaceConfig.get<string>("cliPath") ?? DEFAULT_CONFIG.cliPath;
 
     let onClickAction: "openDashboard" | "showOutput" | "none" = "openDashboard";
     const storedAction = workspaceConfig.get<string>("onClickAction");
@@ -34,14 +37,32 @@ export class ConfigManager {
       onClickAction = storedAction;
     }
 
+    const dailyBudget = workspaceConfig.get<number>("dailyBudget") ?? DEFAULT_CONFIG.dailyBudget;
+    const monthlyBudget = workspaceConfig.get<number>("monthlyBudget") ?? DEFAULT_CONFIG.monthlyBudget;
+    const notifyOnBudgetWarning = workspaceConfig.get<boolean>("notifyOnBudgetWarning") ?? DEFAULT_CONFIG.notifyOnBudgetWarning;
+
+    // Load per-provider budgets
+    const providerBudgets: Record<string, number> = {};
+    const providers = ["claudeCode", "opencode", "codex", "cursor", "copilot", "pi"];
+    for (const provider of providers) {
+      const budget = workspaceConfig.get<number>(`${provider}Budget`);
+      if (budget && budget > 0) {
+        providerBudgets[provider] = budget;
+      }
+    }
+
     return {
       pollingInterval,
       cliPath,
       onClickAction,
+      dailyBudget,
+      monthlyBudget,
+      notifyOnBudgetWarning,
+      providerBudgets,
     };
   }
 
-  get(): StatusBarConfig {
+  get(): StatusBarConfig & BudgetConfig {
     return this.config;
   }
 
@@ -51,5 +72,25 @@ export class ConfigManager {
 
   getPollingIntervalMs(): number {
     return this.config.pollingInterval * 1000;
+  }
+
+  getDailyBudget(): number {
+    return this.config.dailyBudget;
+  }
+
+  getMonthlyBudget(): number {
+    return this.config.monthlyBudget;
+  }
+
+  shouldNotifyOnWarning(): boolean {
+    return this.config.notifyOnBudgetWarning;
+  }
+
+  getProviderBudget(providerId: string): number {
+    return this.config.providerBudgets[providerId] || 0;
+  }
+
+  getProviderBudgets(): Record<string, number> {
+    return this.config.providerBudgets;
   }
 }
