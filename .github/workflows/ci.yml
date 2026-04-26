@@ -17,6 +17,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            src/apps/web/package-lock.json
+            src/apps/vscode/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -25,10 +29,16 @@ jobs:
         run: npm run build
 
       - name: Build Web Dashboard
-        run: cd src/apps/web && npm ci && npm run build
+        working-directory: src/apps/web
+        run: |
+          npm install
+          npm run build
 
       - name: Build VS Code extension
-        run: cd src/apps/vscode && npm ci && npm run build
+        working-directory: src/apps/vscode
+        run: |
+          npm install
+          npm run build
 
   test:
     runs-on: ubuntu-latest
@@ -40,6 +50,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            src/apps/web/package-lock.json
+            src/apps/vscode/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -57,6 +71,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            src/apps/web/package-lock.json
+            src/apps/vscode/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -67,6 +85,9 @@ jobs:
   package-smoke:
     name: Package Smoke (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
@@ -79,24 +100,26 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            src/apps/web/package-lock.json
+            src/apps/vscode/package-lock.json
 
       - name: Install root dependencies
         run: npm ci
 
       - name: Install web dependencies
         working-directory: src/apps/web
-        run: npm ci
+        run: npm install
 
       - name: Build publishable package
         run: npm run build:all
 
       - name: Pack npm tarball
-        shell: bash
         run: |
           mkdir -p artifacts
           npm pack --pack-destination artifacts
 
       - name: Smoke test installed tarball
-        shell: bash
         run: |
           node scripts/ci/smoke-installed-package.mjs artifacts/*.tgz
