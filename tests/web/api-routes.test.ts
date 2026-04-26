@@ -10,6 +10,18 @@ const setBudgetMock = vi.fn();
 const computeHealthScoreMock = vi.fn();
 const getAllProvidersMock = vi.fn();
 
+vi.mock('next/server', () => ({
+  NextResponse: {
+    json: (body: unknown, init?: ResponseInit) =>
+      new Response(JSON.stringify(body), {
+        status: init?.status ?? 200,
+        headers: {
+          'content-type': 'application/json',
+        },
+      }),
+  },
+}));
+
 vi.mock('../../src/apps/web/lib/server-core', () => ({
   CoreEngine: {
     runFull: (...args: any[]) => runFullMock(...args),
