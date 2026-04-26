@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { CoreEngine } from '@agentlens/core/engine';
+import { CoreEngine } from '../../../lib/server-core';
 
 export async function GET(request: Request) {
   try {

@@ -45,7 +45,7 @@ export default function ActiveHoursChart({ hourly }: ActiveHoursChartProps) {
             fontSize: '12px'
           }}
           labelStyle={{ color: '#6366f1' }}
-          formatter={(value: number) => [value.toString(), 'Messages']}
+          formatter={(value) => [String(value ?? 0), 'Messages']}
           labelFormatter={(label) => `Hour: ${label}:00`}
         />
         <Bar dataKey="messages" radius={[4, 4, 0, 0]}>

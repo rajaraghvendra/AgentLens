@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server';
-import { runAgentLensCliJson } from '../../../lib/agentlens-cli';
+import { getAllProviders } from '../../../lib/server-core';
 
 async function GET(): Promise<NextResponse> {
   try {
-    const report = await runAgentLensCliJson<any>(['report', '-p', 'today', '--format', 'json', '--minimal']);
-    return NextResponse.json({ providers: report.providers ?? [] });
+    return NextResponse.json({
+      providers: getAllProviders().map((provider) => ({
+        id: provider.id,
+        name: provider.name,
+        available: provider.isAvailable(),
+      })),
+    });
   } catch (e: any) {
     return NextResponse.json({ error: e.message, providers: [] }, { status: 500 });
   }

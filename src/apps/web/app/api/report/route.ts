@@ -1,24 +1,25 @@
 import { NextResponse } from 'next/server';
-import { runAgentLensCliJson, sanitizePeriod, sanitizeProvider } from '../../../lib/agentlens-cli';
+import { CoreEngine } from '../../../lib/server-core';
+import { sanitizePeriod, sanitizeProvider, parsePeriod } from '../../../lib/query-params';
 
 async function GET(request: Request): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(request.url);
     const period = sanitizePeriod(searchParams.get('period'), '7');
     const provider = sanitizeProvider(searchParams.get('provider'));
-    const args = ['report', '-p', period, '--format', 'json', '--minimal'];
-    if (provider) args.push('--provider', provider);
-
-    const result = await runAgentLensCliJson<any>(args);
-    const { metrics, findings, insights, providers, daily, projects } = result;
+    const periodDays = parsePeriod(period);
+    const filters = provider ? { provider } : undefined;
+    const result = await CoreEngine.runFull(periodDays, 'USD', filters);
+    const exportData = CoreEngine.buildExportData(result.sessions, result.metrics, periodDays);
+    const { metrics, findings, insights, providers } = result;
 
     return NextResponse.json({
       metrics,
       findings,
       insights,
       providers,
-      daily: daily ?? [],
-      projects: (projects ?? []).filter((p: any) => p.name != null),
+      daily: exportData.byDay ?? [],
+      projects: (exportData.byProject ?? []).filter((p: any) => p.name != null),
       activities: Object.values(metrics?.byActivity || {}).map((a: any) => ({
         name: a.category,
         cost: a.costUSD,
@@ -32,6 +33,17 @@ async function GET(request: Request): Promise<NextResponse> {
         totalTokens: m.totalTokens,
         inputTokens: m.inputTokens,
         outputTokens: m.outputTokens
+      })),
+      providerBreakdown: Object.values(metrics?.byProvider || {}).map((p: any) => ({
+        id: p.provider,
+        name: p.provider,
+        costUSD: p.costUSD,
+        totalTokens: p.totalTokens,
+        inputTokens: p.inputTokens,
+        outputTokens: p.outputTokens,
+        cacheReadTokens: p.cacheReadTokens,
+        cacheWriteTokens: p.cacheWriteTokens,
+        messageCount: p.messageCount,
       }))
     });
   } catch (e: any) {

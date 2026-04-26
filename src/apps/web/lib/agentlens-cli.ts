@@ -1,36 +1,10 @@
-import { existsSync, readFileSync } from 'fs';
+import { existsSync } from 'fs';
 import { spawn } from 'child_process';
-import { dirname, join, resolve as pathResolve } from 'path';
+import { dirname, resolve as pathResolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const DEFAULT_TIMEOUT_MS = 20_000;
 const VALID_PROVIDERS = new Set(['all', 'claude', 'codex', 'cursor', 'opencode', 'pi', 'copilot']);
-
-function isAgentLensPackageJson(path: string): boolean {
-  try {
-    const raw = readFileSync(path, 'utf-8');
-    const parsed = JSON.parse(raw) as { name?: string };
-    return parsed.name === '@rajaraghvendra/agentlens';
-  } catch {
-    return false;
-  }
-}
-
-function findRepoRoot(startDir: string): string {
-  let current = startDir;
-
-  for (let i = 0; i < 8; i++) {
-    const pkg = join(current, 'package.json');
-    if (existsSync(pkg) && isAgentLensPackageJson(pkg)) {
-      return current;
-    }
-    const parent = dirname(current);
-    if (parent === current) break;
-    current = parent;
-  }
-
-  return process.cwd();
-}
 
 export function getAgentLensRoot(): string {
   if (process.env.AGENTLENS_ROOT && existsSync(process.env.AGENTLENS_ROOT)) {
@@ -38,7 +12,7 @@ export function getAgentLensRoot(): string {
   }
 
   const currentFileDir = dirname(fileURLToPath(import.meta.url));
-  return findRepoRoot(currentFileDir);
+  return pathResolve(currentFileDir, '../../../../');
 }
 
 function getCliProgram(root: string): { cmd: string; args: string[] } {

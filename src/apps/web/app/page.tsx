@@ -17,6 +17,7 @@ type ReportResponse = {
   metrics?: {
     byActivity?: Record<string, any>;
     byModel?: Record<string, any>;
+    hourly?: Record<string, { messages: number; tokens: number; costUSD: number }>;
     overview?: {
       totalCostLocal?: number;
       localCurrency?: string;
