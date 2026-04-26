@@ -84,7 +84,7 @@ jobs:
         run: npm run build:all
 
       - name: Publish package to npmjs
-        run: npm publish --provenance
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

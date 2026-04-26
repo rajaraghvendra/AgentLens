@@ -355,6 +355,10 @@ npm publish
 Published package:
 - [`@rajaraghvendra/agentlens` on npmjs.com](https://www.npmjs.com/package/@rajaraghvendra/agentlens)
 
+Note:
+- npm provenance via `npm publish --provenance` only works from public GitHub repositories
+- if this repository is private, publish without `--provenance`
+
 ### Package VS Code Extension
 ```bash
 cd src/apps/vscode
