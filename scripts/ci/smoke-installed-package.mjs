@@ -63,6 +63,24 @@ async function waitForHttp(url, attempts = 60) {
   throw new Error(`Timed out waiting for ${url}`);
 }
 
+async function removeDirWithRetry(targetPath, attempts = 5) {
+  let lastError = null;
+
+  for (let index = 0; index < attempts; index += 1) {
+    try {
+      await rm(targetPath, { recursive: true, force: true, maxRetries: 3, retryDelay: 200 });
+      return;
+    } catch (error) {
+      lastError = error;
+      await delay(300);
+    }
+  }
+
+  if (lastError) {
+    throw lastError;
+  }
+}
+
 function getNpmCommand() {
   return process.platform === 'win32' ? 'npm.cmd' : 'npm';
 }
@@ -143,7 +161,7 @@ async function main() {
       console.log('Dashboard smoke test passed without diagnostic output.');
     }
   } finally {
-    await rm(tempRoot, { recursive: true, force: true });
+    await removeDirWithRetry(tempRoot);
   }
 }
 

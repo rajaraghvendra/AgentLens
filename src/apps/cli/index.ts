@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { existsSync, writeFileSync } from 'fs';
+import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'fs';
 import { spawn } from 'child_process';
+import { createHash } from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { CoreEngine } from '../../core/engine.js';
@@ -11,6 +12,7 @@ import { formatCurrency, formatSeverityBadge, colorize } from './formatters.js';
 import type { ProviderFilter } from '../../providers/index.js';
 import { getBudget, setBudget, resetBudget } from '../../core/budget.js';
 import { notify } from '../../core/notifier.js';
+import { getCacheDir } from '../../utils/paths.js';
 
 interface CLIOptions {
   period?: string;
@@ -51,6 +53,12 @@ function getPackageRoot(): string {
   return path.resolve(cliDir, '../../..');
 }
 
+function getPackageVersion(): string {
+  const packageJsonPath = path.join(getPackageRoot(), 'package.json');
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as { version?: string };
+  return packageJson.version || '0.0.0';
+}
+
 function getDashboardAppDir(): string {
   return path.join(getPackageRoot(), 'src', 'apps', 'web');
 }
@@ -68,12 +76,81 @@ function getTuiSourcePath(): string {
   return path.join(getPackageRoot(), 'src', 'apps', 'tui', 'index.ts');
 }
 
+function isInstalledUnderNodeModules(targetPath: string): boolean {
+  return targetPath.split(path.sep).includes('node_modules');
+}
+
+function copyDashboardRuntime(sourceRoot: string, targetRoot: string): void {
+  rmSync(targetRoot, { recursive: true, force: true });
+  mkdirSync(path.join(targetRoot, 'src', 'apps'), { recursive: true });
+
+  cpSync(path.join(sourceRoot, 'dist'), path.join(targetRoot, 'dist'), { recursive: true });
+  cpSync(path.join(sourceRoot, 'src', 'apps', 'web'), path.join(targetRoot, 'src', 'apps', 'web'), {
+    recursive: true,
+    filter: (sourcePath) => {
+      const relativePath = path.relative(path.join(sourceRoot, 'src', 'apps', 'web'), sourcePath);
+      if (!relativePath || relativePath === '') {
+        return true;
+      }
+
+      const segments = relativePath.split(path.sep);
+      return !segments.includes('node_modules') && !segments.includes('.agentlens-next');
+    },
+  });
+}
+
+function linkDashboardDependencies(sourceRoot: string, targetRoot: string): void {
+  const sourceNodeModules = path.join(sourceRoot, 'node_modules');
+  const targetNodeModules = path.join(targetRoot, 'node_modules');
+  const symlinkType = process.platform === 'win32' ? 'junction' : 'dir';
+
+  if (existsSync(targetNodeModules)) {
+    const stats = lstatSync(targetNodeModules);
+    if (stats.isSymbolicLink() || stats.isDirectory()) {
+      rmSync(targetNodeModules, { recursive: true, force: true });
+    }
+  }
+
+  symlinkSync(sourceNodeModules, targetNodeModules, symlinkType);
+}
+
+function getPackageRootHash(): string {
+  return createHash('sha256').update(getPackageRoot()).digest('hex').slice(0, 12);
+}
+
+function getDashboardRuntimeRoot(): string {
+  const runtimeKey = `${getPackageVersion()}-${getPackageRootHash()}`;
+  const cacheRoot = process.env['AGENTLENS_CACHE_DIR'] || getCacheDir('agentlens');
+  return path.join(cacheRoot, 'dashboard-runtime', runtimeKey);
+}
+
+function ensureDashboardRuntimeAppDir(): string {
+  const packageRoot = getPackageRoot();
+
+  if (!isInstalledUnderNodeModules(packageRoot)) {
+    return getDashboardAppDir();
+  }
+
+  const runtimeRoot = getDashboardRuntimeRoot();
+  const runtimeAppDir = path.join(runtimeRoot, 'src', 'apps', 'web');
+  const sourceMarker = path.join(runtimeRoot, '.source-root');
+  const currentMarker = existsSync(sourceMarker) ? readFileSync(sourceMarker, 'utf8').trim() : '';
+
+  if (!existsSync(runtimeAppDir) || currentMarker !== packageRoot) {
+    copyDashboardRuntime(packageRoot, runtimeRoot);
+    linkDashboardDependencies(packageRoot, runtimeRoot);
+    writeFileSync(sourceMarker, packageRoot, 'utf8');
+  }
+
+  return runtimeAppDir;
+}
+
 const program = new Command();
 
 program
   .name('agentlens')
   .description('Local-first AI developer analytics CLI')
-  .version('0.1.0');
+  .version(getPackageVersion());
 
 program
   .command('tui')
@@ -100,7 +177,7 @@ program
   .option('-p, --port <port>', 'Port to run on', '3000')
   .action((options) => {
     const port = options.port || '3000';
-    const dashboardDir = getDashboardAppDir();
+    const dashboardDir = ensureDashboardRuntimeAppDir();
     const nextBin = getDashboardBinPath();
 
     console.log(colorize('Starting AgentLens dashboard on http://localhost:' + port + '...', 'cyan'));
