@@ -4,9 +4,21 @@ import { tmpdir } from 'os';
 import { spawn } from 'child_process';
 import { setTimeout as delay } from 'timers/promises';
 
+function normalizeCommand(command, args) {
+  if (process.platform === 'win32' && command.toLowerCase().endsWith('.cmd')) {
+    return {
+      command: 'cmd.exe',
+      args: ['/d', '/s', '/c', command, ...args],
+    };
+  }
+
+  return { command, args };
+}
+
 function run(command, args, options = {}) {
   return new Promise((resolveRun, rejectRun) => {
-    const child = spawn(command, args, {
+    const normalized = normalizeCommand(command, args);
+    const child = spawn(normalized.command, normalized.args, {
       stdio: ['ignore', 'pipe', 'pipe'],
       ...options,
     });
@@ -29,7 +41,7 @@ function run(command, args, options = {}) {
         return;
       }
 
-      rejectRun(new Error(`${command} ${args.join(' ')} failed with code ${code}\n${stdout}\n${stderr}`));
+      rejectRun(new Error(`${normalized.command} ${normalized.args.join(' ')} failed with code ${code}\n${stdout}\n${stderr}`));
     });
   });
 }
@@ -89,7 +101,8 @@ async function main() {
     await run(cli.command, [...cli.args, 'tui', '--help']);
 
     const port = process.env['AGENTLENS_SMOKE_PORT'] || '3123';
-    const dashboard = spawn(cli.command, [...cli.args, 'dashboard', '--port', port], {
+    const dashboardCommand = normalizeCommand(cli.command, [...cli.args, 'dashboard', '--port', port]);
+    const dashboard = spawn(dashboardCommand.command, dashboardCommand.args, {
       stdio: ['ignore', 'pipe', 'pipe'],
       env: {
         ...process.env,
@@ -98,16 +111,24 @@ async function main() {
     });
 
     let dashboardOutput = '';
+    let dashboardError = null;
     dashboard.stdout?.on('data', (chunk) => {
       dashboardOutput += chunk.toString();
     });
     dashboard.stderr?.on('data', (chunk) => {
       dashboardOutput += chunk.toString();
     });
+    dashboard.on('error', (error) => {
+      dashboardError = error;
+    });
 
     try {
       await waitForHttp(`http://127.0.0.1:${port}/api/status`);
     } finally {
+      if (dashboardError) {
+        throw dashboardError;
+      }
+
       dashboard.kill('SIGTERM');
       await new Promise((resolveClose) => {
         dashboard.once('close', () => resolveClose(undefined));
