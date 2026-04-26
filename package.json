@@ -5,8 +5,7 @@
   "type": "module",
   "main": "dist/core/engine.js",
   "bin": {
-    "agentlens": "./dist/apps/cli/index.js",
-    "agentlens-tui": "./dist/apps/tui/index.js"
+    "agentlens": "./dist/apps/cli/index.js"
   },
   "repository": {
     "type": "git",
@@ -33,7 +32,7 @@
     "dev": "node --import tsx src/apps/cli/index.ts",
     "tui": "node --import tsx src/apps/tui/index.ts",
     "build": "tsc",
-    "build:all": "tsc && cd src/apps/web && npm run build",
+    "build:all": "npm run build && cd src/apps/web && npm run build",
     "prepublishOnly": "npm run build:all",
     "test": "vitest run",
     "test:watch": "vitest",
