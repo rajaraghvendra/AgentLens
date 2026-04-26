@@ -108,12 +108,8 @@ jobs:
       - name: Install root dependencies
         run: npm ci
 
-      - name: Install web dependencies
-        working-directory: src/apps/web
-        run: npm install
-
       - name: Build publishable package
-        run: npm run build:all
+        run: npm run build
 
       - name: Pack npm tarball
         run: |
