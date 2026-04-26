@@ -3,6 +3,8 @@
 import { Command } from 'commander';
 import { writeFileSync } from 'fs';
 import { spawn } from 'child_process';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { CoreEngine } from '../../core/engine.js';
 import { getAllProviders } from '../../providers/index.js';
 import { formatCurrency, formatSeverityBadge, colorize } from './formatters.js';
@@ -44,6 +46,11 @@ function getFilters(options: CLIOptions) {
   };
 }
 
+function getDashboardServerPath(): string {
+  const cliDir = path.dirname(fileURLToPath(import.meta.url));
+  return path.resolve(cliDir, '../dashboard/src/apps/web/server.js');
+}
+
 const program = new Command();
 
 program
@@ -62,17 +69,28 @@ program
   });
 
 program
-  .command('web')
-  .description('Start the web dashboard (run: npm run dashboard)')
+  .command('dashboard')
+  .alias('web')
+  .description('Start the packaged web dashboard server')
   .option('-p, --port <port>', 'Port to run on', '3000')
   .action((options) => {
     const port = options.port || '3000';
-    console.log(colorize('Starting AgentLens web dashboard on port ' + port + '...', 'cyan'));
-    
-    spawn('npx', ['next', 'dev', '-p', port], {
-      cwd: './src/apps/web',
+    const serverPath = getDashboardServerPath();
+    console.log(colorize('Starting AgentLens dashboard on http://localhost:' + port + '...', 'cyan'));
+
+    const child = spawn(process.execPath, [serverPath], {
       stdio: 'inherit',
-      shell: true
+      env: {
+        ...process.env,
+        PORT: port,
+        HOSTNAME: process.env['HOSTNAME'] || '127.0.0.1',
+      },
+    });
+
+    child.on('error', (error) => {
+      console.error(colorize(`Failed to start packaged dashboard: ${error.message}`, 'red'));
+      console.error(colorize('Reinstall the package or run `npm run build:all` from a source checkout.', 'yellow'));
+      process.exit(1);
     });
   });
 

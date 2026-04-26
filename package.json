@@ -4,6 +4,18 @@
   "description": "Local-first AI developer analytics — parse, classify, cost-track, and optimize your AI coding sessions.",
   "type": "module",
   "main": "dist/core/engine.js",
+  "files": [
+    "dist/adapters",
+    "dist/apps/cli",
+    "dist/apps/dashboard",
+    "dist/config",
+    "dist/core",
+    "dist/providers",
+    "dist/types",
+    "dist/utils",
+    "LICENSE",
+    "README.md"
+  ],
   "bin": {
     "agentlens": "./dist/apps/cli/index.js"
   },
@@ -32,7 +44,7 @@
     "dev": "node --import tsx src/apps/cli/index.ts",
     "tui": "node --import tsx src/apps/tui/index.ts",
     "build": "tsc",
-    "build:all": "npm run build && cd src/apps/web && npm run build",
+    "build:all": "npm run build && cd src/apps/web && npm run build && cd ../../.. && node scripts/package-dashboard.mjs",
     "prepublishOnly": "npm run build:all",
     "test": "vitest run",
     "test:watch": "vitest",

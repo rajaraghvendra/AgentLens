@@ -39,6 +39,8 @@ AgentLens parses, classifies, and tracks your AI coding sessions directly from y
 npm install -g @rajaraghvendra/agentlens
 ```
 
+This installs the `agentlens` CLI.
+
 ### Or run without installing
 ```bash
 npx @rajaraghvendra/agentlens <command>
@@ -60,15 +62,28 @@ agentlens report -p today # Today only
 agentlens status         # Quick status
 agentlens optimize       # Scan inefficiencies
 agentlens compare        # Compare models
-agentlens tui           # Terminal UI
+agentlens dashboard      # Start the packaged web dashboard
+agentlens tui            # Terminal UI
 ```
 
 ## Web Dashboard
 
+From a global install:
+
 ```bash
-npm run dashboard
-# Open http://localhost:3000
+agentlens dashboard
 ```
+
+Then open `http://localhost:3000`.
+
+If you installed with `npm install -g`, use:
+- `agentlens dashboard`
+- `agentlens report`
+- `agentlens status`
+- `agentlens optimize`
+- `agentlens compare`
+
+The `web` command is kept as an alias for `dashboard`.
 
 ## VS Code Extension
 
