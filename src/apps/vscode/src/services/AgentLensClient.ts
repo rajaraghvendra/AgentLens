@@ -132,7 +132,7 @@ export class AgentLensClient {
               nodePath,
               [cliAbsolutePath, "status", "--format", "json"],
               { timeout: 10000 },
-              (retryError, retryStdout) => {
+              (retryError: Error | null, retryStdout: string) => {
                 if (retryError) {
                   this.outputChannel.appendLine(`Error: ${retryError.message}`);
                   resolve(null);
