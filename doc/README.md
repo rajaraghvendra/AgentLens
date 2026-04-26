@@ -205,7 +205,7 @@ Query parameters:
 ## VS Code Extension
 
 ### Installation
-Install by dragging `agentlens-0.1.0.vsix` into VS Code Extensions panel or double-click the file.
+Install by dragging the packaged `agentlens-<version>.vsix` into the VS Code Extensions panel or by double-clicking the file.
 
 ### Prerequisites
 The VS Code extension requires the AgentLens CLI to fetch data. You have two options:
@@ -362,7 +362,7 @@ Ensure your `package.json` has the correct details:
 ```json
 {
   "name": "agentlens",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Local-first AI developer analytics",
   "main": "dist/apps/cli/index.js",
   "bin": {

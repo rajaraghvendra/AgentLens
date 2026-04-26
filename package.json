@@ -1,6 +1,6 @@
 {
   "name": "@rajaraghvendra/agentlens",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Local-first AI developer analytics — parse, classify, cost-track, and optimize your AI coding sessions.",
   "type": "module",
   "main": "dist/core/engine.js",
@@ -49,10 +49,11 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
+    "sync:version": "node scripts/sync-versions.mjs",
     "dev": "node --import tsx src/apps/cli/index.ts",
     "tui": "node --import tsx src/apps/tui/index.ts",
-    "build": "tsc",
-    "build:all": "npm run build && cd src/apps/web && npm run build",
+    "build": "npm run sync:version && tsc",
+    "build:all": "npm run sync:version && tsc && cd src/apps/web && npm run build",
     "prepublishOnly": "npm run build:all",
     "test": "vitest run",
     "test:watch": "vitest",

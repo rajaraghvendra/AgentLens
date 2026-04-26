@@ -125,7 +125,7 @@ jobs:
 
       - name: Create GitHub release with VSIX
         run: |
-          VERSION="$(node -p "require('./src/apps/vscode/package.json').version")"
+          VERSION="$(cat VERSION)"
           TAG="vsix-v${VERSION}-${GITHUB_RUN_NUMBER}"
           gh release create "$TAG" src/apps/vscode/*.vsix \
             --title "AgentLens VSIX ${VERSION} (${GITHUB_RUN_NUMBER})" \
