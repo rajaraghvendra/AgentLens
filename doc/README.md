@@ -292,7 +292,7 @@ agentlens tui
 | Workflow | Trigger | Description |
 |----------|---------|-------------|
 | **CI** | Push to `main` / PR | Runs build, test, lint automatically |
-| **CD** | Manual dispatch | Builds CLI, web, and VS Code extension, uploads `.vsix`, and optionally publishes npm / Marketplace artifacts |
+| **CD** | Manual dispatch | Builds CLI, web, and VS Code extension, uploads `.vsix`, and optionally publishes npm / creates a GitHub Release with the `.vsix` attached |
 
 ### Running CD Manually
 
@@ -300,7 +300,7 @@ agentlens tui
 2. Click **Run workflow**
 3. Select options:
    - `publish_npm`: Publish `@rajaraghvendra/agentlens` to [npmjs.com](https://www.npmjs.com/package/@rajaraghvendra/agentlens)
-   - `publish_marketplace`: Publish to VS Code Marketplace
+   - `publish_vsix_release`: Create a GitHub Release and attach the packaged `.vsix`
 4. Click **Run workflow**
 
 If both publish toggles are left unchecked, the workflow still builds everything and uploads the packaged `.vsix` as a workflow artifact.
@@ -308,7 +308,6 @@ If both publish toggles are left unchecked, the workflow still builds everything
 ### Required GitHub Secrets
 
 - `NPM_TOKEN`: npm automation token with publish access to `@rajaraghvendra/agentlens`
-- `VSCE_PAT`: Visual Studio Marketplace personal access token for `vsce publish`
 
 ### Running CI Locally
 ```bash
@@ -356,11 +355,30 @@ npm publish
 Published package:
 - [`@rajaraghvendra/agentlens` on npmjs.com](https://www.npmjs.com/package/@rajaraghvendra/agentlens)
 
-### Publish to VS Code Marketplace
+### Package VS Code Extension
 ```bash
 cd src/apps/vscode
-npx vsce publish
+npm run package
 ```
+
+The packaged file will be created as:
+- `src/apps/vscode/agentlens-<version>.vsix`
+
+### Release VSIX on GitHub
+
+Use the `CD (Manual)` workflow and enable:
+- `publish_vsix_release = true`
+
+That workflow will create a GitHub Release and attach the packaged `.vsix`.
+
+### Install in VS Code
+
+1. Download the `.vsix` file from the GitHub Release
+2. Open VS Code
+3. Open the Extensions view
+4. Click the `...` menu in the top-right of the Extensions panel
+5. Choose `Install from VSIX...`
+6. Select the downloaded `.vsix`
 
 ---
 

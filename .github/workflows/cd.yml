@@ -8,10 +8,10 @@ on:
         required: false
         default: false
         type: boolean
-      publish_marketplace:
-        description: 'Publish the VS Code extension to the VS Code Marketplace'
+      publish_vsix_release:
+        description: 'Create a GitHub Release with the packaged VSIX attached'
         required: false
-        default: false
+        default: true
         type: boolean
 
 jobs:
@@ -88,12 +88,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  publish-marketplace:
+  publish-vsix-release:
     needs: build
-    if: ${{ inputs.publish_marketplace }}
+    if: ${{ inputs.publish_vsix_release }}
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -107,8 +107,16 @@ jobs:
         working-directory: src/apps/vscode
         run: npm ci
 
-      - name: Publish extension to VS Code Marketplace
+      - name: Package VS Code extension
         working-directory: src/apps/vscode
-        run: npm run publish
+        run: npm run package
+
+      - name: Create GitHub release with VSIX
+        run: |
+          VERSION="$(node -p "require('./src/apps/vscode/package.json').version")"
+          TAG="vsix-v${VERSION}-${GITHUB_RUN_NUMBER}"
+          gh release create "$TAG" src/apps/vscode/*.vsix \
+            --title "AgentLens VSIX ${VERSION} (${GITHUB_RUN_NUMBER})" \
+            --notes "Packaged VS Code extension for manual installation via Install from VSIX..."
         env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

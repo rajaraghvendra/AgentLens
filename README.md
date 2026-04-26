@@ -72,13 +72,13 @@ npm run dashboard
 
 ## VS Code Extension
 
-Install from [VS Code Marketplace](https://marketplace.visualstudio.com) or use the `.vsix` file from releases.
+Install from the packaged `.vsix` file attached to GitHub Releases.
 
 ## Publishing
 
 - npm package: [`@rajaraghvendra/agentlens`](https://www.npmjs.com/package/@rajaraghvendra/agentlens)
-- VS Code extension: publish from [`src/apps/vscode`](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/src/apps/vscode) with `npm run publish`
-- GitHub Actions CD: [`.github/workflows/cd.yml`](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/.github/workflows/cd.yml) builds all artifacts, uploads the `.vsix`, and optionally publishes to npmjs and the VS Code Marketplace
+- VS Code extension: package from [`src/apps/vscode`](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/src/apps/vscode) with `npm run package`
+- GitHub Actions CD: [`.github/workflows/cd.yml`](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/.github/workflows/cd.yml) builds all artifacts, uploads the `.vsix` artifact, and can create a GitHub Release with the `.vsix` attached
 
 ## License
 
