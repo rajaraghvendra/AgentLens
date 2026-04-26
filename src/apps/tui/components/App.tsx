@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Box, Text, useInput, useApp, useWindowSize } from 'ink';
-import { CoreEngine } from '../../../core/engine.js';
-import { getAllProviders } from '../../../providers/index.js';
+import { CoreEngine } from '../../../dist/core/engine.js';
+import { getAllProviders } from '../../../dist/providers/index.js';
 
 type Period = 'today' | 'week' | '30days' | 'month' | 'all';
 const PERIODS: Period[] = ['today', 'week', '30days', 'month', 'all'];
