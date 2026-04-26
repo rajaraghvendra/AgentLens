@@ -12,12 +12,6 @@ const nextConfig = {
   },
   distDir: process.env.AGENTLENS_WEB_DIST_DIR || '.agentlens-next',
   outputFileTracingRoot: repoRoot,
-  turbopack: {
-    root: repoRoot,
-    resolveAlias: {
-      tailwindcss: path.resolve(configDir, 'node_modules/tailwindcss'),
-    },
-  },
 };
 
 export default nextConfig;
