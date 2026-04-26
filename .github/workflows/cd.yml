@@ -4,21 +4,21 @@ on:
   workflow_dispatch:
     inputs:
       publish_npm:
-        description: 'Publish to npmjs.com'
+        description: 'Publish the CLI package to npmjs.com'
         required: false
-        default: 'false'
+        default: false
         type: boolean
       publish_marketplace:
-        description: 'Publish to VS Code Marketplace'
+        description: 'Publish the VS Code extension to the VS Code Marketplace'
         required: false
-        default: 'false'
+        default: false
         type: boolean
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -28,73 +28,68 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci
 
-      - name: Build TypeScript
+      - name: Build CLI
         run: npm run build
 
-      - name: Build Web Dashboard
-        run: cd src/apps/web && npm ci && npm run build
+      - name: Run tests
+        run: npm run test
+
+      - name: Build web dashboard
+        working-directory: src/apps/web
+        run: |
+          npm ci
+          npm run build
 
       - name: Build VS Code extension
-        run: cd src/apps/vscode && npm ci && npm run build
-
-      - name: Package VS Code extension
-        run: npm run package
         working-directory: src/apps/vscode
-
-      - name: Create Release
-        if: github.event.inputs.publish_npm != 'true'
         run: |
-          gh release create "v${{ github.run_number }}" \
-            --title "AgentLens v0.1.0 (${{ github.run_number }})" \
-            --notes "Build ${{ github.run_number }} - Manual CD triggered" \
-            --draft \
-            src/apps/vscode/agentlens-0.1.0.vsix
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          npm ci
+          npm run package
 
-      - name: Upload release asset
-        if: github.event.inputs.publish_npm != 'true'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: src/apps/vscode/agentlens-0.1.0.vsix
-          asset_name: agentlens-0.1.0.vsix
-          asset_content_type: application/octet-stream
+          name: vscode-extension-vsix
+          path: src/apps/vscode/*.vsix
+          if-no-files-found: error
 
   publish-npm:
     needs: build
-    if: github.event.inputs.publish_npm == 'true'
+    if: ${{ inputs.publish_npm }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js for npm publish
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          registry: 'https://registry.npmjs.org'
+          registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build CLI package
         run: npm run build
 
-      - name: Publish to npm
-        run: npm publish --access public
+      - name: Publish package to npmjs
+        run: npm publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-marketplace:
     needs: build
-    if: github.event.inputs.publish_marketplace == 'true'
+    if: ${{ inputs.publish_marketplace }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -104,11 +99,12 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install VSCE
-        run: npm install -g @vscode/vsce
+      - name: Install VS Code extension dependencies
+        working-directory: src/apps/vscode
+        run: npm ci
 
-      - name: Publish to Marketplace
-        run: vsce publish
+      - name: Publish extension to VS Code Marketplace
+        working-directory: src/apps/vscode
+        run: npm run publish
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        working-directory: src/apps/vscode

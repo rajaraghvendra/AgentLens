@@ -38,11 +38,15 @@ interface CodexEntry {
   };
 }
 
+function estimateTokensFromContent(content: string): number {
+  return Math.ceil(content.length / 4);
+}
+
 export class CodexProvider implements IProvider {
   readonly id = 'codex';
   readonly name = 'Codex CLI';
 
-  private sessionsDir = join(config.codexDir, 'sessions');
+  private sessionsDir = config.codexDir;
 
   isAvailable(): boolean {
     try {
@@ -127,6 +131,7 @@ export class CodexProvider implements IProvider {
         const p = raw.payload;
         
         if (p.type !== 'message') continue;
+        const role = p.role === 'developer' ? 'assistant' : (p.role === 'user' ? 'user' : 'assistant');
         
         const content = p.content
           ?.filter((c): c is { type: string; text: string } => c && typeof c === 'object' && 'text' in c)
@@ -146,13 +151,13 @@ export class CodexProvider implements IProvider {
 
         const msg: Message = {
           id: p.id || `codex-${messages.length}`,
-          role: p.role === 'developer' ? 'assistant' : (p.role === 'user' ? 'user' : 'assistant'),
+          role,
           content: content,
           timestamp: raw.timestamp ? new Date(raw.timestamp).getTime() : Date.now(),
           model: p.model || 'gpt-5.4',
           tokens: {
-            input: inputTokens > 0 ? inputTokens : Math.ceil(content.length / 4),
-            output: outputTokens > 0 ? outputTokens : 0,
+            input: inputTokens > 0 ? inputTokens : (role === 'user' ? estimateTokensFromContent(content) : 0),
+            output: outputTokens > 0 ? outputTokens : (role === 'assistant' ? estimateTokensFromContent(content) : 0),
             cacheRead: p.usage?.cache_read_tokens || 0,
             cacheWrite: p.usage?.cache_write_tokens || 0,
           },

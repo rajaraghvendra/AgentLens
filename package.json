@@ -25,6 +25,10 @@
   ],
   "author": "rajaraghvendra",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "dev": "node --import tsx src/apps/cli/index.ts",
     "tui": "node --import tsx src/apps/tui/index.ts",

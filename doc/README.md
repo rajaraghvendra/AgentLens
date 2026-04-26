@@ -254,7 +254,7 @@ Then configure the path in VS Code settings:
 ```bash
 cd src/apps/vscode
 npm run build
-npx vsce package
+npm run package
 ```
 
 ---
@@ -292,19 +292,23 @@ agentlens tui
 | Workflow | Trigger | Description |
 |----------|---------|-------------|
 | **CI** | Push to `main` / PR | Runs build, test, lint automatically |
-| **CD** | Manual dispatch | Build + optional npm/Marketplace publish |
+| **CD** | Manual dispatch | Builds CLI, web, and VS Code extension, uploads `.vsix`, and optionally publishes npm / Marketplace artifacts |
 
 ### Running CD Manually
 
 1. Go to [Actions → CD (Manual)](https://github.com/rajaraghvendra/AgentLens/actions/workflows/cd.yml)
 2. Click **Run workflow**
 3. Select options:
-   - `publish_npm`: Publish to npmjs.com
+   - `publish_npm`: Publish `@rajaraghvendra/agentlens` to [npmjs.com](https://www.npmjs.com/package/@rajaraghvendra/agentlens)
    - `publish_marketplace`: Publish to VS Code Marketplace
 4. Click **Run workflow**
 
-To build without publishing:
-- Leave both checkboxes unchecked → creates a draft release with `.vsix`
+If both publish toggles are left unchecked, the workflow still builds everything and uploads the packaged `.vsix` as a workflow artifact.
+
+### Required GitHub Secrets
+
+- `NPM_TOKEN`: npm automation token with publish access to `@rajaraghvendra/agentlens`
+- `VSCE_PAT`: Visual Studio Marketplace personal access token for `vsce publish`
 
 ### Running CI Locally
 ```bash
@@ -348,6 +352,9 @@ Ensure your `package.json` has the correct details:
 npm login
 npm publish
 ```
+
+Published package:
+- [`@rajaraghvendra/agentlens` on npmjs.com](https://www.npmjs.com/package/@rajaraghvendra/agentlens)
 
 ### Publish to VS Code Marketplace
 ```bash

@@ -34,6 +34,63 @@ function filterSessionsByProject(sessions: Session[], projects: string[], exclud
 }
 
 export class CoreEngine {
+  static buildExportData(sessions: Session[], metrics: Metrics, periodDays: number): ExportData {
+    const dailyMap = new Map<string, { costUSD: number; sessions: number; tokens: number }>();
+    const projectMap = new Map<string, { cost: number; sessions: number }>();
+
+    for (const session of sessions) {
+      const day = new Date(session.timestamp).toISOString().split('T')[0];
+      if (!dailyMap.has(day)) {
+        dailyMap.set(day, { costUSD: 0, sessions: 0, tokens: 0 });
+      }
+      const dayData = dailyMap.get(day)!;
+      dayData.sessions++;
+
+      const proj = projectMap.get(session.project) || { cost: 0, sessions: 0 };
+      proj.sessions++;
+
+      for (const msg of session.messages) {
+        if (msg.tokens) {
+          const msgTokens = msg.tokens.input + msg.tokens.output;
+          dayData.tokens += msgTokens;
+
+          if (msg.model) {
+            const { cost } = PricingEngine.calculateMessageCost(msg.model, msg.tokens);
+            dayData.costUSD += cost;
+            proj.cost += cost;
+          }
+        }
+      }
+      projectMap.set(session.project, proj);
+    }
+
+    const byDay = Array.from(dailyMap.entries())
+      .map(([date, data]) => ({ date, costUSD: data.costUSD, sessions: data.sessions, tokens: data.tokens }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    const byProject = Array.from(projectMap.entries())
+      .map(([name, data]) => ({ name, cost: data.cost, sessions: data.sessions }))
+      .sort((a, b) => b.cost - a.cost);
+
+    const activityData = Object.values(metrics.byActivity).map(a => ({
+      name: a.category,
+      cost: a.costUSD,
+      percentage: a.percentage,
+      oneShotRate: a.oneShotRate || 0,
+    }));
+
+    return {
+      period: `${periodDays} days`,
+      totalCost: metrics.overview.totalCostUSD,
+      totalSessions: metrics.overview.sessionsCount,
+      totalTokens: metrics.overview.totalTokens,
+      byDay,
+      byProject,
+      byModel: [],
+      byActivity: activityData,
+    };
+  }
+
   /**
    * Run purely the parsing and metrics calculation phase.
    */
@@ -113,57 +170,6 @@ export class CoreEngine {
     filters?: FilterOptions
   ): Promise<ExportData> {
     const { sessions, metrics } = await this.run(periodDays, 'USD', filters);
-
-    const dailyMap = new Map<string, { costUSD: number; sessions: number; tokens: number }>();
-    const projectMap = new Map<string, { cost: number; sessions: number }>();
-
-    for (const session of sessions) {
-      const day = new Date(session.timestamp).toISOString().split('T')[0];
-      if (!dailyMap.has(day)) {
-        dailyMap.set(day, { costUSD: 0, sessions: 0, tokens: 0 });
-      }
-      const dayData = dailyMap.get(day)!;
-      dayData.sessions++;
-
-      const proj = projectMap.get(session.project) || { cost: 0, sessions: 0 };
-      proj.sessions++;
-
-      for (const msg of session.messages) {
-        if (msg.tokens && msg.model) {
-          const { cost } = PricingEngine.calculateMessageCost(msg.model, msg.tokens);
-          const msgTokens = msg.tokens.input + msg.tokens.output;
-          dayData.costUSD += cost;
-          dayData.tokens += msgTokens;
-          proj.cost += cost;
-        }
-      }
-      projectMap.set(session.project, proj);
-    }
-
-    const byDay = Array.from(dailyMap.entries())
-      .map(([date, data]) => ({ date, costUSD: data.costUSD, sessions: data.sessions, tokens: data.tokens }))
-      .sort((a, b) => a.date.localeCompare(b.date));
-
-    const byProject = Array.from(projectMap.entries())
-      .map(([name, data]) => ({ name, cost: data.cost, sessions: data.sessions }))
-      .sort((a, b) => b.cost - a.cost);
-
-    const activityData = Object.values(metrics.byActivity).map(a => ({
-      name: a.category,
-      cost: a.costUSD,
-      percentage: a.percentage,
-      oneShotRate: a.oneShotRate || 0,
-    }));
-
-    return {
-      period: `${periodDays} days`,
-      totalCost: metrics.overview.totalCostUSD,
-      totalSessions: metrics.overview.sessionsCount,
-      totalTokens: metrics.overview.totalTokens,
-      byDay,
-      byProject,
-      byModel: [],
-      byActivity: activityData,
-    };
+    return this.buildExportData(sessions, metrics, periodDays);
   }
 }

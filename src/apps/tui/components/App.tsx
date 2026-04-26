@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Box, Text, useInput, useApp, useWindowSize } from 'ink';
+import { CoreEngine } from '../../../core/engine.js';
+import { getAllProviders } from '../../../providers/index.js';
 
 type Period = 'today' | 'week' | '30days' | 'month' | 'all';
 const PERIODS: Period[] = ['today', 'week', '30days', 'month', 'all'];
@@ -370,13 +372,36 @@ export const App: React.FC = () => {
     setLoading(true);
     try {
       const days = periodToDays(p);
-      const url = prov && prov !== 'all'
-        ? `http://localhost:3000/api/report?period=${days}&provider=${prov}`
-        : `http://localhost:3000/api/report?period=${days}`;
-      const res = await fetch(url);
-      const json = await res.json();
-      setData(json);
-      providersListRef.current = json.providers ?? [];
+      const filters = prov && prov !== 'all' ? { provider: prov as any } : undefined;
+      const result = await CoreEngine.runFull(days, 'USD', filters);
+      const exportData = CoreEngine.buildExportData(result.sessions, result.metrics, days);
+
+      const allProviders = getAllProviders().map((provider) => ({
+        id: provider.id,
+        name: provider.name,
+        available: provider.isAvailable(),
+        sessionCount: result.providers.find((item) => item.id === provider.id)?.sessionCount ?? 0,
+      }));
+
+      const selectableProviders = allProviders.filter((provider) => (provider.sessionCount ?? 0) > 0);
+      if (prov === 'all' || providersListRef.current.length === 0) {
+        providersListRef.current = selectableProviders;
+      } else {
+        const merged = new Map<string, any>();
+        for (const provider of providersListRef.current) merged.set(provider.id, provider);
+        for (const provider of selectableProviders) merged.set(provider.id, provider);
+        providersListRef.current = Array.from(merged.values());
+      }
+
+      setData({
+        metrics: result.metrics,
+        findings: result.findings,
+        insights: result.insights,
+        providers: allProviders,
+        daily: exportData.byDay ?? [],
+        projects: exportData.byProject ?? [],
+        models: Object.values(result.metrics?.byModel ?? {}),
+      });
     } catch {
       setData(null);
     } finally {
@@ -396,7 +421,7 @@ export const App: React.FC = () => {
   }, [currentProvider, fetchData]);
 
   const switchProvider = useCallback(() => {
-    const provs = providersListRef.current;
+    const provs = [{ id: 'all' }, ...providersListRef.current];
     const nextIdx = (providerIndexRef.current + 1) % Math.max(provs.length, 1);
     providerIndexRef.current = nextIdx;
     const nextProv = provs[nextIdx]?.id ?? 'all';

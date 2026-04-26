@@ -97,6 +97,7 @@ export interface ModelPrice {
 export interface Metrics {
   overview: MetricsOverview;
   byModel: Record<string, ModelMetrics>;
+  byProvider: Record<string, ProviderMetrics>;
   byActivity: Partial<Record<ActivityCategory, ActivityMetrics>>;
   hourly: Record<string, { messages: number; tokens: number; costUSD: number }>;
 }
@@ -124,6 +125,17 @@ export interface ModelMetrics {
   messageCount: number;
   /** True when pricing was estimated from fallback rates */
   isEstimated?: boolean;
+}
+
+export interface ProviderMetrics {
+  provider: string;
+  totalTokens: number;
+  inputTokens: number;
+  outputTokens: number;
+  cacheReadTokens: number;
+  cacheWriteTokens: number;
+  costUSD: number;
+  messageCount: number;
 }
 
 export interface ActivityMetrics {

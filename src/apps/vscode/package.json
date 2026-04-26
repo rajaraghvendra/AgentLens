@@ -4,6 +4,15 @@
   "description": "Live AI token and cost tracking in your VS Code status bar",
   "version": "0.1.0",
   "publisher": "rajaraghvendra",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rajaraghvendra/AgentLens.git"
+  },
+  "homepage": "https://github.com/rajaraghvendra/AgentLens",
+  "bugs": {
+    "url": "https://github.com/rajaraghvendra/AgentLens/issues"
+  },
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -12,7 +21,10 @@
     "Developer Tools"
   ],
   "activationEvents": [
-    "*"
+    "onStartupFinished",
+    "onCommand:agentlens.openDashboard",
+    "onCommand:agentlens.showOutput",
+    "onCommand:agentlens.setBudget"
   ],
   "main": "./dist/extension.js",
   "contributes": {

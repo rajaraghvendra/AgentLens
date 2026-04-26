@@ -200,6 +200,14 @@ export class CursorProvider implements IProvider {
             cacheRead: Number(usage.cache_read_tokens ?? usage.cacheRead ?? 0),
             cacheWrite: Number(usage.cache_write_tokens ?? usage.cacheWrite ?? 0),
           };
+        } else if (content) {
+          const estimatedTokens = Math.ceil(content.length / 4);
+          msg.tokens = {
+            input: role === 'user' ? estimatedTokens : 0,
+            output: role === 'assistant' ? estimatedTokens : 0,
+            cacheRead: 0,
+            cacheWrite: 0,
+          };
         }
 
         messages.push(msg);
@@ -291,6 +299,14 @@ export class CursorProvider implements IProvider {
           output: (usage as any)?.output_tokens || (usage as any)?.output || 0,
           cacheRead: (usage as any)?.cache_read_tokens || 0,
           cacheWrite: (usage as any)?.cache_write_tokens || 0,
+        };
+      } else if (msg.content) {
+        const estimatedTokens = Math.ceil(msg.content.length / 4);
+        msg.tokens = {
+          input: msg.role === 'user' ? estimatedTokens : 0,
+          output: msg.role === 'assistant' ? estimatedTokens : 0,
+          cacheRead: 0,
+          cacheWrite: 0,
         };
       }
 

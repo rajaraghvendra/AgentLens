@@ -70,6 +70,7 @@ export async function computeMetrics(sessions: Session[]): Promise<Metrics> {
       cacheHitRate: 0,
     },
     byModel: {},
+    byProvider: {},
     byActivity: {},
     hourly,
   };
@@ -86,7 +87,9 @@ export async function computeMetrics(sessions: Session[]): Promise<Metrics> {
       const msg = session.messages[idx];
       if (msg.role === 'user') {
         lastUserMessage = msg.content;
-      } else if (msg.role === 'assistant') {
+      }
+
+      if (msg.role === 'assistant') {
         const tools = msg.tools || [];
         const category = classifyTurn(lastUserMessage, tools);
         msg.classification = category;
@@ -117,52 +120,84 @@ export async function computeMetrics(sessions: Session[]): Promise<Metrics> {
           }
         }
 
-        if (msg.tokens && msg.model) {
-          const t = msg.tokens;
-          const totalMsgTokens = t.input + t.output + t.cacheRead + t.cacheWrite;
-          
-          totalInput += t.input;
-          totalCacheRead += t.cacheRead;
+      }
 
-          const { cost, isEstimated } = PricingEngine.calculateMessageCost(msg.model, t);
+      if (!msg.tokens) continue;
 
-          metrics.overview.totalTokens += totalMsgTokens;
-          metrics.overview.totalCostUSD += cost;
-          activity.totalTokens += totalMsgTokens;
-          activity.costUSD += cost;
+      const t = msg.tokens;
+      const totalMsgTokens = t.input + t.output + t.cacheRead + t.cacheWrite;
+      totalInput += t.input;
+      totalCacheRead += t.cacheRead;
+      metrics.overview.totalTokens += totalMsgTokens;
 
-          if (!metrics.byModel[msg.model]) {
-            metrics.byModel[msg.model] = {
-              model: msg.model,
-              totalTokens: 0,
-              inputTokens: 0,
-              outputTokens: 0,
-              cacheReadTokens: 0,
-              cacheWriteTokens: 0,
-              costUSD: 0,
-              messageCount: 0,
-              isEstimated,
-            };
-          }
+      let cost = 0;
+      let isEstimated = false;
+      if (msg.model) {
+        const pricing = PricingEngine.calculateMessageCost(msg.model, t);
+        cost = pricing.cost;
+        isEstimated = pricing.isEstimated;
+        metrics.overview.totalCostUSD += cost;
+      }
 
-          const mod = metrics.byModel[msg.model];
-          mod.totalTokens += totalMsgTokens;
-          mod.inputTokens += t.input;
-          mod.outputTokens += t.output;
-          mod.cacheReadTokens += t.cacheRead;
-          mod.cacheWriteTokens += t.cacheWrite;
-          mod.costUSD += cost;
-          mod.messageCount++;
-          if (isEstimated) mod.isEstimated = true;
+      if (!metrics.byProvider[session.provider]) {
+        metrics.byProvider[session.provider] = {
+          provider: session.provider,
+          totalTokens: 0,
+          inputTokens: 0,
+          outputTokens: 0,
+          cacheReadTokens: 0,
+          cacheWriteTokens: 0,
+          costUSD: 0,
+          messageCount: 0,
+        };
+      }
 
-          // Aggregate by hour
-          const hour = new Date(msg.timestamp).getHours().toString();
-          if (metrics.hourly[hour]) {
-            metrics.hourly[hour].messages++;
-            metrics.hourly[hour].tokens += totalMsgTokens;
-            metrics.hourly[hour].costUSD += cost;
-          }
+      const providerMetrics = metrics.byProvider[session.provider];
+      providerMetrics.totalTokens += totalMsgTokens;
+      providerMetrics.inputTokens += t.input;
+      providerMetrics.outputTokens += t.output;
+      providerMetrics.cacheReadTokens += t.cacheRead;
+      providerMetrics.cacheWriteTokens += t.cacheWrite;
+      providerMetrics.costUSD += cost;
+      providerMetrics.messageCount++;
+
+      if (msg.role === 'assistant' && msg.classification) {
+        const activity = metrics.byActivity[msg.classification]!;
+        activity.totalTokens += totalMsgTokens;
+        activity.costUSD += cost;
+      }
+
+      if (msg.model) {
+        if (!metrics.byModel[msg.model]) {
+          metrics.byModel[msg.model] = {
+            model: msg.model,
+            totalTokens: 0,
+            inputTokens: 0,
+            outputTokens: 0,
+            cacheReadTokens: 0,
+            cacheWriteTokens: 0,
+            costUSD: 0,
+            messageCount: 0,
+            isEstimated,
+          };
         }
+
+        const mod = metrics.byModel[msg.model];
+        mod.totalTokens += totalMsgTokens;
+        mod.inputTokens += t.input;
+        mod.outputTokens += t.output;
+        mod.cacheReadTokens += t.cacheRead;
+        mod.cacheWriteTokens += t.cacheWrite;
+        mod.costUSD += cost;
+        mod.messageCount++;
+        if (isEstimated) mod.isEstimated = true;
+      }
+
+      const hour = new Date(msg.timestamp).getHours().toString();
+      if (metrics.hourly[hour]) {
+        metrics.hourly[hour].messages++;
+        metrics.hourly[hour].tokens += totalMsgTokens;
+        metrics.hourly[hour].costUSD += cost;
       }
     }
   }
