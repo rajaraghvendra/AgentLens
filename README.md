@@ -24,13 +24,15 @@ AgentLens parses, classifies, and tracks your AI coding sessions directly from y
 
 | Provider | Data Location |
 |----------|---------------|
-| Claude Code | `~/.claude/projects/` |
-| Claude Desktop | `~/Library/Application Support/Claude/` |
-| Codex | `~/.codex/sessions/` |
-| Cursor | `~/Library/Application Support/Cursor/User/globalStorage/` |
-| Opencode | `~/.local/share/opencode/` |
-| Pi | `~/.pi/agent/sessions/` |
-| GitHub Copilot | `~/.copilot/session-state/` |
+| Claude Code | Auto-discovered on macOS, Linux, and Windows |
+| Claude Desktop | Auto-discovered on macOS, Linux, and Windows |
+| Codex | Auto-discovered on macOS, Linux, and Windows |
+| Cursor | Auto-discovered on macOS, Linux, and Windows |
+| Opencode | Auto-discovered on macOS, Linux, and Windows |
+| Pi | Auto-discovered on macOS, Linux, and Windows |
+| GitHub Copilot | Auto-discovered on macOS, Linux, and Windows |
+
+AgentLens uses platform-specific local data directories under the hood, so the same CLI commands work across supported operating systems without changing flags.
 
 ## Installation
 
@@ -40,6 +42,30 @@ npm install -g @rajaraghvendra/agentlens
 ```
 
 This installs the `agentlens` CLI.
+
+If `agentlens` is not found after global install, your npm global bin directory is not on `PATH`.
+
+Check your npm global prefix:
+```bash
+npm prefix -g
+```
+
+If it prints `~/.npm-global`, add this to your shell profile:
+```bash
+export PATH="$HOME/.npm-global/bin:$PATH"
+```
+
+For `zsh` on macOS:
+```bash
+echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+Then verify:
+```bash
+which agentlens
+agentlens --help
+```
 
 ### Or run without installing
 ```bash
@@ -62,7 +88,7 @@ agentlens report -p today # Today only
 agentlens status         # Quick status
 agentlens optimize       # Scan inefficiencies
 agentlens compare        # Compare models
-agentlens dashboard      # Start the packaged web dashboard
+agentlens dashboard      # Start the web dashboard
 agentlens tui            # Terminal UI
 ```
 
@@ -75,6 +101,8 @@ agentlens dashboard
 ```
 
 Then open `http://localhost:3000`.
+
+The dashboard now runs from packaged web source plus the target machine's own installed runtime dependencies, so npm resolves the correct native binaries for Windows, Linux, or macOS at install time instead of shipping a host-built web server.
 
 If you installed with `npm install -g`, use:
 - `agentlens dashboard`

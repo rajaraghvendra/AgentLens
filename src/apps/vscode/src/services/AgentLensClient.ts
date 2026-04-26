@@ -14,6 +14,43 @@ export class AgentLensClient {
     this.outputChannel = vscode.window.createOutputChannel("AgentLens");
   }
 
+  private getWorkspaceCliPath(): string | null {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+      return null;
+    }
+
+    return path.join(workspaceFolders[0].uri.fsPath, "dist", "apps", "cli", "index.js");
+  }
+
+  private async pathExists(targetPath: string): Promise<boolean> {
+    try {
+      await vscode.workspace.fs.stat(vscode.Uri.file(targetPath));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private async resolveCLICommand(): Promise<{ command: string; args: string[] } | null> {
+    if (this.cliPath.trim()) {
+      if (path.isAbsolute(this.cliPath)) {
+        if (await this.pathExists(this.cliPath)) {
+          return { command: process.execPath, args: [this.cliPath] };
+        }
+      } else {
+        return { command: this.cliPath, args: [] };
+      }
+    }
+
+    const workspaceCliPath = this.getWorkspaceCliPath();
+    if (workspaceCliPath && await this.pathExists(workspaceCliPath)) {
+      return { command: process.execPath, args: [workspaceCliPath] };
+    }
+
+    return { command: "agentlens", args: [] };
+  }
+
   async getStatus(): Promise<LiveSessionStatus | null> {
     if (this.isExecuting) {
       return this.lastStatus;
@@ -38,36 +75,22 @@ export class AgentLensClient {
   }
 
   private async ensureCLI(): Promise<string | null> {
-    // Try workspace paths first
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    let cliPath: string;
-    
-    if (workspaceFolders && workspaceFolders.length > 0) {
-      const wsRoot = workspaceFolders[0].uri.fsPath;
-      cliPath = path.join(wsRoot, "dist", "apps", "cli", "index.js");
-      
-      // Check if CLI exists
-      try {
-        await vscode.workspace.fs.stat(vscode.Uri.file(cliPath));
-        return cliPath;
-      } catch {
-        // CLI not built, try to build
-        this.outputChannel.appendLine(`CLI not found at ${cliPath}, attempting to build...`);
+    if (this.cliPath.trim()) {
+      if (path.isAbsolute(this.cliPath) && await this.pathExists(this.cliPath)) {
+        return this.cliPath;
+      }
+
+      if (!path.isAbsolute(this.cliPath)) {
+        return this.cliPath;
       }
     }
-    
-    // Try home directory path
-    const homeDir = process.env.HOME || "";
-    cliPath = path.join(homeDir, "Documents", "Study", "Python", "LLM", "AgentLens", "dist", "apps", "cli", "index.js");
-    
-    try {
-      await vscode.workspace.fs.stat(vscode.Uri.file(cliPath));
-      return cliPath;
-    } catch {
-      // Not found
+
+    const workspaceCliPath = this.getWorkspaceCliPath();
+    if (workspaceCliPath && await this.pathExists(workspaceCliPath)) {
+      return workspaceCliPath;
     }
-    
-    // Prompt user to install
+
+    const workspaceFolders = vscode.workspace.workspaceFolders;
     const install = await vscode.window.showWarningMessage(
       "◊ AgentLens CLI not found. Would you like to install it?",
       "Install CLI"
@@ -77,12 +100,12 @@ export class AgentLensClient {
       // Open terminal and run install
       const terminal = vscode.window.createTerminal({
         name: "AgentLens Install",
-        cwd: workspaceFolders?.[0]?.uri.fsPath || homeDir
+        cwd: workspaceFolders?.[0]?.uri.fsPath
       });
       terminal.show();
-      terminal.sendText("cd AgentLens && npm install && npm run build");
+      terminal.sendText("npm install -g @rajaraghvendra/agentlens");
       
-      this.outputChannel.appendLine("Please run 'npm run build' in the AgentLens project folder");
+      this.outputChannel.appendLine("Install AgentLens globally or configure agentlens.cliPath in extension settings.");
       return null;
     }
     
@@ -91,23 +114,17 @@ export class AgentLensClient {
 
   private execCommand(): Promise<LiveSessionStatus | null> {
     return new Promise(async (resolve) => {
-      const nodePath = process.execPath;
-      let cliAbsolutePath: string;
-      
-      const workspaceFolders = vscode.workspace.workspaceFolders;
-      if (workspaceFolders && workspaceFolders.length > 0) {
-        const wsRoot = workspaceFolders[0].uri.fsPath;
-        cliAbsolutePath = path.join(wsRoot, "dist", "apps", "cli", "index.js");
-      } else {
-        const homeDir = process.env.HOME || "";
-        cliAbsolutePath = path.join(homeDir, "Documents", "Study", "Python", "LLM", "AgentLens", "dist", "apps", "cli", "index.js");
+      let cliCommand = await this.resolveCLICommand();
+      if (!cliCommand) {
+        resolve(null);
+        return;
       }
 
-      this.outputChannel.appendLine(`Executing: ${nodePath} ${cliAbsolutePath} status --format json`);
+      this.outputChannel.appendLine(`Executing: ${cliCommand.command} ${[...cliCommand.args, "status", "--format", "json"].join(" ")}`);
 
       execFile(
-        nodePath,
-        [cliAbsolutePath, "status", "--format", "json"],
+        cliCommand.command,
+        [...cliCommand.args, "status", "--format", "json"],
         { timeout: 10000 },
         async (error: Error | null, stdout: string, stderr: string) => {
           if (error) {
@@ -126,11 +143,12 @@ export class AgentLensClient {
               resolve(null);
               return;
             }
-            // Retry with new path
-            cliAbsolutePath = cliPath;
+            cliCommand = path.isAbsolute(cliPath)
+              ? { command: process.execPath, args: [cliPath] }
+              : { command: cliPath, args: [] };
             execFile(
-              nodePath,
-              [cliAbsolutePath, "status", "--format", "json"],
+              cliCommand.command,
+              [...cliCommand.args, "status", "--format", "json"],
               { timeout: 10000 },
               (retryError: Error | null, retryStdout: string) => {
                 if (retryError) {

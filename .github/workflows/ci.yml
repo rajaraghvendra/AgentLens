@@ -63,3 +63,40 @@ jobs:
 
       - name: TypeScript type check
         run: npm run lint
+
+  package-smoke:
+    name: Package Smoke (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install web dependencies
+        working-directory: src/apps/web
+        run: npm ci
+
+      - name: Build publishable package
+        run: npm run build:all
+
+      - name: Pack npm tarball
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          npm pack --pack-destination artifacts
+
+      - name: Smoke test installed tarball
+        shell: bash
+        run: |
+          node scripts/ci/smoke-installed-package.mjs artifacts/*.tgz

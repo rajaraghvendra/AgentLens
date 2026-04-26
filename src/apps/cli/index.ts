@@ -46,9 +46,22 @@ function getFilters(options: CLIOptions) {
   };
 }
 
-function getDashboardServerPath(): string {
+function getPackageRoot(): string {
   const cliDir = path.dirname(fileURLToPath(import.meta.url));
-  return path.resolve(cliDir, '../dashboard/src/apps/web/server.js');
+  return path.resolve(cliDir, '../../..');
+}
+
+function getDashboardAppDir(): string {
+  return path.join(getPackageRoot(), 'src', 'apps', 'web');
+}
+
+function getDashboardBinPath(): string {
+  return path.join(getPackageRoot(), 'node_modules', 'next', 'dist', 'bin', 'next');
+}
+
+function getTuiEntryPath(): string {
+  const cliDir = path.dirname(fileURLToPath(import.meta.url));
+  return path.resolve(cliDir, '../tui/index.js');
 }
 
 const program = new Command();
@@ -60,10 +73,10 @@ program
 
 program
   .command('tui')
-  .description('Launch the interactive terminal UI dashboard (run: npm run tui)')
+  .description('Launch the interactive terminal UI dashboard')
   .action(() => {
     console.log(colorize('Running TUI...', 'cyan'));
-    spawn('npx', ['tsx', 'src/apps/tui/index.ts'], {
+    spawn(process.execPath, [getTuiEntryPath()], {
       stdio: 'inherit'
     });
   });
@@ -71,25 +84,28 @@ program
 program
   .command('dashboard')
   .alias('web')
-  .description('Start the packaged web dashboard server')
+  .description('Start the web dashboard server')
   .option('-p, --port <port>', 'Port to run on', '3000')
   .action((options) => {
     const port = options.port || '3000';
-    const serverPath = getDashboardServerPath();
+    const dashboardDir = getDashboardAppDir();
+    const nextBin = getDashboardBinPath();
+
     console.log(colorize('Starting AgentLens dashboard on http://localhost:' + port + '...', 'cyan'));
 
-    const child = spawn(process.execPath, [serverPath], {
+    const child = spawn(process.execPath, [nextBin, 'dev', '--hostname', '127.0.0.1', '--port', port], {
+      cwd: dashboardDir,
       stdio: 'inherit',
       env: {
         ...process.env,
-        PORT: port,
-        HOSTNAME: process.env['HOSTNAME'] || '127.0.0.1',
+        AGENTLENS_WEB_DIST_DIR: process.env['AGENTLENS_WEB_DIST_DIR'] || '.agentlens-next',
+        NEXT_TELEMETRY_DISABLED: '1',
       },
     });
 
     child.on('error', (error) => {
-      console.error(colorize(`Failed to start packaged dashboard: ${error.message}`, 'red'));
-      console.error(colorize('Reinstall the package or run `npm run build:all` from a source checkout.', 'yellow'));
+      console.error(colorize(`Failed to start dashboard: ${error.message}`, 'red'));
+      console.error(colorize('Make sure the package dependencies are installed correctly for this machine.', 'yellow'));
       process.exit(1);
     });
   });

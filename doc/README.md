@@ -219,6 +219,31 @@ The VS Code extension requires the AgentLens CLI to fetch data. You have two opt
 ```bash
 npm install -g @rajaraghvendra/agentlens
 ```
+
+If `agentlens` is not found after install, add your npm global bin directory to `PATH`.
+
+Check the prefix:
+```bash
+npm prefix -g
+```
+
+If it resolves to `~/.npm-global`, add:
+```bash
+export PATH="$HOME/.npm-global/bin:$PATH"
+```
+
+For `zsh`:
+```bash
+echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+Verify:
+```bash
+which agentlens
+agentlens --help
+```
+
 Then configure the path in VS Code settings:
 ```json
 "agentlens.cliPath": "agentlens"
@@ -228,6 +253,11 @@ Then configure the path in VS Code settings:
 - `agentlens.openDashboard` - Open web dashboard
 - `agentlens.showOutput` - Show output channel
 - `agentlens.setBudget` - Set budgets via quick pick
+
+The extension now resolves the CLI in this order:
+1. `agentlens.cliPath` if configured
+2. the current workspace build at `dist/apps/cli/index.js`
+3. `agentlens` from `PATH`
 
 ### Settings (settings.json)
 
@@ -265,6 +295,8 @@ Launch the interactive TUI dashboard:
 ```bash
 agentlens tui
 ```
+
+The packaged npm install now runs the compiled TUI entrypoint directly instead of depending on `tsx` or a source checkout.
 
 ### Navigation
 - **Arrow Keys** - Navigate between views
