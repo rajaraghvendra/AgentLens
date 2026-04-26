@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { writeFileSync } from 'fs';
+import { existsSync, writeFileSync } from 'fs';
 import { spawn } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -64,6 +64,10 @@ function getTuiEntryPath(): string {
   return path.resolve(cliDir, '../tui/index.js');
 }
 
+function getTuiSourcePath(): string {
+  return path.join(getPackageRoot(), 'src', 'apps', 'tui', 'index.ts');
+}
+
 const program = new Command();
 
 program
@@ -76,7 +80,15 @@ program
   .description('Launch the interactive terminal UI dashboard')
   .action(() => {
     console.log(colorize('Running TUI...', 'cyan'));
-    spawn(process.execPath, [getTuiEntryPath()], {
+    const compiledTuiPath = getTuiEntryPath();
+    const sourceTuiPath = getTuiSourcePath();
+    const hasCompiledTui = existsSync(compiledTuiPath);
+
+    const commandArgs = hasCompiledTui
+      ? [compiledTuiPath]
+      : ['--import', 'tsx', sourceTuiPath];
+
+    spawn(process.execPath, commandArgs, {
       stdio: 'inherit'
     });
   });
