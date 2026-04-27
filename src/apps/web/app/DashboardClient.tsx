@@ -87,6 +87,17 @@ function severityTone(severity?: string): string {
   }
 }
 
+function formatProjectLabel(name: string, maxLength = 32): string {
+  const trimmed = String(name ?? "").trim();
+  if (!trimmed) return "Unknown Project";
+
+  const segments = trimmed.split(/[\\/]+/).filter(Boolean);
+  const tail = segments.length > 0 ? segments[segments.length - 1] : trimmed;
+
+  if (tail.length <= maxLength) return tail;
+  return `${tail.slice(0, Math.max(0, maxLength - 1))}…`;
+}
+
 export default function Dashboard() {
   const [report, setReport] = useState<ReportResponse | null>(null);
   const [optimizeData, setOptimizeData] = useState<any>(null);
@@ -315,8 +326,10 @@ export default function Dashboard() {
                   {projects.slice(0, 5).map((proj, idx) => (
                     <div key={idx} className="rounded-xl bg-background/70 px-4 py-3">
                       <div className="flex items-center justify-between gap-3">
-                        <div className="truncate font-medium">{proj.name}</div>
-                        <div className="text-sm font-semibold text-emerald-400">${proj.cost.toFixed(2)}</div>
+                        <div className="min-w-0 flex-1 truncate font-medium" title={proj.name}>
+                          {formatProjectLabel(proj.name)}
+                        </div>
+                        <div className="shrink-0 text-sm font-semibold text-emerald-400">${proj.cost.toFixed(2)}</div>
                       </div>
                       <div className="mt-1 text-xs text-text-secondary">{proj.sessions} sessions</div>
                     </div>

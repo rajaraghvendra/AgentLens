@@ -55,12 +55,12 @@
     "tui": "node --import tsx src/apps/tui/index.ts",
     "build:core": "tsc",
     "build": "npm run sync:version && npm run build:core",
-    "build:all": "npm run sync:version && npm run build:core && cd src/apps/web && npm run build",
+    "build:all": "npm run sync:version && npm run build:core && npm --prefix src/apps/web run build",
     "prepublishOnly": "npm run build:all",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
-    "dashboard": "cd src/apps/web && npm run dev"
+    "dashboard": "npm --prefix src/apps/web run dev"
   },
   "engines": {
     "node": ">=18.0.0"

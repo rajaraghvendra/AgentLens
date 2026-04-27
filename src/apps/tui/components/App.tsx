@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Box, Text, useInput, useApp, useWindowSize } from 'ink';
 import { CoreEngine } from '../../../../dist/core/engine.js';
 import { getAllProviders } from '../../../../dist/providers/index.js';
+import { getHomeDir } from '../../../../dist/utils/paths.js';
 
 type Period = 'today' | 'week' | '30days' | 'month' | 'all';
 type Mode = 'dashboard' | 'compare' | 'detail';
@@ -141,7 +142,7 @@ function formatTokens(tokens: number): string {
 function shortProject(s: string): string {
   if (!s) return 'home';
   s = s.replace(/^-/, '');
-  const home = process.env.HOME?.replace(/\//g, '-') || '';
+  const home = getHomeDir().replace(/[\\/]/g, '-');
   if (s.startsWith(home)) s = s.slice(home.length).replace(/^-/, '');
   s = s.replace(/^private-tmp-[^-]+-[^-]+-/, '').replace(/^private-tmp-/, '').replace(/^tmp-/, '');
   if (!s) return 'home';
