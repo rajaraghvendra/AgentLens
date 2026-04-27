@@ -124,6 +124,40 @@ function getDashboardRuntimeRoot(): string {
   return path.join(cacheRoot, 'dashboard-runtime', runtimeKey);
 }
 
+function openBrowser(url: string): void {
+  const platform = process.platform;
+
+  if (platform === 'darwin') {
+    spawn('open', [url], { stdio: 'ignore', detached: true }).unref();
+    return;
+  }
+
+  if (platform === 'win32') {
+    spawn('cmd', ['/c', 'start', '', url], { stdio: 'ignore', detached: true }).unref();
+    return;
+  }
+
+  spawn('xdg-open', [url], { stdio: 'ignore', detached: true }).unref();
+}
+
+async function waitForDashboard(url: string, timeoutMs = 30_000): Promise<void> {
+  const start = Date.now();
+  const healthUrl = `${url.replace(/\/$/, '')}/api/status`;
+
+  while (Date.now() - start < timeoutMs) {
+    try {
+      const res = await fetch(healthUrl);
+      if (res.ok) return;
+    } catch {
+      // ignore until timeout
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+
+  throw new Error(`Dashboard did not become ready within ${timeoutMs}ms`);
+}
+
 function ensureDashboardRuntimeAppDir(): string {
   const packageRoot = getPackageRoot();
 
@@ -175,10 +209,12 @@ program
   .alias('web')
   .description('Start the web dashboard server')
   .option('-p, --port <port>', 'Port to run on', '3000')
+  .option('--no-open', 'Do not open the browser automatically')
   .action((options) => {
     const port = options.port || '3000';
     const dashboardDir = ensureDashboardRuntimeAppDir();
     const nextBin = getDashboardBinPath();
+    const dashboardUrl = `http://127.0.0.1:${port}`;
 
     console.log(colorize('Starting AgentLens dashboard on http://localhost:' + port + '...', 'cyan'));
 
@@ -197,6 +233,17 @@ program
       console.error(colorize('Make sure the package dependencies are installed correctly for this machine.', 'yellow'));
       process.exit(1);
     });
+
+    if (options.open !== false) {
+      void waitForDashboard(dashboardUrl)
+        .then(() => {
+          console.log(colorize(`Opening ${dashboardUrl} ...`, 'blue'));
+          openBrowser(dashboardUrl);
+        })
+        .catch(() => {
+          console.log(colorize(`Dashboard is running at ${dashboardUrl}`, 'yellow'));
+        });
+    }
   });
 
 program
