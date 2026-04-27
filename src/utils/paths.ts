@@ -51,7 +51,7 @@ export function getClaudeProjectsDir(): string {
   const home = homedir();
   
   if (isWindows()) {
-    return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Claude', 'projects');
+    return join(home, '.claude', 'projects');
   }
   
   if (isMac()) {
@@ -59,6 +59,17 @@ export function getClaudeProjectsDir(): string {
   }
   
   return join(home, '.claude', 'projects');
+}
+
+export function getClaudeProjectsDirCandidates(): string[] {
+  const home = homedir();
+  const candidates = [join(home, '.claude', 'projects')];
+
+  if (isWindows()) {
+    candidates.push(join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Claude', 'projects'));
+  }
+
+  return Array.from(new Set(candidates));
 }
 
 export function getCursorDataDir(): string {

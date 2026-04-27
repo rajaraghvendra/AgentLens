@@ -3,12 +3,13 @@
 // ─────────────────────────────────────────────────────────────
 
 import { accessSync, constants, statSync, readdirSync } from 'fs';
-import { join, basename } from 'path';
+import { join, basename, dirname } from 'path';
 import { IProvider } from './base.js';
 import type { Session, Message, DateRange, ToolUsage } from '../types/index.js';
 import { streamJsonlFile } from '../utils/fs-stream.js';
 import { isWithinRange } from '../utils/dates.js';
 import config from '../config/env.js';
+import { getClaudeProjectsDirCandidates } from '../utils/paths.js';
 
 interface ClaudeEntry {
   type?: string;
@@ -44,54 +45,55 @@ export class ClaudeProvider implements IProvider {
   readonly id = 'claude';
   readonly name = 'Claude Code';
 
+  private getProjectRoots(): string[] {
+    return Array.from(new Set([config.claudeProjectsDir, ...getClaudeProjectsDirCandidates()]));
+  }
+
   isAvailable(): boolean {
-    try {
-      accessSync(config.claudeProjectsDir, constants.R_OK);
-      return true;
-    } catch {
-      return false;
+    for (const root of this.getProjectRoots()) {
+      try {
+        accessSync(root, constants.R_OK);
+        return true;
+      } catch {
+        // continue
+      }
     }
+
+    return false;
   }
 
   async discoverSessions(dateRange?: DateRange): Promise<string[]> {
     if (!this.isAvailable()) return [];
 
-    const discovered: string[] = [];
-    try {
-      const projects = readdirSync(config.claudeProjectsDir);
-      for (const projectDir of projects) {
-        const fullPath = join(config.claudeProjectsDir, projectDir);
-        try {
-          if (!statSync(fullPath).isDirectory()) continue;
-          const files = this.findJsonlFiles(fullPath);
-          for (const file of files) {
-            try {
-              const mtimeMs = statSync(file).mtimeMs;
-              if (dateRange) {
-                if (isWithinRange(mtimeMs, dateRange)) {
-                  discovered.push(file);
-                }
-              } else {
-                discovered.push(file);
+    const discovered = new Set<string>();
+    for (const root of this.getProjectRoots()) {
+      try {
+        const files = this.findJsonlFiles(root);
+        for (const file of files) {
+          try {
+            const mtimeMs = statSync(file).mtimeMs;
+            if (dateRange) {
+              if (isWithinRange(mtimeMs, dateRange)) {
+                discovered.add(file);
               }
-            } catch {
-              // Skip inaccessible files
+            } else {
+              discovered.add(file);
             }
+          } catch {
+            // Skip inaccessible files
           }
-        } catch {
-          // Ignore unreadable project directories
         }
+      } catch {
+        // Ignore unreadable roots
       }
-    } catch {
-      // Ignore if dir reading fails
     }
 
-    return discovered;
+    return Array.from(discovered);
   }
 
   async parseSession(identifier: string): Promise<Session> {
     const messages: Message[] = [];
-    const project = basename(join(identifier, '..'));
+    const project = inferClaudeProjectName(identifier);
     let sessionTimestamp = Date.now();
 
     for await (const raw of streamJsonlFile<ClaudeEntry>(identifier)) {
@@ -208,4 +210,21 @@ export class ClaudeProvider implements IProvider {
     }
     return results;
   }
+}
+
+export function inferClaudeProjectName(identifier: string): string {
+  const normalized = identifier.replace(/\\/g, '/');
+  const parts = normalized.split('/').filter(Boolean);
+  const projectsIndex = parts.lastIndexOf('projects');
+
+  if (projectsIndex >= 0 && projectsIndex < parts.length - 1) {
+    return parts[projectsIndex + 1];
+  }
+
+  const parent = basename(dirname(identifier));
+  if (parent === 'subagents') {
+    return basename(dirname(dirname(identifier)));
+  }
+
+  return parent;
 }

@@ -4,8 +4,9 @@ import { Command } from 'commander';
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'fs';
 import { spawn } from 'child_process';
 import { createHash } from 'crypto';
+import { createRequire } from 'module';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { CoreEngine } from '../../core/engine.js';
 import { getAllProviders } from '../../providers/index.js';
 import { formatCurrency, formatSeverityBadge, colorize } from './formatters.js';
@@ -74,6 +75,15 @@ function getTuiEntryPath(): string {
 
 function getTuiSourcePath(): string {
   return path.join(getPackageRoot(), 'src', 'apps', 'tui', 'index.ts');
+}
+
+function getTsxImportSpecifier(): string | null {
+  try {
+    const require = createRequire(import.meta.url);
+    return pathToFileURL(require.resolve('tsx')).href;
+  } catch {
+    return null;
+  }
 }
 
 function isInstalledUnderNodeModules(targetPath: string): boolean {
@@ -194,10 +204,19 @@ program
     const compiledTuiPath = getTuiEntryPath();
     const sourceTuiPath = getTuiSourcePath();
     const hasCompiledTui = existsSync(compiledTuiPath);
+    const tsxImportSpecifier = getTsxImportSpecifier();
 
     const commandArgs = hasCompiledTui
       ? [compiledTuiPath]
-      : ['--import', 'tsx', sourceTuiPath];
+      : tsxImportSpecifier
+        ? ['--import', tsxImportSpecifier, sourceTuiPath]
+        : [];
+
+    if (!hasCompiledTui && commandArgs.length === 0) {
+      console.error(colorize('Failed to launch TUI: compiled build is missing and tsx runtime could not be resolved.', 'red'));
+      console.error(colorize('Reinstall AgentLens or run npm install before using the source fallback path.', 'yellow'));
+      process.exit(1);
+    }
 
     spawn(process.execPath, commandArgs, {
       stdio: 'inherit'

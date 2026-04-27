@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { describe, it, expect, vi } from 'vitest';
-import { ClaudeProvider } from '../../src/providers/claude.js';
+import { ClaudeProvider, inferClaudeProjectName } from '../../src/providers/claude.js';
 import { getAvailableProviders } from '../../src/providers/index.js';
 import { deduplicateSessions } from '../../src/core/parser/dedup.js';
 import path from 'path';
@@ -65,6 +65,16 @@ describe('ClaudeProvider', () => {
     const bashTool = execToolMsg.tools!.find(t => t.name === 'Bash');
     expect(bashTool).toBeDefined();
     expect(bashTool!.outputLength).toBe(45);
+  });
+
+  it('infers project name for nested Windows subagent session paths', () => {
+    const path = 'C:\\Users\\alice\\.claude\\projects\\my-project\\session-123\\subagents\\abc.jsonl';
+    expect(inferClaudeProjectName(path)).toBe('my-project');
+  });
+
+  it('infers project name for nested POSIX subagent session paths', () => {
+    const path = '/Users/alice/.claude/projects/my-project/session-123/subagents/abc.jsonl';
+    expect(inferClaudeProjectName(path)).toBe('my-project');
   });
 });
 

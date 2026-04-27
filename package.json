@@ -1,6 +1,6 @@
 {
   "name": "@rajaraghvendra/agentlens",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Local-first AI developer analytics — parse, classify, cost-track, and optimize your AI coding sessions.",
   "type": "module",
   "main": "dist/core/engine.js",
