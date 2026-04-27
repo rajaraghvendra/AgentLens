@@ -189,6 +189,27 @@ function ensureDashboardRuntimeAppDir(): string {
   return runtimeAppDir;
 }
 
+function bindChildLifecycle(child: ReturnType<typeof spawn>): void {
+  const forwardSignal = (signal: NodeJS.Signals) => {
+    if (!child.killed) {
+      child.kill(signal);
+    }
+  };
+
+  process.once('SIGINT', () => forwardSignal('SIGINT'));
+  process.once('SIGTERM', () => forwardSignal('SIGTERM'));
+  process.once('SIGHUP', () => forwardSignal('SIGHUP'));
+
+  child.on('close', (code, signal) => {
+    if (signal) {
+      process.kill(process.pid, signal);
+      return;
+    }
+
+    process.exit(code ?? 0);
+  });
+}
+
 const program = new Command();
 
 program
@@ -246,6 +267,8 @@ program
         NEXT_TELEMETRY_DISABLED: '1',
       },
     });
+
+    bindChildLifecycle(child);
 
     child.on('error', (error) => {
       console.error(colorize(`Failed to start dashboard: ${error.message}`, 'red'));

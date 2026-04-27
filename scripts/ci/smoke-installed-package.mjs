@@ -119,7 +119,7 @@ async function main() {
     await run(cli.command, [...cli.args, 'tui', '--help']);
 
     const port = process.env['AGENTLENS_SMOKE_PORT'] || '3123';
-    const dashboardCommand = normalizeCommand(cli.command, [...cli.args, 'dashboard', '--port', port]);
+    const dashboardCommand = normalizeCommand(cli.command, [...cli.args, 'dashboard', '--port', port, '--no-open']);
     const dashboard = spawn(dashboardCommand.command, dashboardCommand.args, {
       stdio: ['ignore', 'pipe', 'pipe'],
       env: {
