@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e293b"/>
+      <stop offset="100%" style="stop-color:#0f172a"/>
+    </linearGradient>
+    <linearGradient id="primary" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#a855f7"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="700" fill="url(#bg)"/>
+  
+  <!-- Header -->
+  <text x="40" y="50" fill="white" font-size="28" font-weight="bold">◊ AgentLens</text>
+  <text x="40" y="75" fill="#94a3b8" font-size="14">AI Developer Analytics Dashboard</text>
+  
+  <!-- Period Tabs -->
+  <rect x="700" y="35" width="70" height="30" rx="15" fill="#6366f1"/>
+  <text x="735" y="55" fill="white" font-size="12" text-anchor="middle">7 Days</text>
+  <rect x="780" y="35" width="60" height="30" rx="15" fill="#1e293b"/>
+  <text x="810" y="55" fill="#94a3b8" font-size="12" text-anchor="middle">Today</text>
+  <rect x="850" y="35" width="70" height="30" rx="15" fill="#1e293b"/>
+  <text x="885" y="55" fill="#94a3b8" font-size="12" text-anchor="middle">30 Days</text>
+  
+  <!-- Metric Cards -->
+  <rect x="40" y="100" width="200" height="120" rx="12" fill="url(#card)" stroke="#6366f1" stroke-width="1"/>
+  <text x="60" y="130" fill="#94a3b8" font-size="12">Total Cost</text>
+  <text x="60" y="170" fill="#10b981" font-size="32" font-weight="bold">$334.83</text>
+  <text x="60" y="195" fill="#64748b" font-size="11">USD</text>
+  
+  <rect x="260" y="100" width="200" height="120" rx="12" fill="url(#card)"/>
+  <text x="280" y="130" fill="#94a3b8" font-size="12">Sessions</text>
+  <text x="280" y="170" fill="white" font-size="32" font-weight="bold">99</text>
+  <text x="280" y="195" fill="#64748b" font-size="11">Avg $3.38/session</text>
+  
+  <rect x="480" y="100" width="200" height="120" rx="12" fill="url(#card)"/>
+  <text x="500" y="130" fill="#94a3b8" font-size="12">Total Tokens</text>
+  <text x="500" y="170" fill="white" font-size="32" font-weight="bold">24.5M</text>
+  <text x="500" y="195" fill="#64748b" font-size="11">Processed</text>
+  
+  <rect x="700" y="100" width="200" height="120" rx="12" fill="url(#card)"/>
+  <text x="720" y="130" fill="#94a3b8" font-size="12">Cache Efficiency</text>
+  <text x="720" y="170" fill="white" font-size="32" font-weight="bold">0.0%</text>
+  <text x="720" y="195" fill="#64748b" font-size="11">Context hit rate</text>
+  
+  <rect x="920" y="100" width="200" height="120" rx="12" fill="url(#card)"/>
+  <text x="940" y="130" fill="#94a3b8" font-size="12">Providers</text>
+  <text x="940" y="170" fill="white" font-size="32" font-weight="bold">4</text>
+  <text x="940" y="195" fill="#64748b" font-size="11">Active</text>
+  
+  <!-- Daily Chart -->
+  <rect x="40" y="240" width="540" height="200" rx="12" fill="url(#card)"/>
+  <text x="60" y="270" fill="white" font-size="16" font-weight="bold">Daily Activity</text>
+  <!-- Bars -->
+  <rect x="70" y="380" width="25" height="40" rx="3" fill="url(#primary)"/>
+  <text x="82" y="435" fill="#64748b" font-size="10" text-anchor="middle">Mon</text>
+  <rect x="110" y="350" width="25" height="70" rx="3" fill="url(#primary)"/>
+  <text x="122" y="435" fill="#64748b" font-size="10" text-anchor="middle">Tue</text>
+  <rect x="150" y="320" width="25" height="100" rx="3" fill="url(#primary)"/>
+  <text x="162" y="435" fill="#64748b" font-size="10" text-anchor="middle">Wed</text>
+  <rect x="190" y="360" width="25" height="60" rx="3" fill="url(#primary)"/>
+  <text x="202" y="435" fill="#64748b" font-size="10" text-anchor="middle">Thu</text>
+  <rect x="230" y="300" width="25" height="120" rx="3" fill="url(#primary)"/>
+  <text x="242" y="435" fill="#64748b" font-size="10" text-anchor="middle">Fri</text>
+  <rect x="270" y="340" width="25" height="80" rx="3" fill="url(#primary)"/>
+  <text x="282" y="435" fill="#64748b" font-size="10" text-anchor="middle">Sat</text>
+  <rect x="310" y="370" width="25" height="50" rx="3" fill="url(#primary)"/>
+  <text x="322" y="435" fill="#64748b" font-size="10" text-anchor="middle">Sun</text>
+  <rect x="350" y="330" width="25" height="90" rx="3" fill="url(#primary)"/>
+  <rect x="390" y="300" width="25" height="120" rx="3" fill="url(#primary)"/>
+  <rect x="430" y="280" width="25" height="140" rx="3" fill="url(#primary)"/>
+  <rect x="470" y="310" width="25" height="110" rx="3" fill="url(#primary)"/>
+  <rect x="510" y="340" width="25" height="80" rx="3" fill="url(#primary)"/>
+  
+  <!-- Projects -->
+  <rect x="600" y="240" width="540" height="200" rx="12" fill="url(#card)"/>
+  <text x="620" y="270" fill="white" font-size="16" font-weight="bold">Projects</text>
+  <rect x="620" y="290" width="500" height="35" rx="6" fill="#0f172a"/>
+  <text x="640" y="313" fill="white" font-size="14">AgentLens</text>
+  <text x="1050" y="313" fill="#10b981" font-size="14" font-weight="bold">$198.45</text>
+  <rect x="620" y="335" width="500" height="35" rx="6" fill="#0f172a"/>
+  <text x="640" y="358" fill="white" font-size="14">LLM</text>
+  <text x="1050" y="358" fill="#10b981" font-size="14" font-weight="bold">$89.32</text>
+  <rect x="620" y="380" width="500" height="35" rx="6" fill="#0f172a"/>
+  <text x="640" y="403" fill="white" font-size="14">subagents</text>
+  <text x="1050" y="403" fill="#10b981" font-size="14" font-weight="bold">$32.10</text>
+  
+  <!-- Tabs -->
+  <rect x="40" y="460" width="1100" height="220" rx="12" fill="url(#card)"/>
+  <rect x="60" y="480" width="80" height="35" rx="8" fill="#6366f1"/>
+  <text x="100" y="502" fill="white" font-size="13" font-weight="bold" text-anchor="middle">Dashboard</text>
+  <rect x="150" y="480" width="80" height="35" rx="8" fill="#1e293b"/>
+  <text x="190" y="502" fill="#94a3b8" font-size="13" text-anchor="middle">Optimize</text>
+  <rect x="240" y="480" width="80" height="35" rx="8" fill="#1e293b"/>
+  <text x="280" y="502" fill="#94a3b8" font-size="13" text-anchor="middle">Compare</text>
+  
+  <!-- Activities Content -->
+  <text x="60" y="560" fill="#94a3b8" font-size="12">Top Activities</text>
+  <rect x="60" y="575" width="200" height="8" rx="4" fill="#1e293b"/>
+  <rect x="60" y="575" width="180" height="8" rx="4" fill="url(#primary)"/>
+  <text x="270" y="582" fill="white" font-size="11">General 90%</text>
+  <rect x="60" y="595" width="200" height="8" rx="4" fill="#1e293b"/>
+  <rect x="60" y="595" width="40" height="8" rx="4" fill="#10b981"/>
+  <text x="270" y="602" fill="white" font-size="11">Coding 10%</text>
+  
+  <text x="400" y="560" fill="#94a3b8" font-size="12">Models Used</text>
+  <text x="400" y="585" fill="white" font-size="14">big-pickle</text>
+  <text x="600" y="585" fill="#10b981" font-size="14">$198.45</text>
+  <text x="400" y="610" fill="white" font-size="14">qwen3-coder:480b</text>
+  <text x="600" y="610" fill="#10b981" font-size="14">$89.32</text>
+  
+  <!-- Warning Alert -->
+  <rect x="40" y="690" width="1100" height="50" rx="8" fill="#7f1d1d" stroke="#ef4444" stroke-width="1"/>
+  <text x="70" y="715" fill="#fca5a5" font-size="14">⚠️ HIGH: Edit Retry Loops Detected</text>
+  <text x="450" y="715" fill="#fca5a5" font-size="12">An agent edited the same file 4 times in a row.</text>
+</svg>

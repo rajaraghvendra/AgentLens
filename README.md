@@ -1,47 +1,49 @@
-# AgentLens 🔍
+# AgentLens
 
-**Local-first AI Developer Analytics**
+**Local-first AI developer analytics for Claude Code, Cursor, Codex, OpenCode, Pi, and GitHub Copilot.**
 
-AgentLens parses, classifies, and tracks your AI coding sessions directly from your local disk. It supports multiple providers (Claude Code, Cursor, Codex, Pi, Opencode, GitHub Copilot), calculates exact costs, detects token-wasting patterns, and provides one-shot success rate tracking.
+AgentLens parses your local AI coding session history, computes cost and token usage, surfaces retry loops and waste patterns, and gives you CLI, TUI, web, and VS Code views over the same dataset.
 
 [![GitHub](https://img.shields.io/badge/GitHub-rajaraghvendra%2FAgentLens-blue.svg)](https://github.com/rajaraghvendra/AgentLens)
 [![npm](https://img.shields.io/badge/npm-@rajaraghvendra%2Fagentlens-orange.svg)](https://www.npmjs.com/~rajaraghvendra)
 
-## Features
+## What It Does
 
-- 💸 **Exact Cost Tracking** — Uses live LiteLLM pricing data to accurately track input, output, and caching costs.
-- 🎯 **Deterministic Activity Classification** — Categorizes session turns into 13 developer tasks (Coding, Debugging, Git Ops, Testing, etc.) without relying on expensive LLM calls.
-- ⚡ **One-Shot Rate Tracking** — Measures edit success rate — see where your AI nails it first try vs burns tokens on retries.
-- ♻️ **Waste Optimizer** — Detects inefficiencies like uncapped bash output, edit loops, excessive reads, and missing MCP context.
-- 🔒 **Zero Egress** — No API dependency for core parsing. Your codebase and session logs never leave your machine.
-- 💻 **CLI & TUI Dashboard** — Native terminal output with optional export to CSV/JSON.
-- 🌐 **Web Dashboard** — Next.js dashboard with Dashboard/Optimize/Compare tabs.
-- 💱 **Multi-Currency** — Display costs in USD, EUR, GBP, JPY, and 160+ currencies.
-- 📊 **VS Code Extension** — Live cost tracking in status bar with budget alerts.
-- 🔔 **Budget Notifications** — Per-provider and total budget tracking with alerts at 50%, 75%, 90%, 100%.
+- **Cross-provider analytics** for Claude Code, Cursor, Codex, OpenCode, Pi, and GitHub Copilot.
+- **Exact token accounting** for input, output, cache read, and cache write where provider data supports it.
+- **Cost tracking** with pricing lookup, currency conversion, and provider/model breakdowns.
+- **Deterministic activity classification** across coding, debugging, git ops, testing, planning, delegation, and more.
+- **One-shot and retry-loop detection** to show where agents got it right first time and where they burned tokens.
+- **Optimizer findings** for waste patterns such as edit loops, excessive reads, missing context, and noisy shell usage.
+- **Multiple interfaces**:
+  - `agentlens report`, `status`, `compare`, `optimize`
+  - `agentlens tui`
+  - `agentlens dashboard`
+  - VS Code extension with status-bar cost visibility
+- **Local-first execution**. Core parsing runs against local provider data on your machine.
 
-## Supported Providers
+## Screenshots
 
-| Provider | Data Location |
-|----------|---------------|
-| Claude Code | Auto-discovered on macOS, Linux, and Windows |
-| Claude Desktop | Auto-discovered on macOS, Linux, and Windows |
-| Codex | Auto-discovered on macOS, Linux, and Windows |
-| Cursor | Auto-discovered on macOS, Linux, and Windows |
-| Opencode | Auto-discovered on macOS, Linux, and Windows |
-| Pi | Auto-discovered on macOS, Linux, and Windows |
-| GitHub Copilot | Auto-discovered on macOS, Linux, and Windows |
+### Web Dashboard
 
-AgentLens uses platform-specific local data directories under the hood, so the same CLI commands work across supported operating systems without changing flags.
+![AgentLens dashboard](assets/screenshots/dashboard.svg)
+
+### Compare View
+
+![AgentLens compare view](assets/screenshots/compare.svg)
+
+### Terminal UI
+
+![AgentLens TUI](assets/screenshots/tui.svg)
 
 ## Installation
 
-### Global (recommended)
+### Global Install
 ```bash
 npm install -g @rajaraghvendra/agentlens
 ```
 
-This installs the `agentlens` CLI.
+This installs the `agentlens` CLI and the packaged dashboard runtime.
 
 If `agentlens` is not found after global install, your npm global bin directory is not on `PATH`.
 
@@ -67,12 +69,12 @@ which agentlens
 agentlens --help
 ```
 
-### Or run without installing
+### Run Without Installing
 ```bash
 npx @rajaraghvendra/agentlens <command>
 ```
 
-### From source
+### From Source
 ```bash
 git clone https://github.com/rajaraghvendra/AgentLens.git
 cd AgentLens
@@ -83,16 +85,51 @@ npm run build
 ## Quick Start
 
 ```bash
-agentlens report          # View usage report (last 7 days)
-agentlens report -p today # Today only
-agentlens status         # Quick status
-agentlens optimize       # Scan inefficiencies
-agentlens compare        # Compare models
-agentlens dashboard      # Start the web dashboard
-agentlens tui            # Terminal UI
+agentlens report                 # Detailed usage report (last 7 days)
+agentlens report -p today        # Today only
+agentlens report --provider codex
+agentlens status                 # Quick budget/cost snapshot
+agentlens optimize               # Optimization findings
+agentlens compare                # Model comparison
+agentlens dashboard              # Web dashboard on localhost:3000
+agentlens dashboard --port 3128
+agentlens tui                    # Terminal UI
 ```
 
-## Web Dashboard
+## Supported Providers
+
+| Provider | Discovery |
+|----------|-----------|
+| Claude Code | Auto-discovered on macOS, Linux, and Windows |
+| Claude Desktop | Auto-discovered on macOS, Linux, and Windows |
+| Codex | Auto-discovered on macOS, Linux, and Windows |
+| Cursor | Auto-discovered on macOS, Linux, and Windows |
+| OpenCode | Auto-discovered on macOS, Linux, and Windows |
+| Pi | Auto-discovered on macOS, Linux, and Windows |
+| GitHub Copilot | Auto-discovered on macOS, Linux, and Windows |
+
+AgentLens uses platform-specific local data directories internally, so the same commands work across supported operating systems without changing flags.
+
+## Interfaces
+
+### CLI
+
+- `agentlens report`
+- `agentlens status`
+- `agentlens compare`
+- `agentlens optimize`
+- `agentlens providers`
+- `agentlens budget:set`, `budget:status`, `budget:reset`
+
+### TUI
+
+```bash
+agentlens tui
+```
+
+Use the keyboard shortcuts shown in the footer to switch period and provider.
+
+### Web Dashboard
 
 From a global install:
 
@@ -104,24 +141,41 @@ Then open `http://localhost:3000`.
 
 The dashboard now runs from packaged web source plus the target machine's own installed runtime dependencies, so npm resolves the correct native binaries for Windows, Linux, or macOS at install time instead of shipping a host-built web server.
 
-If you installed with `npm install -g`, use:
-- `agentlens dashboard`
-- `agentlens report`
-- `agentlens status`
-- `agentlens optimize`
-- `agentlens compare`
-
 The `web` command is kept as an alias for `dashboard`.
 
 ## VS Code Extension
 
-Install from the packaged `.vsix` file attached to GitHub Releases.
+Install from the packaged `.vsix` attached to GitHub Releases:
+
+1. Download the latest `.vsix` from Releases.
+2. Open VS Code.
+3. Open Extensions.
+4. Use `...` -> `Install from VSIX...`
+5. Select the downloaded file.
+
+The extension surfaces live status-bar cost tracking and can open the AgentLens dashboard.
 
 ## Publishing
 
 - npm package: [`@rajaraghvendra/agentlens`](https://www.npmjs.com/package/@rajaraghvendra/agentlens)
 - VS Code extension: package from [`src/apps/vscode`](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/src/apps/vscode) with `npm run package`
 - GitHub Actions CD: [`.github/workflows/cd.yml`](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/.github/workflows/cd.yml) builds all artifacts, uploads the `.vsix` artifact, and can create a GitHub Release with the `.vsix` attached
+
+## Development
+
+```bash
+npm install
+npm run build
+npm run test
+npm run dashboard
+```
+
+Key project entry points:
+
+- [CLI](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/src/apps/cli/index.ts)
+- [TUI](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/src/apps/tui/index.ts)
+- [Web app](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/src/apps/web/app/page.tsx)
+- [VS Code extension](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/src/apps/vscode/src/extension.ts)
 
 ## License
 

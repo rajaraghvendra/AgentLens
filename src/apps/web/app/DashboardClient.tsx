@@ -1,0 +1,624 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import nextDynamic from "next/dynamic";
+import {
+  Activity,
+  ChevronDown,
+  Clock,
+  Cpu,
+  Database,
+  DollarSign,
+  Filter,
+  Gauge,
+  GitCompare,
+  RefreshCw,
+  TerminalSquare,
+  Wallet,
+  Wrench,
+  Zap,
+} from "lucide-react";
+
+const BudgetSettings = nextDynamic(() => import("../components/BudgetSettings"), { ssr: false });
+const CostTrendChart = nextDynamic(() => import("../components/CostTrendChart").then((mod) => mod.CostTrendChart), { ssr: false });
+const ActivityBreakdown = nextDynamic(() => import("../components/ActivityBreakdown").then((mod) => mod.ActivityBreakdown), { ssr: false });
+const ModelUsageChart = nextDynamic(() => import("../components/ModelUsageChart").then((mod) => mod.ModelUsageChart), { ssr: false });
+const OptimizationFindings = nextDynamic(() => import("../components/OptimizationFindings").then((mod) => mod.OptimizationFindings), { ssr: false });
+const ActiveHoursChart = nextDynamic(() => import("../components/ActiveHoursChart"), { ssr: false });
+const InsightsPanel = nextDynamic(() => import("../components/InsightsPanel").then((mod) => mod.InsightsPanel), { ssr: false });
+
+type TabType = "dashboard" | "optimize" | "compare";
+
+type ReportResponse = {
+  metrics?: {
+    byActivity?: Record<string, any>;
+    byModel?: Record<string, any>;
+    hourly?: Record<string, { messages: number; tokens: number; costUSD: number }>;
+    overview?: {
+      totalCostLocal?: number;
+      localCurrency?: string;
+      sessionsCount?: number;
+      totalTokens?: number;
+      avgCostPerSession?: number;
+      cacheHitRate?: number;
+    };
+  };
+  findings?: Array<{ title: string; severity: string; description: string }>;
+  insights?: string[];
+  daily?: Array<{ date: string; costUSD: number; sessions: number; tokens: number }>;
+  projects?: Array<{ name: string; cost: number; sessions: number }>;
+  providers?: Array<{ id: string; name: string; available: boolean; sessionCount?: number }>;
+  tools?: Array<{ name: string; count: number }>;
+  commands?: Array<{ command: string; count: number }>;
+};
+
+const PERIODS = [
+  { label: "Today", days: 1, key: "today" },
+  { label: "7 Days", days: 7, key: "7days" },
+  { label: "30 Days", days: 30, key: "30days" },
+  { label: "All Time", days: 365, key: "all" },
+] as const;
+
+const PROVIDER_LABELS: Record<string, string> = {
+  all: "All Providers",
+  claude: "Claude",
+  codex: "Codex",
+  cursor: "Cursor",
+  opencode: "OpenCode",
+  pi: "Pi",
+  copilot: "Copilot",
+};
+
+function providerLabel(id: string): string {
+  return PROVIDER_LABELS[id] ?? id;
+}
+
+function severityTone(severity?: string): string {
+  switch ((severity ?? "").toLowerCase()) {
+    case "high":
+      return "border-red-500/60 bg-red-950/55 text-red-100";
+    case "medium":
+      return "border-amber-500/60 bg-amber-950/45 text-amber-100";
+    case "low":
+      return "border-sky-500/60 bg-sky-950/45 text-sky-100";
+    default:
+      return "border-border/70 bg-background/70 text-text-primary";
+  }
+}
+
+export default function Dashboard() {
+  const [report, setReport] = useState<ReportResponse | null>(null);
+  const [optimizeData, setOptimizeData] = useState<any>(null);
+  const [compareData, setCompareData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [period, setPeriod] = useState<string>("7days");
+  const [activeTab, setActiveTab] = useState<TabType>("dashboard");
+  const [showBudgetSettings, setShowBudgetSettings] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState("all");
+  const [showProviderDropdown, setShowProviderDropdown] = useState(false);
+  const [compareSortBy, setCompareSortBy] = useState<"name" | "costUSD" | "totalTokens" | "messageCount">("costUSD");
+  const [compareSortDir, setCompareSortDir] = useState<"asc" | "desc">("desc");
+
+  const fetchReport = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const selected = PERIODS.find((p) => p.key === period);
+      const params = new URLSearchParams({ period: String(selected?.days ?? 7) });
+      if (selectedProvider !== "all") params.set("provider", selectedProvider);
+      const res = await fetch(`/api/report?${params.toString()}`);
+      setReport(await res.json());
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [period, selectedProvider]);
+
+  const fetchOptimize = useCallback(async () => {
+    const selected = PERIODS.find((p) => p.key === period);
+    const params = new URLSearchParams({ period: String(selected?.days ?? 7) });
+    if (selectedProvider !== "all") params.set("provider", selectedProvider);
+    const res = await fetch(`/api/optimize?${params.toString()}`);
+    setOptimizeData(await res.json());
+  }, [period, selectedProvider]);
+
+  const fetchCompare = useCallback(async () => {
+    const selected = PERIODS.find((p) => p.key === period);
+    const params = new URLSearchParams({ period: String(selected?.days ?? 7) });
+    if (selectedProvider !== "all") params.set("provider", selectedProvider);
+    const res = await fetch(`/api/compare?${params.toString()}`);
+    setCompareData(await res.json());
+  }, [period, selectedProvider]);
+
+  useEffect(() => {
+    void fetchReport();
+  }, [fetchReport]);
+
+  useEffect(() => {
+    if (activeTab === "optimize") void fetchOptimize();
+    if (activeTab === "compare") void fetchCompare();
+  }, [activeTab, fetchOptimize, fetchCompare]);
+
+  if (loading || !report) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-center">
+          <RefreshCw className="mx-auto h-12 w-12 animate-spin text-primary" />
+          <p className="mt-4 text-text-secondary">Loading AgentLens data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const overview = report.metrics?.overview ?? {};
+  const hourly = report.metrics?.hourly ?? {};
+  const findings = report.findings ?? [];
+  const activities = Object.values(report.metrics?.byActivity ?? {}).sort((a: any, b: any) => b.costUSD - a.costUSD);
+  const models = Object.values(report.metrics?.byModel ?? {}).sort((a: any, b: any) => b.costUSD - a.costUSD);
+  const daily = report.daily ?? [];
+  const projects = report.projects ?? [];
+  const providers = report.providers ?? [];
+  const tools = report.tools ?? [];
+  const commands = report.commands ?? [];
+  const insights = report.insights ?? [];
+  const optimizeFindings = optimizeData?.findings ?? [];
+  const optimizeInsights = optimizeData?.insights ?? [];
+  const optimizeHealthScore = optimizeData?.healthScore;
+  const optimizeHealthGrade = optimizeData?.healthGrade;
+  const compareModels = compareData?.models ?? [];
+  const compareTotalCost = compareData?.totalCostUSD ?? 0;
+  const topFinding = findings[0];
+  const activeProviderCount = providers.filter((provider) => provider.available).length;
+  const currentPeriodLabel = PERIODS.find((entry) => entry.key === period)?.label ?? "7 Days";
+
+  const sortedCompareModels = [...compareModels].sort((a: any, b: any) => {
+    const aValue = a?.[compareSortBy];
+    const bValue = b?.[compareSortBy];
+
+    if (compareSortBy === "name") {
+      const left = String(aValue ?? "").toLowerCase();
+      const right = String(bValue ?? "").toLowerCase();
+      return compareSortDir === "asc" ? left.localeCompare(right) : right.localeCompare(left);
+    }
+
+    const left = Number(aValue ?? 0);
+    const right = Number(bValue ?? 0);
+    return compareSortDir === "asc" ? left - right : right - left;
+  });
+
+  return (
+    <div className="min-h-screen bg-background px-5 py-6 md:px-8">
+      <div className="mx-auto max-w-[1200px] rounded-[22px] border border-border/70 bg-[#050816] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+        <header className="flex flex-col gap-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-[32px] font-semibold tracking-tight">◊ AgentLens</h1>
+              <p className="mt-1 text-sm text-text-secondary">AI developer analytics dashboard</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => void fetchReport()} className="panel-button" title="Refresh">
+                <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+              </button>
+              <button onClick={() => setShowBudgetSettings(true)} className="panel-button" title="Budget Settings">
+                <Wallet className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-border/70 bg-surface/80 px-4 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                {PERIODS.map((entry) => (
+                  <button
+                    key={entry.key}
+                    onClick={() => setPeriod(entry.key)}
+                    className={`rounded-full px-4 py-2 text-sm transition-colors ${
+                      period === entry.key
+                        ? "bg-primary text-white shadow-[0_0_0_1px_rgba(99,102,241,0.35)]"
+                        : "bg-transparent text-text-secondary hover:bg-white/5 hover:text-text-primary"
+                    }`}
+                  >
+                    {period === entry.key ? `[ ${entry.label} ]` : entry.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-3 text-sm">
+                <span className="text-text-secondary">|</span>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowProviderDropdown((value) => !value)}
+                    className="inline-flex items-center gap-2 rounded-full border border-border/70 px-3 py-2 text-text-primary hover:bg-white/5"
+                  >
+                    <span className="text-primary">[p]</span>
+                    <span>{providerLabel(selectedProvider)}</span>
+                    <ChevronDown className="h-4 w-4 text-text-secondary" />
+                  </button>
+                  {showProviderDropdown && (
+                    <div className="absolute right-0 top-full z-20 mt-2 min-w-[190px] rounded-2xl border border-border/70 bg-surface/95 p-2 shadow-2xl">
+                      <button
+                        onClick={() => {
+                          setSelectedProvider("all");
+                          setShowProviderDropdown(false);
+                        }}
+                        className={`block w-full rounded-xl px-3 py-2 text-left text-sm ${
+                          selectedProvider === "all" ? "bg-primary/15 text-primary" : "hover:bg-white/5"
+                        }`}
+                      >
+                        All Providers
+                      </button>
+                      {providers.map((provider) => (
+                        <button
+                          key={provider.id}
+                          onClick={() => {
+                            setSelectedProvider(provider.id);
+                            setShowProviderDropdown(false);
+                          }}
+                          className={`block w-full rounded-xl px-3 py-2 text-left text-sm ${
+                            selectedProvider === provider.id ? "bg-primary/15 text-primary" : "hover:bg-white/5"
+                          }`}
+                        >
+                          {provider.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {(["all", ...providers.slice(0, 6).map((provider) => provider.id)] as string[]).map((providerId) => (
+                <button
+                  key={providerId}
+                  onClick={() => setSelectedProvider(providerId)}
+                  className={`rounded-full px-3 py-1 text-xs transition-colors ${
+                    selectedProvider === providerId
+                      ? "bg-primary text-white"
+                      : "border border-border/60 text-text-secondary hover:bg-white/5 hover:text-text-primary"
+                  }`}
+                >
+                  {providerId}
+                </button>
+              ))}
+            </div>
+          </div>
+        </header>
+
+        <div className="mt-6 rounded-2xl border border-border/70 bg-surface/75 p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <TabButton tab="dashboard" activeTab={activeTab} onClick={() => setActiveTab("dashboard")} />
+            <TabButton tab="optimize" activeTab={activeTab} onClick={() => setActiveTab("optimize")} />
+            <TabButton tab="compare" activeTab={activeTab} onClick={() => setActiveTab("compare")} />
+          </div>
+        </div>
+
+        {activeTab === "dashboard" && (
+          <div className="mt-6 space-y-6">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+              <MetricCard title="Total Cost" value={`$${(overview.totalCostLocal ?? 0).toFixed(2)}`} subtitle={overview.localCurrency ?? "USD"} icon={<DollarSign className="text-emerald-400" />} highlight />
+              <MetricCard title="Sessions" value={overview.sessionsCount ?? 0} subtitle={`Avg $${(overview.avgCostPerSession ?? 0).toFixed(2)}/session`} icon={<Activity className="text-primary-300" />} />
+              <MetricCard title="Total Tokens" value={`${(((overview.totalTokens ?? 0) / 1_000_000).toFixed(1))}M`} subtitle="Processed" icon={<Database className="text-sky-300" />} />
+              <MetricCard title="Cache Efficiency" value={(overview.cacheHitRate ?? 0).toFixed(1) + "%"} subtitle="Context hit rate" icon={<Zap className="text-yellow-300" />} />
+              <MetricCard title="Providers" value={activeProviderCount} subtitle="Active" icon={<Filter className="text-violet-300" />} />
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+              <SurfaceCard title="Daily Activity">
+                <div className="h-64">
+                  <CostTrendChart data={daily} />
+                </div>
+              </SurfaceCard>
+              <SurfaceCard title="Projects">
+                <div className="space-y-3">
+                  {projects.slice(0, 5).map((proj, idx) => (
+                    <div key={idx} className="rounded-xl bg-background/70 px-4 py-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="truncate font-medium">{proj.name}</div>
+                        <div className="text-sm font-semibold text-emerald-400">${proj.cost.toFixed(2)}</div>
+                      </div>
+                      <div className="mt-1 text-xs text-text-secondary">{proj.sessions} sessions</div>
+                    </div>
+                  ))}
+                  {projects.length === 0 && <p className="text-sm text-text-secondary">No project data available.</p>}
+                </div>
+              </SurfaceCard>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+              <SurfaceCard title="Top Activities">
+                <ActivityBreakdown activities={activities.slice(0, 10)} />
+              </SurfaceCard>
+              <SurfaceCard title="Models Used">
+                <div className="h-64">
+                  <ModelUsageChart data={models.slice(0, 8)} />
+                </div>
+              </SurfaceCard>
+            </div>
+
+            <SurfaceCard title="Active Hours" icon={<Clock className="h-4 w-4 text-accent" />}>
+              <p className="mb-4 text-sm text-text-secondary">When you are most active across the selected window.</p>
+              <div className="h-52">
+                <ActiveHoursChart hourly={hourly} />
+              </div>
+            </SurfaceCard>
+
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+              <SurfaceCard title="Top Tools" icon={<Wrench className="h-4 w-4 text-accent" />}>
+                <div className="space-y-2">
+                  {tools.slice(0, 8).map((tool, idx) => (
+                    <div key={idx} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2 text-sm">
+                      <span>{tool.name}</span>
+                      <span className="text-text-secondary">{tool.count}x</span>
+                    </div>
+                  ))}
+                  {tools.length === 0 && <p className="text-sm text-text-secondary">No tool usage data available.</p>}
+                </div>
+              </SurfaceCard>
+              <SurfaceCard title="Top Commands" icon={<TerminalSquare className="h-4 w-4 text-accent" />}>
+                <div className="space-y-2">
+                  {commands.slice(0, 8).map((cmd, idx) => (
+                    <div key={idx} className="flex items-center justify-between gap-3 rounded-xl bg-background/70 px-3 py-2 text-sm">
+                      <code className="truncate">{cmd.command}</code>
+                      <span className="shrink-0 text-text-secondary">{cmd.count}x</span>
+                    </div>
+                  ))}
+                  {commands.length === 0 && <p className="text-sm text-text-secondary">No command data available.</p>}
+                </div>
+              </SurfaceCard>
+              <SurfaceCard title="Providers" icon={<Cpu className="h-4 w-4 text-accent" />}>
+                <div className="space-y-2">
+                  {providers.map((provider, idx) => (
+                    <div key={idx} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2 text-sm">
+                      <span>{provider.name}</span>
+                      <span className={provider.available ? "text-emerald-400" : "text-text-secondary"}>{provider.sessionCount ?? 0}</span>
+                    </div>
+                  ))}
+                </div>
+              </SurfaceCard>
+            </div>
+
+            {topFinding && (
+              <div className={`rounded-2xl border px-6 py-4 ${severityTone(topFinding.severity)}`}>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="text-sm font-semibold uppercase tracking-wide">{topFinding.severity}</span>
+                  <span className="text-base font-semibold">{topFinding.title}</span>
+                </div>
+                <p className="mt-2 text-sm opacity-90">{topFinding.description}</p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1fr]">
+              <SurfaceCard title="Findings">
+                {findings.length === 0 ? (
+                  <p className="text-sm text-text-secondary">No findings available.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {findings.map((finding, idx) => (
+                      <div key={idx} className={`rounded-xl border px-4 py-3 ${severityTone(finding.severity)}`}>
+                        <div className="font-medium">{finding.title}</div>
+                        <p className="mt-1 text-sm opacity-90">{finding.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </SurfaceCard>
+              <SurfaceCard title="Insights">
+                {insights.length === 0 ? (
+                  <p className="text-sm text-text-secondary">No insights available.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {insights.map((insight, idx) => (
+                      <div key={idx} className="rounded-xl bg-background/70 px-4 py-3 text-sm text-text-primary">
+                        {insight.replace(/\*\*/g, "")}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </SurfaceCard>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "optimize" && (
+          <div className="mt-6 space-y-6">
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[0.75fr_0.75fr_1fr]">
+              <SurfaceCard title="Health Grade" accentClass="border-emerald-500/45">
+                <div className="flex items-center gap-5">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500 text-4xl font-bold text-white">
+                    {optimizeHealthGrade ?? "--"}
+                  </div>
+                  <div>
+                    <div className="text-2xl font-semibold">Score {typeof optimizeHealthScore === "number" ? optimizeHealthScore : "--"}</div>
+                    <div className="mt-1 text-sm text-text-secondary">Overall optimization grade</div>
+                  </div>
+                </div>
+              </SurfaceCard>
+              <SurfaceCard title="Period Total">
+                <div className="text-4xl font-semibold text-emerald-400">${Number(overview.totalCostLocal ?? 0).toFixed(2)}</div>
+                <div className="mt-2 text-sm text-text-secondary">Selected period spend</div>
+              </SurfaceCard>
+              <SurfaceCard title={`Findings (${optimizeFindings.length})`}>
+                {optimizeFindings.length === 0 ? (
+                  <p className="text-sm text-text-secondary">No optimization findings in this period.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {optimizeFindings.slice(0, 2).map((finding: any, idx: number) => (
+                      <div key={idx} className={`rounded-xl border px-4 py-3 ${severityTone(finding.severity)}`}>
+                        <div className="font-medium">{finding.title}</div>
+                        <div className="mt-1 text-sm opacity-90">{finding.description}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </SurfaceCard>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.25fr_0.75fr]">
+              <SurfaceCard title="Detailed Findings">
+                <OptimizationFindings findings={optimizeFindings} />
+              </SurfaceCard>
+              <SurfaceCard title="Optimization Insights">
+                <InsightsPanel insights={optimizeInsights} />
+              </SurfaceCard>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "compare" && (
+          <div className="mt-6 space-y-6">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <MetricCard title="Models Compared" value={compareModels.length} subtitle="Current comparison set" icon={<Cpu className="text-violet-300" />} highlight />
+              <MetricCard title="Total Compared Spend" value={`$${Number(compareTotalCost || 0).toFixed(2)}`} subtitle="Combined model cost" icon={<DollarSign className="text-emerald-400" />} />
+              <MetricCard title="Selected Provider" value={selectedProvider === "all" ? "All" : providerLabel(selectedProvider)} subtitle="Current filter" icon={<Filter className="text-sky-300" />} />
+              <MetricCard title="Period" value={currentPeriodLabel} subtitle="Comparison window" icon={<Clock className="text-amber-300" />} />
+            </div>
+
+            <SurfaceCard
+              title="Model Comparison"
+              action={
+                <div className="flex items-center gap-2">
+                  <select
+                    value={compareSortBy}
+                    onChange={(e) => setCompareSortBy(e.target.value as any)}
+                    className="rounded-xl border border-border/70 bg-background px-3 py-2 text-xs text-text-primary"
+                  >
+                    <option value="costUSD">Sort: Cost</option>
+                    <option value="totalTokens">Sort: Tokens</option>
+                    <option value="messageCount">Sort: Messages</option>
+                    <option value="name">Sort: Name</option>
+                  </select>
+                  <button onClick={() => setCompareSortDir((value) => (value === "asc" ? "desc" : "asc"))} className="panel-button text-xs">
+                    {compareSortDir === "asc" ? "Asc" : "Desc"}
+                  </button>
+                </div>
+              }
+            >
+              {compareModels.length === 0 ? (
+                <p className="text-sm text-text-secondary">No comparison data available for this period or provider.</p>
+              ) : (
+                <div className="overflow-hidden rounded-2xl border border-border/70">
+                  <table className="w-full text-sm">
+                    <thead className="bg-background/80 text-left text-text-secondary">
+                      <tr>
+                        <th className="px-4 py-3">Model</th>
+                        <th className="px-4 py-3">Cost</th>
+                        <th className="px-4 py-3">Tokens</th>
+                        <th className="px-4 py-3">Messages</th>
+                        <th className="px-4 py-3">Share</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sortedCompareModels.map((model: any, idx: number) => {
+                        const share = compareTotalCost > 0 ? Math.min(100, (Number(model.costUSD || 0) / compareTotalCost) * 100) : 0;
+                        return (
+                          <tr key={idx} className="border-t border-border/50 bg-surface/45">
+                            <td className="px-4 py-3 font-medium">{model.name || "unknown"}</td>
+                            <td className="px-4 py-3 text-emerald-400">${Number(model.costUSD || 0).toFixed(2)}</td>
+                            <td className="px-4 py-3">{(((model.totalTokens || 0) / 1_000_000)).toFixed(2)}M</td>
+                            <td className="px-4 py-3">{model.messageCount ?? 0}</td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center gap-3">
+                                <div className="h-2 w-28 overflow-hidden rounded-full bg-background">
+                                  <div className="h-full rounded-full bg-gradient-to-r from-primary to-fuchsia-500" style={{ width: `${share}%` }} />
+                                </div>
+                                <span className="text-xs text-text-secondary">{share.toFixed(0)}%</span>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </SurfaceCard>
+          </div>
+        )}
+      </div>
+
+      <BudgetSettings isOpen={showBudgetSettings} onClose={() => setShowBudgetSettings(false)} />
+    </div>
+  );
+}
+
+function TabButton({
+  tab,
+  activeTab,
+  onClick,
+}: {
+  tab: TabType;
+  activeTab: TabType;
+  onClick: () => void;
+}) {
+  const meta: Record<TabType, { label: string; icon: ReactNode }> = {
+    dashboard: { label: "Dashboard", icon: <Gauge className="h-4 w-4" /> },
+    optimize: { label: "Optimize", icon: <Zap className="h-4 w-4" /> },
+    compare: { label: "Compare", icon: <GitCompare className="h-4 w-4" /> },
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm transition-colors ${
+        activeTab === tab ? "bg-primary text-white" : "text-text-secondary hover:bg-white/5 hover:text-text-primary"
+      }`}
+    >
+      {meta[tab].icon}
+      {meta[tab].label}
+    </button>
+  );
+}
+
+function MetricCard({
+  title,
+  value,
+  subtitle,
+  icon,
+  highlight = false,
+}: {
+  title: string;
+  value: string | number;
+  subtitle: string;
+  icon: ReactNode;
+  highlight?: boolean;
+}) {
+  return (
+    <div className={`rounded-2xl border border-border/70 bg-surface/80 p-5 shadow-[0_16px_48px_rgba(0,0,0,0.25)] ${highlight ? "ring-1 ring-primary/30" : ""}`}>
+      <div className="mb-2 flex items-center justify-between">
+        <span className="text-sm text-text-secondary">{title}</span>
+        {icon}
+      </div>
+      <div className="text-3xl font-semibold">{value}</div>
+      <div className="mt-1 text-xs text-text-secondary">{subtitle}</div>
+    </div>
+  );
+}
+
+function SurfaceCard({
+  title,
+  children,
+  icon,
+  action,
+  accentClass = "",
+}: {
+  title: string;
+  children: ReactNode;
+  icon?: ReactNode;
+  action?: ReactNode;
+  accentClass?: string;
+}) {
+  return (
+    <section className={`rounded-2xl border border-border/70 bg-surface/80 p-6 shadow-[0_16px_48px_rgba(0,0,0,0.25)] ${accentClass}`}>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          {icon}
+          <h3 className="text-lg font-semibold">{title}</h3>
+        </div>
+        {action}
+      </div>
+      {children}
+    </section>
+  );
+}
