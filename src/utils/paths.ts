@@ -47,6 +47,19 @@ export function getCacheDir(appName: string): string {
   return join(home, '.cache', appName);
 }
 
+function uniquePaths(paths: string[]): string[] {
+  return Array.from(new Set(paths.filter(Boolean)));
+}
+
+function splitPathSegments(targetPath: string): string[] {
+  return targetPath.split(/[\\/]+/).filter(Boolean);
+}
+
+export function getPathLeaf(targetPath: string): string {
+  const segments = splitPathSegments(targetPath);
+  return segments[segments.length - 1] || '';
+}
+
 export function getClaudeProjectsDir(): string {
   const home = homedir();
   
@@ -87,6 +100,15 @@ export function getCursorDataDir(): string {
   return join(home, '.cursor');
 }
 
+export function getCursorDataDirCandidates(): string[] {
+  const home = homedir();
+  return uniquePaths([
+    join(home, '.cursor'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Cursor'),
+    join(process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'), 'Cursor'),
+  ]);
+}
+
 export function getOpencodeDataDir(): string {
   const home = homedir();
   
@@ -99,6 +121,16 @@ export function getOpencodeDataDir(): string {
   }
   
   return join(home, '.local', 'share', 'opencode');
+}
+
+export function getOpencodeDataDirCandidates(): string[] {
+  const home = homedir();
+  return uniquePaths([
+    join(process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'), 'opencode'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'opencode'),
+    join(home, '.local', 'share', 'opencode'),
+    join(home, '.opencode'),
+  ]);
 }
 
 export function getCopilotDataDir(): string {
@@ -115,6 +147,15 @@ export function getCopilotDataDir(): string {
   return join(home, '.copilot', 'session-state');
 }
 
+export function getCopilotDataDirCandidates(): string[] {
+  const home = homedir();
+  return uniquePaths([
+    join(home, '.copilot', 'session-state'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'copilot', 'session-state'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'GitHub Copilot', 'session-state'),
+  ]);
+}
+
 export function getPiDataDir(): string {
   const home = homedir();
   
@@ -129,6 +170,14 @@ export function getPiDataDir(): string {
   return join(home, '.pi', 'agent', 'sessions');
 }
 
+export function getPiDataDirCandidates(): string[] {
+  const home = homedir();
+  return uniquePaths([
+    join(home, '.pi', 'agent', 'sessions'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'pi', 'agent', 'sessions'),
+  ]);
+}
+
 export function getCodexDataDir(): string {
   const home = homedir();
   
@@ -141,4 +190,12 @@ export function getCodexDataDir(): string {
   }
   
   return join(home, '.codex', 'sessions');
+}
+
+export function getCodexDataDirCandidates(): string[] {
+  const home = homedir();
+  return uniquePaths([
+    join(home, '.codex', 'sessions'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'codex', 'sessions'),
+  ]);
 }

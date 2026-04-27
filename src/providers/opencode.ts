@@ -7,7 +7,7 @@ import type { Session, DateRange, Message, ToolUsage } from '../types/index.js';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { openReadonly } from '../adapters/sqlite.js';
-import { getOpencodeDataDir } from '../utils/paths.js';
+import { getOpencodeDataDir, getOpencodeDataDirCandidates, getPathLeaf } from '../utils/paths.js';
 
 interface OpencodeMessageData {
   role: string;
@@ -32,49 +32,58 @@ export class OpencodeProvider implements IProvider {
   readonly name = 'Opencode (Deepmind)';
 
   private dbPath = join(getOpencodeDataDir(), 'opencode.db');
+  private getDbPaths(): string[] {
+    return Array.from(new Set([
+      this.dbPath,
+      ...getOpencodeDataDirCandidates().map((root) => join(root, 'opencode.db')),
+    ]));
+  }
 
   isAvailable(): boolean {
-    return existsSync(this.dbPath);
+    return this.getDbPaths().some((dbPath) => existsSync(dbPath));
   }
 
   async discoverSessions(dateRange?: DateRange): Promise<string[]> {
     if (!this.isAvailable()) return [];
 
-    const discovered: string[] = [];
-    const db = await openReadonly(this.dbPath);
-    
-    if (!db) return discovered;
+    const discovered = new Set<string>();
 
-    try {
-      const rows = db.prepare(`
-        SELECT id, project_id, time_created 
-        FROM session 
-        ORDER BY time_created DESC
-        LIMIT 1000
-      `).all() as Array<{ id: string; project_id: string; time_created: number }>;
+    for (const dbPath of this.getDbPaths()) {
+      const db = await openReadonly(dbPath);
+      if (!db) continue;
 
-      for (const row of rows) {
-        if (dateRange) {
-          const ts = row.time_created;
-          const inRange = ts >= dateRange.from && ts <= dateRange.to;
-          if (inRange) {
-            discovered.push(row.id);
+      try {
+        const rows = db.prepare(`
+          SELECT id, project_id, time_created 
+          FROM session 
+          ORDER BY time_created DESC
+          LIMIT 1000
+        `).all() as Array<{ id: string; project_id: string; time_created: number }>;
+
+        for (const row of rows) {
+          if (dateRange) {
+            const ts = row.time_created;
+            const inRange = ts >= dateRange.from && ts <= dateRange.to;
+            if (inRange) {
+              discovered.add(`${dbPath}::${row.id}`);
+            }
+          } else {
+            discovered.add(`${dbPath}::${row.id}`);
           }
-        } else {
-          discovered.push(row.id);
         }
+      } catch {
+        // Query error
+      } finally {
+        db.close();
       }
-    } catch {
-      // Query error
-    } finally {
-      db.close();
     }
 
-    return discovered;
+    return Array.from(discovered);
   }
 
   async parseSession(identifier: string): Promise<Session> {
-    const db = await openReadonly(this.dbPath);
+    const [dbPath, sessionId] = identifier.includes('::') ? identifier.split('::', 2) : [this.dbPath, identifier];
+    const db = await openReadonly(dbPath);
     if (!db) {
       throw new Error('Cannot open Opencode database');
     }
@@ -84,8 +93,6 @@ export class OpencodeProvider implements IProvider {
     let sessionTimestamp = Date.now();
 
     try {
-      const sessionId = identifier;
-      
       const sessionRows = db.prepare(`
         SELECT time_created, directory, title FROM session WHERE id = ?
       `).get(sessionId) as { time_created: number; directory: string; title: string } | undefined;
@@ -94,9 +101,7 @@ export class OpencodeProvider implements IProvider {
         sessionTimestamp = sessionRows.time_created;
         // Use directory as project, fallback to title
         if (sessionRows.directory) {
-          // Extract meaningful project name from path
-          const parts = sessionRows.directory.split('/');
-          project = parts.slice(-2, -1)[0] || sessionRows.title || 'opencode';
+          project = getPathLeaf(sessionRows.directory) || sessionRows.title || 'opencode';
         } else {
           project = sessionRows.title || 'opencode';
         }

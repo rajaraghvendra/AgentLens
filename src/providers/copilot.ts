@@ -3,7 +3,7 @@ import type { Session, DateRange, Message, ToolUsage, TokenUsage } from '../type
 import { readdirSync, statSync, readFileSync, existsSync } from 'fs';
 import { join, basename } from 'path';
 import { isWithinRange } from '../utils/dates.js';
-import { getCopilotDataDir } from '../utils/paths.js';
+import { getCopilotDataDir, getCopilotDataDirCandidates, getPathLeaf } from '../utils/paths.js';
 
 interface CopilotEvent {
   type: string;
@@ -18,43 +18,52 @@ export class CopilotProvider implements IProvider {
   readonly name = 'GitHub Copilot';
 
   private sessionStateDir = getCopilotDataDir();
+  private getSessionStateDirs(): string[] {
+    return Array.from(new Set([this.sessionStateDir, ...getCopilotDataDirCandidates()]));
+  }
 
   isAvailable(): boolean {
-    try {
-      return existsSync(this.sessionStateDir);
-    } catch {
-      return false;
+    for (const dir of this.getSessionStateDirs()) {
+      try {
+        if (existsSync(dir)) return true;
+      } catch {
+        // continue
+      }
     }
+
+    return false;
   }
 
   async discoverSessions(dateRange?: DateRange): Promise<string[]> {
     if (!this.isAvailable()) return [];
 
-    const discovered: string[] = [];
+    const discovered = new Set<string>();
 
-    try {
-      const dirs = readdirSync(this.sessionStateDir);
+    for (const root of this.getSessionStateDirs()) {
+      try {
+        const dirs = readdirSync(root);
 
-      for (const dir of dirs) {
-        const eventsPath = join(this.sessionStateDir, dir, 'events.jsonl');
-        try {
-          const stats = statSync(eventsPath);
-          if (dateRange) {
-            if (isWithinRange(stats.mtimeMs, dateRange)) {
-              discovered.push(eventsPath);
+        for (const dir of dirs) {
+          const eventsPath = join(root, dir, 'events.jsonl');
+          try {
+            const stats = statSync(eventsPath);
+            if (dateRange) {
+              if (isWithinRange(stats.mtimeMs, dateRange)) {
+                discovered.add(eventsPath);
+              }
+            } else {
+              discovered.add(eventsPath);
             }
-          } else {
-            discovered.push(eventsPath);
+          } catch {
+            // Not a valid session dir
           }
-        } catch {
-          // Not a valid session dir
         }
+      } catch {
+        // Directory doesn't exist
       }
-    } catch {
-      // Directory doesn't exist
     }
 
-    return discovered;
+    return Array.from(discovered);
   }
 
   async parseSession(identifier: string): Promise<Session> {
@@ -89,7 +98,8 @@ export class CopilotProvider implements IProvider {
           const context = data.context as Record<string, unknown> | undefined;
           if (context && typeof context.cwd === 'string') {
             const cwd: string = context.cwd;
-            project = cwd.split('/').slice(-2).join('/') || project;
+            const segments = cwd.split(/[\\/]+/).filter(Boolean);
+            project = segments.slice(-2).join('/') || getPathLeaf(cwd) || project;
           }
         }
 

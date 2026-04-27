@@ -9,6 +9,7 @@ import { join, basename } from 'path';
 import config from '../config/env.js';
 import { streamJsonlFile } from '../utils/fs-stream.js';
 import { isWithinRange } from '../utils/dates.js';
+import { getCodexDataDirCandidates, getPathLeaf } from '../utils/paths.js';
 
 interface CodexEntry {
   timestamp?: string;
@@ -47,65 +48,74 @@ export class CodexProvider implements IProvider {
   readonly name = 'Codex CLI';
 
   private sessionsDir = config.codexDir;
+  private getSessionDirs(): string[] {
+    return Array.from(new Set([this.sessionsDir, ...getCodexDataDirCandidates()]));
+  }
 
   isAvailable(): boolean {
-    try {
-      return existsSync(this.sessionsDir);
-    } catch {
-      return false;
+    for (const dir of this.getSessionDirs()) {
+      try {
+        if (existsSync(dir)) return true;
+      } catch {
+        // continue
+      }
     }
+
+    return false;
   }
 
   async discoverSessions(dateRange?: DateRange): Promise<string[]> {
     if (!this.isAvailable()) return [];
 
-    const discovered: string[] = [];
+    const discovered = new Set<string>();
     
-    try {
-      const years = readdirSync(this.sessionsDir);
-      
-      for (const year of years) {
-        const yearPath = join(this.sessionsDir, year);
-        if (!statSync(yearPath).isDirectory()) continue;
+    for (const sessionsDir of this.getSessionDirs()) {
+      try {
+        const years = readdirSync(sessionsDir);
         
-        const months = readdirSync(yearPath);
-        for (const month of months) {
-          const monthPath = join(yearPath, month);
-          if (!statSync(monthPath).isDirectory()) continue;
+        for (const year of years) {
+          const yearPath = join(sessionsDir, year);
+          if (!statSync(yearPath).isDirectory()) continue;
           
-          const days = readdirSync(monthPath);
-          for (const day of days) {
-            const dayPath = join(monthPath, day);
-            if (!statSync(dayPath).isDirectory()) continue;
+          const months = readdirSync(yearPath);
+          for (const month of months) {
+            const monthPath = join(yearPath, month);
+            if (!statSync(monthPath).isDirectory()) continue;
             
-            const files = readdirSync(dayPath);
-            for (const file of files) {
-              if (!file.startsWith('rollout-') || !file.endsWith('.jsonl')) continue;
+            const days = readdirSync(monthPath);
+            for (const day of days) {
+              const dayPath = join(monthPath, day);
+              if (!statSync(dayPath).isDirectory()) continue;
               
-              const filePath = join(dayPath, file);
-              
-              try {
-                const stats = statSync(filePath);
+              const files = readdirSync(dayPath);
+              for (const file of files) {
+                if (!file.startsWith('rollout-') || !file.endsWith('.jsonl')) continue;
                 
-                if (dateRange) {
-                  if (isWithinRange(stats.mtimeMs, dateRange)) {
-                    discovered.push(filePath);
+                const filePath = join(dayPath, file);
+                
+                try {
+                  const stats = statSync(filePath);
+                  
+                  if (dateRange) {
+                    if (isWithinRange(stats.mtimeMs, dateRange)) {
+                      discovered.add(filePath);
+                    }
+                  } else {
+                    discovered.add(filePath);
                   }
-                } else {
-                  discovered.push(filePath);
+                } catch {
+                  // Skip inaccessible files
                 }
-              } catch {
-                // Skip inaccessible files
               }
             }
           }
         }
+      } catch {
+        // Directory doesn't exist or is not readable
       }
-    } catch {
-      // Directory doesn't exist or is not readable
     }
 
-    return discovered;
+    return Array.from(discovered);
   }
 
   async parseSession(identifier: string): Promise<Session> {
@@ -116,10 +126,9 @@ export class CodexProvider implements IProvider {
     for await (const raw of streamJsonlFile<CodexEntry>(identifier)) {
       if (!raw.type) continue;
       
-      if (raw.type === 'session_meta' && raw.payload) {
+        if (raw.type === 'session_meta' && raw.payload) {
         if (raw.payload.cwd) {
-          const parts = raw.payload.cwd.split('/');
-          project = parts[parts.length - 1] || project;
+          project = getPathLeaf(raw.payload.cwd) || project;
         }
         if (raw.timestamp) {
           sessionTimestamp = new Date(raw.timestamp).getTime();

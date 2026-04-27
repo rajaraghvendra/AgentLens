@@ -8,7 +8,7 @@ import { accessSync, constants, readdirSync, statSync, readFileSync } from 'fs';
 import { join, basename } from 'path';
 import { streamJsonlFile } from '../utils/fs-stream.js';
 import { isWithinRange } from '../utils/dates.js';
-import { getPiDataDir } from '../utils/paths.js';
+import { getPiDataDir, getPiDataDirCandidates } from '../utils/paths.js';
 
 interface PiEntry {
   type: string;
@@ -57,57 +57,66 @@ export class PiProvider implements IProvider {
   readonly name = 'Pi';
 
   private sessionsDir = getPiDataDir();
+  private getSessionDirs(): string[] {
+    return Array.from(new Set([this.sessionsDir, ...getPiDataDirCandidates()]));
+  }
 
   isAvailable(): boolean {
-    try {
-      accessSync(this.sessionsDir, constants.R_OK);
-      return true;
-    } catch {
-      return false;
+    for (const dir of this.getSessionDirs()) {
+      try {
+        accessSync(dir, constants.R_OK);
+        return true;
+      } catch {
+        // continue
+      }
     }
+
+    return false;
   }
 
   async discoverSessions(dateRange?: DateRange): Promise<string[]> {
     if (!this.isAvailable()) return [];
 
-    const discovered: string[] = [];
+    const discovered = new Set<string>();
 
-    try {
-      const projectDirs = readdirSync(this.sessionsDir);
-      
-      for (const dirName of projectDirs) {
-        const dirPath = join(this.sessionsDir, dirName);
-        const dirStat = statSync(dirPath);
+    for (const sessionsDir of this.getSessionDirs()) {
+      try {
+        const projectDirs = readdirSync(sessionsDir);
         
-        if (!dirStat.isDirectory()) continue;
-
-        let files: string[];
-        try {
-          files = readdirSync(dirPath);
-        } catch {
-          continue;
-        }
-
-        for (const file of files) {
-          if (!file.endsWith('.jsonl')) continue;
+        for (const dirName of projectDirs) {
+          const dirPath = join(sessionsDir, dirName);
+          const dirStat = statSync(dirPath);
           
-          const filePath = join(dirPath, file);
-          const fileStat = statSync(filePath);
-          
-          if (dateRange) {
-            if (isWithinRange(fileStat.mtimeMs, dateRange)) {
-              discovered.push(filePath);
+          if (!dirStat.isDirectory()) continue;
+
+          let files: string[];
+          try {
+            files = readdirSync(dirPath);
+          } catch {
+            continue;
+          }
+
+          for (const file of files) {
+            if (!file.endsWith('.jsonl')) continue;
+            
+            const filePath = join(dirPath, file);
+            const fileStat = statSync(filePath);
+            
+            if (dateRange) {
+              if (isWithinRange(fileStat.mtimeMs, dateRange)) {
+                discovered.add(filePath);
+              }
+            } else {
+              discovered.add(filePath);
             }
-          } else {
-            discovered.push(filePath);
           }
         }
+      } catch {
+        // Ignore errors
       }
-    } catch {
-      // Ignore errors
     }
 
-    return discovered;
+    return Array.from(discovered);
   }
 
   async parseSession(identifier: string): Promise<Session> {

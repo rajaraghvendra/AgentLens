@@ -8,88 +8,102 @@ import { accessSync, constants, statSync, readdirSync, existsSync } from 'fs';
 import { join, basename, dirname } from 'path';
 import { openReadonly } from '../adapters/sqlite.js';
 import { isWithinRange } from '../utils/dates.js';
-import { getCursorDataDir } from '../utils/paths.js';
+import { getCursorDataDir, getCursorDataDirCandidates } from '../utils/paths.js';
 
 export class CursorProvider implements IProvider {
   readonly id = 'cursor';
   readonly name = 'Cursor';
 
   private cursorDataDir = getCursorDataDir();
-  private workspaceStoragePath = join(this.cursorDataDir, 'User', 'workspaceStorage');
-  private chatsStoragePath = join(this.cursorDataDir, 'chats');
+  private getCursorRoots(): string[] {
+    return Array.from(new Set([this.cursorDataDir, ...getCursorDataDirCandidates()]));
+  }
+
+  private getWorkspaceStoragePaths(): string[] {
+    return this.getCursorRoots().map((root) => join(root, 'User', 'workspaceStorage'));
+  }
+
+  private getChatsStoragePaths(): string[] {
+    return this.getCursorRoots().map((root) => join(root, 'chats'));
+  }
 
   isAvailable(): boolean {
-    return this.isReadableDir(this.workspaceStoragePath) || this.isReadableDir(this.chatsStoragePath);
+    return this.getWorkspaceStoragePaths().some((path) => this.isReadableDir(path))
+      || this.getChatsStoragePaths().some((path) => this.isReadableDir(path));
   }
 
   async discoverSessions(dateRange?: DateRange): Promise<string[]> {
     if (!this.isAvailable()) return [];
 
-    const discovered: string[] = [];
+    const discovered = new Set<string>();
     this.discoverWorkspaceSessions(discovered, dateRange);
     this.discoverChatStoreSessions(discovered, dateRange);
-    return discovered;
+    return Array.from(discovered);
   }
 
-  private discoverWorkspaceSessions(discovered: string[], dateRange?: DateRange): void {
-    if (!this.isReadableDir(this.workspaceStoragePath)) return;
-    try {
-      const workspaces = readdirSync(this.workspaceStoragePath, { withFileTypes: true });
-      
-      for (const workspace of workspaces) {
-        if (!workspace.isDirectory()) continue;
+  private discoverWorkspaceSessions(discovered: Set<string>, dateRange?: DateRange): void {
+    for (const workspaceStoragePath of this.getWorkspaceStoragePaths()) {
+      if (!this.isReadableDir(workspaceStoragePath)) continue;
+      try {
+        const workspaces = readdirSync(workspaceStoragePath, { withFileTypes: true });
         
-        const workspacePath = join(this.workspaceStoragePath, workspace.name);
-        const stateDbPath = join(workspacePath, 'state.vscdb');
-        
-        try {
-          accessSync(stateDbPath, constants.R_OK);
-          const stats = statSync(stateDbPath);
+        for (const workspace of workspaces) {
+          if (!workspace.isDirectory()) continue;
           
-          if (dateRange) {
-            if (isWithinRange(stats.mtimeMs, dateRange)) {
-              discovered.push(stateDbPath);
+          const workspacePath = join(workspaceStoragePath, workspace.name);
+          const stateDbPath = join(workspacePath, 'state.vscdb');
+          
+          try {
+            accessSync(stateDbPath, constants.R_OK);
+            const stats = statSync(stateDbPath);
+            
+            if (dateRange) {
+              if (isWithinRange(stats.mtimeMs, dateRange)) {
+                discovered.add(stateDbPath);
+              }
+            } else {
+              discovered.add(stateDbPath);
             }
-          } else {
-            discovered.push(stateDbPath);
+          } catch {
+            // Skip if state.vscdb doesn't exist
           }
-        } catch {
-          // Skip if state.vscdb doesn't exist
         }
+      } catch {
+        // Directory not accessible
       }
-    } catch {
-      // Directory not accessible
     }
   }
 
-  private discoverChatStoreSessions(discovered: string[], dateRange?: DateRange): void {
-    if (!this.isReadableDir(this.chatsStoragePath)) return;
+  private discoverChatStoreSessions(discovered: Set<string>, dateRange?: DateRange): void {
+    for (const chatsStoragePath of this.getChatsStoragePaths()) {
+      if (!this.isReadableDir(chatsStoragePath)) continue;
 
-    const stack = [this.chatsStoragePath];
-    while (stack.length > 0) {
-      const current = stack.pop()!;
-      let entries: Array<{ isDirectory: () => boolean; isFile: () => boolean; name: string }>;
-      try {
-        entries = readdirSync(current, { withFileTypes: true }) as Array<{ isDirectory: () => boolean; isFile: () => boolean; name: string }>;
-      } catch {
-        continue;
-      }
-
-      for (const entry of entries) {
-        const full = join(current, entry.name);
-        if (entry.isDirectory()) {
-          stack.push(full);
+      const stack = [chatsStoragePath];
+      while (stack.length > 0) {
+        const current = stack.pop()!;
+        let entries: Array<{ isDirectory: () => boolean; isFile: () => boolean; name: string }>;
+        try {
+          entries = readdirSync(current, { withFileTypes: true }) as Array<{ isDirectory: () => boolean; isFile: () => boolean; name: string }>;
+        } catch {
           continue;
         }
 
-        if (entry.isFile() && entry.name === 'store.db') {
-          try {
-            const stats = statSync(full);
-            if (!dateRange || isWithinRange(stats.mtimeMs, dateRange)) {
-              discovered.push(full);
+        for (const entry of entries) {
+          const full = join(current, entry.name);
+          if (entry.isDirectory()) {
+            stack.push(full);
+            continue;
+          }
+
+          if (entry.isFile() && entry.name === 'store.db') {
+            try {
+              const stats = statSync(full);
+              if (!dateRange || isWithinRange(stats.mtimeMs, dateRange)) {
+                discovered.add(full);
+              }
+            } catch {
+              // ignore unreadable db
             }
-          } catch {
-            // ignore unreadable db
           }
         }
       }
