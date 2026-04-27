@@ -36,14 +36,19 @@ describe('CLI Commands Execution', () => {
           avgCostPerSession: 10,
           cacheHitRate: 50,
         },
+        byProvider: {},
         byModel: {},
         byActivity: {
-          'Coding': { category: 'Coding', messageCount: 5, totalTokens: 1000, costUSD: 10, percentage: 100 }
+          'Coding': { category: 'Coding', messageCount: 5, totalTokens: 1000, costUSD: 10, percentage: 100, editTurns: 0, oneShotTurns: 0, oneShotRate: 0 }
         }
       },
       findings: [],
       insights: ['Insight 1'],
-      providers: []
+      providers: [],
+      events: [],
+      digests: [],
+      toolAdvice: [],
+      processing: undefined,
     };
 
     // Replace the static runFull logic with mock manually

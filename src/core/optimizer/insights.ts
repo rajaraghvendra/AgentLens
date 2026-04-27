@@ -2,9 +2,14 @@
 // AgentLens – Insights Generator
 // ─────────────────────────────────────────────────────────────
 
-import type { Metrics, WasteFinding } from '../../types/index.js';
+import type { Metrics, OptimizationEvent, ToolAdvice, WasteFinding } from '../../types/index.js';
 
-export function generateInsights(metrics: Metrics, findings: WasteFinding[]): string[] {
+export function generateInsights(
+  metrics: Metrics,
+  findings: WasteFinding[],
+  events: OptimizationEvent[] = [],
+  toolAdvice: ToolAdvice[] = [],
+): string[] {
   const insights: string[] = [];
 
   // Insight 1: Spending pace
@@ -35,6 +40,16 @@ export function generateInsights(metrics: Metrics, findings: WasteFinding[]): st
   const highSeverity = findings.find(f => f.severity === 'High');
   if (highSeverity) {
     insights.push(`**Critical Inefficiency:** ${highSeverity.description} (Loss: ~$${highSeverity.estimatedCostWastedUSD.toFixed(2)})`);
+  }
+
+  const topEvent = events[0];
+  if (topEvent) {
+    insights.push(`**Active Alert:** ${topEvent.title}. ${topEvent.recommendedAction}`);
+  }
+
+  const topAdvice = toolAdvice[0];
+  if (topAdvice) {
+    insights.push(`**Top Advice:** ${topAdvice.description} ${topAdvice.suggestedAction}`);
   }
 
   if (insights.length === 0) {

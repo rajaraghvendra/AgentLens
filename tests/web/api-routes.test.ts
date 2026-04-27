@@ -54,7 +54,12 @@ describe('web api routes', () => {
       .mockResolvedValueOnce({ totalCostUSD: 1.2, totalTokens: 100, sessionsCount: 2 })
       .mockResolvedValueOnce({ totalCostUSD: 4.5, totalTokens: 300, sessionsCount: 5 });
     getBudgetMock.mockResolvedValueOnce({ daily: 10, monthly: 100, currency: 'USD' });
-    runMock.mockResolvedValueOnce({ metrics: { byProvider: { cursor: { costUSD: 1.2 } } } });
+    runFullMock.mockResolvedValueOnce({
+      metrics: { byProvider: { cursor: { costUSD: 1.2 } } },
+      events: [{ id: 'e1', title: 'Cache issue', severity: 'Medium', description: 'desc', recommendedAction: 'fix it' }],
+      toolAdvice: [{ title: 'Advice 1' }],
+      processing: { filesReparsed: 1, cachedFilesReused: 2, sessionsLoadedFromCache: 2 },
+    });
 
     const response = await getStatus(new Request('http://localhost/api/status?period=today'));
     expect(response.status).toBe(200);
@@ -67,10 +72,18 @@ describe('web api routes', () => {
         byActivity: { Coding: { category: 'Coding', costUSD: 2, percentage: 80, oneShotRate: 50 } },
         byModel: {},
         byProvider: { claude: { provider: 'claude', costUSD: 2, totalTokens: 10, inputTokens: 6, outputTokens: 4, cacheReadTokens: 0, cacheWriteTokens: 0, messageCount: 1 } },
+        byTool: {},
+        byMcpServer: {},
+        byCommandPattern: {},
       },
       findings: [],
       insights: [],
       providers: [{ id: 'claude' }],
+      events: [],
+      digests: [],
+      toolAdvice: [],
+      processing: null,
+      sessions: [],
     });
     buildExportDataMock.mockReturnValueOnce({
       byDay: [],
@@ -82,6 +95,7 @@ describe('web api routes', () => {
     expect(response.status).toBe(200);
     expect(body.providers).toHaveLength(1);
     expect(body.activities[0]).toMatchObject({ name: 'Coding' });
+    expect(body.events).toEqual([]);
   });
 
   it('optimize route returns 500 on runner failures', async () => {

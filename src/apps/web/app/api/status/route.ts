@@ -7,12 +7,13 @@ async function GET(request: Request): Promise<NextResponse> {
     const { searchParams } = new URL(request.url);
     const period = sanitizePeriod(searchParams.get('period'), 'today');
     const periodDays = parsePeriod(period);
+    const fullReparse = searchParams.get('fullReparse') === '1';
 
     const [today, rangeStats, budget, detailedToday] = await Promise.all([
-      CoreEngine.getQuickStats(1),
-      CoreEngine.getQuickStats(periodDays),
+      CoreEngine.getQuickStats(1, { fullReparse }),
+      CoreEngine.getQuickStats(periodDays, { fullReparse }),
       getBudget(),
-      CoreEngine.run(1, 'USD'),
+      CoreEngine.runFull(1, 'USD', { fullReparse }),
     ]);
 
     const dailyBudget = budget?.daily || 0;
@@ -33,6 +34,10 @@ async function GET(request: Request): Promise<NextResponse> {
       costsByProvider: Object.fromEntries(
         Object.entries(detailedToday.metrics.byProvider || {}).map(([provider, data]: [string, any]) => [provider, data.costUSD]),
       ),
+      activeIssuesCount: detailedToday.events?.length || 0,
+      topAlert: detailedToday.events?.[0] || null,
+      recommendations: (detailedToday.toolAdvice || []).slice(0, 3).map((item: any) => item.title),
+      processing: detailedToday.processing ?? null,
       sessionsToday: today.sessionsCount,
       sessionsInPeriod: rangeStats.sessionsCount,
     });

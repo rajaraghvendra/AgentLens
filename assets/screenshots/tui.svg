@@ -1,56 +1,56 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#080b16"/>
-      <stop offset="100%" style="stop-color:#111827"/>
+      <stop offset="0%" stop-color="#070b16"/>
+      <stop offset="100%" stop-color="#111827"/>
     </linearGradient>
   </defs>
 
-  <rect width="1200" height="760" fill="url(#bg)"/>
-  <rect x="30" y="26" width="1140" height="708" rx="18" fill="#050816" stroke="#1f2937" stroke-width="2"/>
+  <rect width="1280" height="800" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1224" height="744" rx="18" fill="#050816" stroke="#1f2937" stroke-width="2"/>
 
-  <circle cx="64" cy="54" r="8" fill="#ef4444"/>
-  <circle cx="88" cy="54" r="8" fill="#f59e0b"/>
-  <circle cx="112" cy="54" r="8" fill="#10b981"/>
-  <text x="160" y="60" fill="#94a3b8" font-size="18" font-family="Menlo, Monaco, Consolas, monospace">agentlens tui</text>
+  <circle cx="64" cy="58" r="8" fill="#ef4444"/>
+  <circle cx="88" cy="58" r="8" fill="#f59e0b"/>
+  <circle cx="112" cy="58" r="8" fill="#10b981"/>
+  <text x="160" y="64" fill="#94a3b8" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">agentlens tui</text>
 
-  <text x="70" y="112" fill="#d946ef" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">Today     7 Days   [ 30 Days ]   This Month     All Time</text>
-  <text x="920" y="112" fill="#6b7280" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">|</text>
-  <text x="950" y="112" fill="#d946ef" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">[p]</text>
-  <text x="1000" y="112" fill="#a78bfa" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">Claude</text>
+  <text x="70" y="118" fill="#d946ef" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">Today     7 Days   [ 30 Days ]   This Month     All Time</text>
+  <text x="934" y="118" fill="#6b7280" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">|</text>
+  <text x="964" y="118" fill="#d946ef" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">[p]</text>
+  <text x="1016" y="118" fill="#a78bfa" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">All Providers</text>
 
-  <rect x="64" y="142" width="1072" height="86" rx="10" fill="none" stroke="#a855f7" stroke-width="2"/>
-  <text x="88" y="176" fill="#d946ef" font-size="28" font-family="Menlo, Monaco, Consolas, monospace">AgentLens</text>
-  <text x="88" y="208" fill="#9ca3af" font-size="22" font-family="Menlo, Monaco, Consolas, monospace">$79.23 cost   38 sessions   35.3M tokens   0.0% cache hit</text>
+  <rect x="64" y="146" width="1144" height="92" rx="10" fill="none" stroke="#a855f7" stroke-width="2"/>
+  <text x="86" y="180" fill="#d946ef" font-size="28" font-family="Menlo, Monaco, Consolas, monospace">AgentLens</text>
+  <text x="86" y="214" fill="#cbd5e1" font-size="22" font-family="Menlo, Monaco, Consolas, monospace">$148.92 cost   54 sessions   18.7M tokens   12.6% cache</text>
 
-  <rect x="64" y="248" width="528" height="218" rx="10" fill="none" stroke="#06b6d4" stroke-width="2"/>
-  <text x="86" y="280" fill="#22d3ee" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">Daily Activity</text>
-  <text x="86" y="314" fill="#6b7280" font-size="18" font-family="Menlo, Monaco, Consolas, monospace">date         cost      sess</text>
-  <text x="86" y="346" fill="#9ca3af" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">04-20  ████░░░░░░   $8.12      3</text>
-  <text x="86" y="378" fill="#9ca3af" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">04-21  ███████░░░   $13.44     5</text>
-  <text x="86" y="410" fill="#9ca3af" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">04-22  █████████░   $16.29     6</text>
-  <text x="86" y="442" fill="#9ca3af" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">04-23  ██████░░░░   $11.02     4</text>
+  <rect x="64" y="260" width="554" height="226" rx="10" fill="none" stroke="#22d3ee" stroke-width="2"/>
+  <text x="86" y="292" fill="#22d3ee" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">Daily Breakdown</text>
+  <text x="86" y="326" fill="#6b7280" font-size="18" font-family="Menlo, Monaco, Consolas, monospace">date      cost     sess     tokens    avg/s</text>
+  <text x="86" y="360" fill="#ffffff" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">› 04-24   ████████   $22.10    8     3.4M    $2.76</text>
+  <text x="86" y="392" fill="#9ca3af" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">  04-23   ██████░░   $18.32    7     2.9M    $2.61</text>
+  <text x="86" y="424" fill="#9ca3af" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">  04-22   ████░░░░   $11.84    4     1.8M    $2.96</text>
+  <text x="86" y="456" fill="#9ca3af" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">  04-21   █████░░░   $15.27    6     2.1M    $2.54</text>
 
-  <rect x="608" y="248" width="528" height="218" rx="10" fill="none" stroke="#39ff14" stroke-width="2"/>
-  <text x="630" y="280" fill="#39ff14" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">By Project</text>
-  <text x="630" y="316" fill="#e5e7eb" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">AgentLens           $41.00   17 sessions</text>
-  <text x="630" y="350" fill="#e5e7eb" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">LLM                 $22.93    9 sessions</text>
-  <text x="630" y="384" fill="#e5e7eb" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">subagents           $5.95     4 sessions</text>
-  <text x="630" y="418" fill="#e5e7eb" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">workspace-tools     $4.56     3 sessions</text>
+  <rect x="654" y="260" width="554" height="226" rx="10" fill="none" stroke="#39ff14" stroke-width="2"/>
+  <text x="676" y="292" fill="#39ff14" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">Projects</text>
+  <text x="676" y="326" fill="#ffffff" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">› AgentLens            $61.30   21s</text>
+  <text x="676" y="358" fill="#e5e7eb" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">  planning-workbench   $28.94   10s</text>
+  <text x="676" y="390" fill="#e5e7eb" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">  docs-refactor        $14.42    6s</text>
+  <text x="676" y="422" fill="#e5e7eb" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">  subagents            $9.17     4s</text>
 
-  <rect x="64" y="486" width="528" height="182" rx="10" fill="none" stroke="#ffb300" stroke-width="2"/>
-  <text x="86" y="518" fill="#ffb300" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">Activity Breakdown</text>
-  <text x="86" y="554" fill="#e5e7eb" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">General        92%   $77.45</text>
-  <text x="86" y="588" fill="#e5e7eb" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">Git Ops         2%   $0.78</text>
-  <text x="86" y="622" fill="#e5e7eb" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">Debugging       4%   $0.71</text>
+  <rect x="64" y="506" width="554" height="180" rx="10" fill="none" stroke="#ffb300" stroke-width="2"/>
+  <text x="86" y="538" fill="#ffb300" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">Models</text>
+  <text x="86" y="572" fill="#ffffff" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">gpt-5.4              $52.73   7.8M</text>
+  <text x="86" y="604" fill="#e5e7eb" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">claude-sonnet-4      $45.18   6.1M</text>
+  <text x="86" y="636" fill="#e5e7eb" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">qwen3-coder:480b     $19.24   2.6M</text>
 
-  <rect x="608" y="486" width="528" height="182" rx="10" fill="none" stroke="#ff4081" stroke-width="2"/>
-  <text x="630" y="518" fill="#ff4081" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">Optimization Findings</text>
-  <text x="630" y="556" fill="#fca5a5" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">HIGH  Edit Retry Loops Detected</text>
-  <text x="630" y="592" fill="#e5e7eb" font-size="18" font-family="Menlo, Monaco, Consolas, monospace">An agent edited the same file</text>
-  <text x="630" y="620" fill="#e5e7eb" font-size="18" font-family="Menlo, Monaco, Consolas, monospace">across 4 consecutive turns.</text>
+  <rect x="654" y="506" width="554" height="180" rx="10" fill="none" stroke="#ff4081" stroke-width="2"/>
+  <text x="676" y="538" fill="#ff4081" font-size="24" font-family="Menlo, Monaco, Consolas, monospace">Findings &amp; Insights</text>
+  <text x="676" y="572" fill="#fca5a5" font-size="20" font-family="Menlo, Monaco, Consolas, monospace">ALERT MCP server failures are spiking</text>
+  <text x="676" y="604" fill="#cbd5e1" font-size="18" font-family="Menlo, Monaco, Consolas, monospace">Disable or repair the failing MCP server before</text>
+  <text x="676" y="628" fill="#cbd5e1" font-size="18" font-family="Menlo, Monaco, Consolas, monospace">it burns more context on retries.</text>
+  <text x="676" y="660" fill="#67e8f9" font-size="18" font-family="Menlo, Monaco, Consolas, monospace">• Cache hit rate is low; split long sessions sooner.</text>
 
-  <rect x="64" y="688" width="1072" height="28" rx="8" fill="none" stroke="#4b5563" stroke-width="2"/>
-  <text x="132" y="708" fill="#d946ef" font-size="18" font-family="Menlo, Monaco, Consolas, monospace">&lt;&gt;</text>
-  <text x="174" y="708" fill="#9ca3af" font-size="18" font-family="Menlo, Monaco, Consolas, monospace">switch   q quit   r refresh   1 today   2 week   3 30 days   4 month   5 all time   p provider</text>
+  <rect x="64" y="708" width="1144" height="34" rx="8" fill="none" stroke="#4b5563" stroke-width="2"/>
+  <text x="88" y="731" fill="#9ca3af" font-size="18" font-family="Menlo, Monaco, Consolas, monospace">mode dashboard   focus daily sort:cost   q quit   r refresh   c compare   s sort   enter detail</text>
 </svg>

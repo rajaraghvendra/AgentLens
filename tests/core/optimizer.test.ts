@@ -4,6 +4,8 @@
 
 import { describe, it, expect } from 'vitest';
 import { analyzeInefficiencies } from '../../src/core/optimizer/index.js';
+import { analyzeAdvice } from '../../src/core/optimizer/advice.js';
+import { computeMetrics } from '../../src/core/metrics/index.js';
 import type { Session, ToolUsage } from '../../src/types/index.js';
 
 describe('Optimizer', () => {
@@ -96,5 +98,27 @@ describe('Optimizer', () => {
     };
     const findings = analyzeInefficiencies([session]);
     expect(findings.length).toBe(0);
+  });
+
+  it('generates MCP advice and events for repeated failures', async () => {
+    const session: Session = {
+      id: 's6', provider: 'claude', project: 'test', timestamp: 0,
+      messages: Array.from({ length: 4 }).map((_, index) => ({
+        id: `m${index}`,
+        role: 'assistant' as const,
+        content: '',
+        timestamp: index + 1,
+        model: 'claude-sonnet-4-20250514',
+        tokens: { input: 50, output: 20, cacheRead: 0, cacheWrite: 0 },
+        tools: [{ name: 'mcp_fetch', input: { server_name: 'broken-mcp' }, isError: true }],
+      })),
+    };
+
+    const metrics = await computeMetrics([session]);
+    const findings = analyzeInefficiencies([session], metrics);
+    const advice = analyzeAdvice([session], metrics, findings, 7);
+
+    expect(advice.events.some((event) => event.kind === 'mcp-failure-spike')).toBe(true);
+    expect(advice.toolAdvice.some((item) => item.title.includes('broken-mcp'))).toBe(true);
   });
 });

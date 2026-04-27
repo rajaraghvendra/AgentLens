@@ -11,6 +11,7 @@ import { PiProvider } from './pi.js';
 import { CopilotProvider } from './copilot.js';
 import type { Session, DateRange } from '../types/index.js';
 import { deduplicateSessions } from '../core/parser/dedup.js';
+import { loadSessionsIncrementally, type ProcessingOptions } from '../core/processing/index.js';
 
 export type ProviderFilter = 'all' | 'claude' | 'codex' | 'cursor' | 'opencode' | 'pi' | 'copilot';
 
@@ -45,27 +46,15 @@ export function getAvailableProviders(filter?: ProviderFilter): IProvider[] {
  * Discovers and parses sessions across all available providers
  * within the optional date range, deduplicating the results.
  */
-export async function getAllSessions(dateRange?: DateRange, providerFilter?: ProviderFilter): Promise<Session[]> {
+export async function getAllSessions(
+  dateRange?: DateRange,
+  providerFilter?: ProviderFilter,
+  processingOptions?: ProcessingOptions,
+): Promise<{ sessions: Session[]; processing: Awaited<ReturnType<typeof loadSessionsIncrementally>>['stats'] }> {
   const providers = getAvailableProviders(providerFilter);
-  const sessionPromises: Promise<Session>[] = [];
-
-  for (const provider of providers) {
-    const identifiers = await provider.discoverSessions(dateRange);
-    
-    for (const identifier of identifiers) {
-      sessionPromises.push(
-        provider.parseSession(identifier).catch(err => {
-          if (process.env.AGENTLENS_DEBUG) {
-            console.error(`[agentlens] Failed to parse ${identifier}:`, err);
-          }
-          return null as unknown as Session; // Will be filtered out
-        })
-      );
-    }
-  }
-
-  const results = await Promise.all(sessionPromises);
-  const validSessions = results.filter(s => s !== null);
-
-  return deduplicateSessions(validSessions);
+  const loaded = await loadSessionsIncrementally(providers, dateRange, processingOptions);
+  return {
+    sessions: deduplicateSessions(loaded.sessions),
+    processing: loaded.stats,
+  };
 }

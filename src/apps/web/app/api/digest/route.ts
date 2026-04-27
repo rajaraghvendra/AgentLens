@@ -1,28 +1,21 @@
 import { NextResponse } from 'next/server';
-import { CoreEngine, computeHealthScore } from '../../../lib/server-core';
+import { CoreEngine } from '../../../lib/server-core';
 import { sanitizePeriod, sanitizeProvider, parsePeriod } from '../../../lib/query-params';
 
 async function GET(request: Request): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(request.url);
-    const period = sanitizePeriod(searchParams.get('period'), '30');
+    const period = sanitizePeriod(searchParams.get('period'), '7');
     const provider = sanitizeProvider(searchParams.get('provider'));
+    const digestPeriod = searchParams.get('digest') === 'daily' ? 'daily' : 'weekly';
     const fullReparse = searchParams.get('fullReparse') === '1';
     const filters = provider ? { provider, fullReparse } : { fullReparse };
     const result = await CoreEngine.runFull(parsePeriod(period), 'USD', filters);
-    const { findings, insights, metrics } = result;
-    const { score, grade } = computeHealthScore(findings);
 
     return NextResponse.json({
-      findings,
-      insights,
+      digest: (result.digests ?? []).find((entry) => entry.period === digestPeriod) ?? null,
       events: result.events ?? [],
-      digests: result.digests ?? [],
-      toolAdvice: result.toolAdvice ?? [],
       processing: result.processing ?? null,
-      healthScore: score,
-      healthGrade: grade,
-      totalCost: metrics?.overview?.totalCostUSD,
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

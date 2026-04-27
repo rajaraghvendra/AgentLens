@@ -7,7 +7,8 @@ async function GET(request: Request): Promise<NextResponse> {
     const { searchParams } = new URL(request.url);
     const period = sanitizePeriod(searchParams.get('period'), '30');
     const provider = sanitizeProvider(searchParams.get('provider'));
-    const filters = provider ? { provider } : undefined;
+    const fullReparse = searchParams.get('fullReparse') === '1';
+    const filters = provider ? { provider, fullReparse } : { fullReparse };
     const { metrics } = await CoreEngine.run(parsePeriod(period), 'USD', filters);
     const models = Object.values(metrics.byModel)
       .sort((a, b) => b.costUSD - a.costUSD)

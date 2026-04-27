@@ -13,6 +13,7 @@ export interface FilterOptions {
   provider?: ProviderFilter;
   projects?: string[];
   exclude?: string[];
+  fullReparse?: boolean;
 }
 
 function filterSessionsByProject(sessions: Session[], projects: string[], exclude: string[]): Session[] {
@@ -98,17 +99,17 @@ export class CoreEngine {
     periodDays: number, 
     currencyCode: string = 'USD',
     filters?: FilterOptions
-  ): Promise<{ sessions: Session[]; metrics: Metrics }> {
+  ): Promise<{ sessions: Session[]; metrics: Metrics; processing: EngineResult['processing'] }> {
     // 1. Load Prices
     await PricingEngine.loadPrices();
 
     // 2. Discover and Parse overlapping sessions across providers
     const dateRange = getDateRange(periodDays);
-    const sessions = await getAllSessions(dateRange, filters?.provider);
+    const loaded = await getAllSessions(dateRange, filters?.provider, { forceReparse: filters?.fullReparse });
 
     // 3. Apply project filters
     const filteredSessions = filterSessionsByProject(
-      sessions, 
+      loaded.sessions, 
       filters?.projects || [], 
       filters?.exclude || []
     );
@@ -121,7 +122,7 @@ export class CoreEngine {
     metrics.overview.totalCostLocal = metrics.overview.totalCostUSD * rate;
     metrics.overview.localCurrency = currencyCode.toUpperCase();
 
-    return { sessions: filteredSessions, metrics };
+    return { sessions: filteredSessions, metrics, processing: loaded.processing };
   }
 
   /**
@@ -140,14 +141,26 @@ export class CoreEngine {
     currencyCode: string = 'USD',
     filters?: FilterOptions
   ): Promise<EngineResult> {
-    const { sessions, metrics } = await this.run(periodDays, currencyCode, filters);
+    const { sessions, metrics, processing } = await this.run(periodDays, currencyCode, filters);
     
     // Lazy load the optimizer
     const { analyzeInefficiencies } = await import('./optimizer/index.js');
+    const { analyzeAdvice } = await import('./optimizer/advice.js');
     const { generateInsights } = await import('./optimizer/insights.js');
     
-    const findings = analyzeInefficiencies(sessions);
-    const insights = generateInsights(metrics, findings);
+    const findings = analyzeInefficiencies(sessions, metrics);
+    const {
+      events,
+      digests,
+      toolAdvice,
+      byTool,
+      byMcpServer,
+      byCommandPattern,
+    } = analyzeAdvice(sessions, metrics, findings, periodDays);
+    metrics.byTool = byTool;
+    metrics.byMcpServer = byMcpServer;
+    metrics.byCommandPattern = byCommandPattern;
+    const insights = generateInsights(metrics, findings, events, toolAdvice);
 
     // Get available providers status
     const { getAllProviders } = await import('../providers/index.js');
@@ -159,7 +172,7 @@ export class CoreEngine {
       sessionCount: sessions.filter(s => s.provider === p.id).length
     }));
 
-    return { sessions, metrics, findings, insights, providers: providersList };
+    return { sessions, metrics, findings, insights, providers: providersList, events, digests, toolAdvice, processing };
   }
 
   /**

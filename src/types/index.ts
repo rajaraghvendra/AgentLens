@@ -100,6 +100,9 @@ export interface Metrics {
   byProvider: Record<string, ProviderMetrics>;
   byActivity: Partial<Record<ActivityCategory, ActivityMetrics>>;
   hourly: Record<string, { messages: number; tokens: number; costUSD: number }>;
+  byTool?: Record<string, ToolMetrics>;
+  byMcpServer?: Record<string, McpServerMetrics>;
+  byCommandPattern?: Record<string, CommandPatternMetrics>;
 }
 
 export interface MetricsOverview {
@@ -182,16 +185,111 @@ export interface ExportData {
   byActivity: { name: string; cost: number; percentage: number; oneShotRate: number }[];
 }
 
+export interface ToolMetrics {
+  name: string;
+  invocationCount: number;
+  errorRate: number;
+  repeatedLoopRate: number;
+  estimatedTokenCost: number;
+  estimatedCostUSD: number;
+  sessionsTouched: number;
+  successCorrelation: number;
+}
+
+export interface McpServerMetrics {
+  name: string;
+  invocationCount: number;
+  errorRate: number;
+  repeatedLoopRate: number;
+  estimatedTokenCost: number;
+  estimatedCostUSD: number;
+  sessionsTouched: number;
+}
+
+export interface CommandPatternMetrics {
+  pattern: string;
+  count: number;
+  errorRate: number;
+  sessionsTouched: number;
+  estimatedCostUSD: number;
+}
+
 // ── Optimizer ────────────────────────────────────────────────
 
+export type FindingSeverity = "High" | "Medium" | "Low";
+
 export interface WasteFinding {
-  severity: "High" | "Medium" | "Low";
+  severity: FindingSeverity;
   title: string;
   description: string;
   estimatedTokensWasted: number;
   estimatedCostWastedUSD: number;
   /** Ready-to-paste CLI command or config edit */
   suggestedFix: string;
+  kind?: string;
+  confidence?: number;
+  baselineWindow?: string;
+  triggerValue?: number | string;
+  expectedRange?: string;
+}
+
+export interface OptimizationEvent {
+  id: string;
+  kind: string;
+  severity: FindingSeverity;
+  title: string;
+  description: string;
+  confidence: number;
+  triggerValue?: number | string;
+  expectedRange?: string;
+  baselineWindow?: string;
+  recommendedAction: string;
+  entity?: string;
+  impactArea?: "cost" | "tokens" | "cache" | "tools" | "model" | "provider";
+}
+
+export interface NotificationDigest {
+  period: "daily" | "weekly";
+  generatedAt: number;
+  headline: string;
+  summary: string[];
+  eventIds: string[];
+}
+
+export interface ToolAdvice {
+  title: string;
+  description: string;
+  priority: FindingSeverity;
+  suggestedAction: string;
+  relatedTool?: string;
+  relatedProvider?: string;
+}
+
+export interface ProcessingIndexEntry {
+  provider: string;
+  identifier: string;
+  size: number;
+  mtimeMs: number;
+  parseStatus: "ok" | "error";
+  lastParsedAt: number;
+  sessionCount: number;
+  error?: string;
+}
+
+export interface ParsedSessionCacheEntry {
+  provider: string;
+  identifier: string;
+  session: Session;
+  cachedAt: number;
+}
+
+export interface IncrementalRunStats {
+  filesScanned: number;
+  filesReparsed: number;
+  cachedFilesReused: number;
+  sessionsLoadedFromCache: number;
+  cacheEnabled: boolean;
+  indexPath?: string;
 }
 
 // ── Provider ─────────────────────────────────────────────────
@@ -211,4 +309,8 @@ export interface EngineResult {
   findings: WasteFinding[];
   insights: string[];
   providers: ProviderInfo[];
+  events?: OptimizationEvent[];
+  digests?: NotificationDigest[];
+  toolAdvice?: ToolAdvice[];
+  processing?: IncrementalRunStats;
 }

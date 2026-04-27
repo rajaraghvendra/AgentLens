@@ -14,6 +14,8 @@ import type { ProviderFilter } from '../../providers/index.js';
 import { getBudget, setBudget, resetBudget } from '../../core/budget.js';
 import { notify } from '../../core/notifier.js';
 import { getCacheDir } from '../../utils/paths.js';
+import { clearProcessingIndex, getProcessingIndexStatus } from '../../core/processing/index.js';
+import type { OptimizationEvent, ToolAdvice } from '../../types/index.js';
 
 interface CLIOptions {
   period?: string;
@@ -22,6 +24,7 @@ interface CLIOptions {
   exclude?: string[];
   format?: string;
   currency?: string;
+  fullReparse?: boolean;
 }
 
 function collect(val: string, acc: string[]): string[] {
@@ -46,7 +49,33 @@ function getFilters(options: CLIOptions) {
     provider: options.provider as ProviderFilter | undefined,
     projects: options.project,
     exclude: options.exclude,
+    fullReparse: options.fullReparse,
   };
+}
+
+function printEvents(events: OptimizationEvent[], limit = 5): void {
+  if (events.length === 0) return;
+  console.log('\n' + colorize('Active Issues:', 'yellow'));
+  for (const event of events.slice(0, limit)) {
+    console.log(`  ${formatSeverityBadge(event.severity)} ${colorize(event.title, 'yellow')}`);
+    console.log(`    → ${event.description}`);
+  }
+}
+
+function printAdvice(advice: ToolAdvice[], limit = 5): void {
+  if (advice.length === 0) return;
+  console.log('\n' + colorize('Advice:', 'cyan'));
+  for (const item of advice.slice(0, limit)) {
+    console.log(`  ${formatSeverityBadge(item.priority)} ${item.title}`);
+    console.log(`    → ${item.suggestedAction}`);
+  }
+}
+
+function notifyHighSeverityEvents(events: OptimizationEvent[]): void {
+  for (const event of events) {
+    if (event.severity !== 'High') continue;
+    void notify(`AgentLens ${event.title}`, event.recommendedAction).catch(() => {});
+  }
 }
 
 function getPackageRoot(): string {
@@ -64,7 +93,12 @@ function getDashboardAppDir(): string {
   return path.join(getPackageRoot(), 'src', 'apps', 'web');
 }
 
-function getDashboardBinPath(): string {
+function getDashboardBinPath(appDir: string): string {
+  const appLocalBin = path.join(appDir, 'node_modules', 'next', 'dist', 'bin', 'next');
+  if (existsSync(appLocalBin)) {
+    return appLocalBin;
+  }
+
   return path.join(getPackageRoot(), 'node_modules', 'next', 'dist', 'bin', 'next');
 }
 
@@ -253,7 +287,7 @@ program
   .action((options) => {
     const port = options.port || '3000';
     const dashboardDir = ensureDashboardRuntimeAppDir();
-    const nextBin = getDashboardBinPath();
+    const nextBin = getDashboardBinPath(dashboardDir);
     const dashboardUrl = `http://127.0.0.1:${port}`;
 
     console.log(colorize('Starting AgentLens dashboard on http://localhost:' + port + '...', 'cyan'));
@@ -296,7 +330,8 @@ program
   .option('--project <name>', 'Show only projects matching name (repeatable)', collect, [])
   .option('--exclude <name>', 'Exclude projects matching name (repeatable)', collect, [])
   .option('--format <type>', 'Output format: text, json', 'text')
-.option('-c, --currency <code>', 'Target currency code (e.g. EUR, GBP)', 'USD')
+  .option('-c, --currency <code>', 'Target currency code (e.g. EUR, GBP)', 'USD')
+  .option('--full-reparse', 'Ignore incremental cache and reparse source sessions')
   .option('--minimal', 'Output minimal JSON without session content')
   .action(async (options) => {
     try {
@@ -312,6 +347,10 @@ program
             findings: result.findings,
             insights: result.insights,
             providers: result.providers,
+            events: result.events,
+            digests: result.digests,
+            toolAdvice: result.toolAdvice,
+            processing: result.processing,
             daily: exportData.byDay,
             projects: exportData.byProject,
             models: Object.values(result.metrics.byModel).map((m: any) => ({
@@ -329,7 +368,7 @@ program
         process.exit(0);
       }
 
-      const { metrics, findings, insights } = result;
+      const { metrics, findings, insights, events = [], toolAdvice = [], processing } = result;
       const { overview } = metrics;
       
       const periodLabel = options.period || 'week';
@@ -345,6 +384,9 @@ program
         const cacheDisplay = overview.cacheHitRate > 0 ? `${overview.cacheHitRate.toFixed(1)}%` : 'N/A';
         console.log(`  Avg/Session:  ${formatCurrency(overview.avgCostPerSession, 'USD')} (USD)`);
         console.log(`  Cache Hit:    ${cacheDisplay}`);
+        if (processing) {
+          console.log(`  Parsed:       ${processing.filesReparsed} reparsed, ${processing.cachedFilesReused} cached`);
+        }
       }
 
       console.log('\n' + colorize('Top Activities:', 'blue'));
@@ -362,6 +404,8 @@ program
         }
       }
 
+      printEvents(events);
+
       if (Object.keys(metrics.byModel).length > 0) {
         console.log('\n' + colorize('Models Used:', 'blue'));
         const models = Object.values(metrics.byModel).sort((a, b) => b.costUSD - a.costUSD);
@@ -377,6 +421,7 @@ program
           console.log(`  💡 ${i}`);
         }
       }
+      printAdvice(toolAdvice);
       
       // Automatic budget alerts (console-only)
       try {
@@ -428,6 +473,7 @@ program
   .option('-p, --period <period>', 'Time period: today, week, month, all', 'today')
   .option('--provider <provider>', 'Filter by provider')
   .option('--format <type>', 'Output format: text, json', 'text')
+  .option('--full-reparse', 'Ignore incremental cache and reparse source sessions')
   .action(async (options) => {
     try {
       const periodDays = parsePeriod(options.period || 'today');
@@ -435,6 +481,7 @@ program
       
       const today = await CoreEngine.getQuickStats(1, filters);
       const period = await CoreEngine.getQuickStats(periodDays, filters);
+      const todayFull = await CoreEngine.runFull(1, 'USD', filters);
       
       const budget = await getBudget();
       const dailyBudget = budget?.daily || 0;
@@ -457,13 +504,22 @@ program
           isBudgetExceeded,
           budgetUtilizationPercentage: budgetUtilization,
           activeProviders,
-          costsByProvider: { note: "Use agentlens report for detailed breakdown" }
+          costsByProvider: Object.fromEntries(
+            Object.entries(todayFull.metrics.byProvider || {}).map(([provider, data]: [string, any]) => [provider, data.costUSD]),
+          ),
+          activeIssuesCount: todayFull.events?.length || 0,
+          topAlert: todayFull.events?.[0] || null,
+          recommendations: (todayFull.toolAdvice || []).slice(0, 3).map((item) => item.title),
+          processing: todayFull.processing,
         }, null, 2));
         return;
       }
 
       console.log(`Today: ${today.sessionsCount} sessions, ${formatCurrency(today.totalCostUSD, 'USD')}`);
       console.log(`${options.period || 'today'}: ${period.sessionsCount} sessions, ${formatCurrency(period.totalCostUSD, 'USD')}`);
+      if ((todayFull.events || []).length > 0) {
+        console.log(colorize(`Active issues: ${todayFull.events!.length}`, 'yellow'));
+      }
       
     } catch (err: any) {
       console.error(colorize(`Error: ${err.message}`, 'red'));
@@ -477,11 +533,12 @@ program
   .option('-p, --period <period>', 'Time period: today, week, month, all', '30days')
   .option('--provider <provider>', 'Filter by provider')
   .option('--format <type>', 'Output format: text, json', 'text')
+  .option('--full-reparse', 'Ignore incremental cache and reparse source sessions')
   .action(async (options) => {
     try {
       const periodDays = parsePeriod(options.period || '30days');
       const filters = getFilters(options);
-      const { findings, insights, metrics } = await CoreEngine.runFull(periodDays, 'USD', filters);
+      const { findings, insights, metrics, events = [], digests = [], toolAdvice = [], processing } = await CoreEngine.runFull(periodDays, 'USD', filters);
 
       if (options.format === 'json') {
         const { computeHealthScore } = await import('../../core/optimizer/index.js');
@@ -489,6 +546,10 @@ program
         console.log(JSON.stringify({ 
           findings, 
           insights, 
+          events,
+          digests,
+          toolAdvice,
+          processing,
           healthScore: score, 
           healthGrade: grade,
           totalCost: metrics?.overview?.totalCostUSD 
@@ -517,6 +578,12 @@ program
           console.log(`  💡 ${i}`);
         }
       }
+      printEvents(events);
+      printAdvice(toolAdvice);
+      if (processing) {
+        console.log(colorize(`\nProcessing: ${processing.filesReparsed} reparsed, ${processing.cachedFilesReused} cached`, 'gray'));
+      }
+      notifyHighSeverityEvents(events);
       
       // Automatic budget alerts (console-only)
       try {
@@ -581,6 +648,169 @@ program
     }
   });
 
+const cacheProgram = program
+  .command('cache')
+  .description('Inspect and manage the incremental processing cache');
+
+cacheProgram
+  .command('status')
+  .description('Show incremental processing cache status')
+  .action(async () => {
+    try {
+      const status = await getProcessingIndexStatus();
+      console.log(JSON.stringify(status, null, 2));
+    } catch (err: any) {
+      console.error(colorize(`Failed to read cache status: ${err.message}`, 'red'));
+      process.exit(1);
+    }
+  });
+
+cacheProgram
+  .command('rebuild')
+  .description('Clear the processing index and reparse sessions')
+  .option('-p, --period <period>', 'Time period to warm after rebuild', '30days')
+  .option('--provider <provider>', 'Filter by provider')
+  .action(async (options) => {
+    try {
+      await clearProcessingIndex();
+      const filters = getFilters({ provider: options.provider, fullReparse: true });
+      const periodDays = parsePeriod(options.period || '30days');
+      const result = await CoreEngine.runFull(periodDays, 'USD', filters);
+      console.log(colorize('Cache rebuilt successfully.', 'green'));
+      console.log(JSON.stringify(result.processing || {}, null, 2));
+    } catch (err: any) {
+      console.error(colorize(`Failed to rebuild cache: ${err.message}`, 'red'));
+      process.exit(1);
+    }
+  });
+
+program
+  .command('advise')
+  .description('Show optimization advice based on current session data')
+  .option('-p, --period <period>', 'Time period: today, week, month, all', '7days')
+  .option('--provider <provider>', 'Filter by provider')
+  .option('--format <type>', 'Output format: text, json', 'text')
+  .option('--full-reparse', 'Ignore incremental cache and reparse source sessions')
+  .action(async (options) => {
+    try {
+      const periodDays = parsePeriod(options.period || '7days');
+      const filters = getFilters(options);
+      const result = await CoreEngine.runFull(periodDays, 'USD', filters);
+      if (options.format === 'json') {
+        console.log(JSON.stringify({ events: result.events || [], toolAdvice: result.toolAdvice || [], digests: result.digests || [] }, null, 2));
+        return;
+      }
+      printEvents(result.events || []);
+      printAdvice(result.toolAdvice || []);
+      const dailyDigest = (result.digests || []).find((digest) => digest.period === 'daily');
+      if (dailyDigest) {
+        console.log('\n' + colorize('Digest:', 'blue'));
+        console.log(`  ${dailyDigest.headline}`);
+      }
+    } catch (err: any) {
+      console.error(colorize(`Error: ${err.message}`, 'red'));
+      process.exit(1);
+    }
+  });
+
+program
+  .command('anomalies')
+  .description('List active anomaly and optimizer events')
+  .option('-p, --period <period>', 'Time period: today, week, month, all', '7days')
+  .option('--provider <provider>', 'Filter by provider')
+  .option('--format <type>', 'Output format: text, json', 'text')
+  .option('--full-reparse', 'Ignore incremental cache and reparse source sessions')
+  .action(async (options) => {
+    try {
+      const periodDays = parsePeriod(options.period || '7days');
+      const filters = getFilters(options);
+      const result = await CoreEngine.runFull(periodDays, 'USD', filters);
+      if (options.format === 'json') {
+        console.log(JSON.stringify(result.events || [], null, 2));
+        return;
+      }
+      printEvents(result.events || [], 10);
+    } catch (err: any) {
+      console.error(colorize(`Error: ${err.message}`, 'red'));
+      process.exit(1);
+    }
+  });
+
+program
+  .command('tools')
+  .description('Show tool, MCP, and command efficiency rankings')
+  .option('-p, --period <period>', 'Time period: today, week, month, all', '30days')
+  .option('--provider <provider>', 'Filter by provider')
+  .option('--format <type>', 'Output format: text, json', 'text')
+  .option('--full-reparse', 'Ignore incremental cache and reparse source sessions')
+  .action(async (options) => {
+    try {
+      const periodDays = parsePeriod(options.period || '30days');
+      const filters = getFilters(options);
+      const result = await CoreEngine.runFull(periodDays, 'USD', filters);
+      const toolRows = Object.values(result.metrics.byTool || {}).sort((a, b) => b.estimatedCostUSD - a.estimatedCostUSD);
+      const mcpRows = Object.values(result.metrics.byMcpServer || {}).sort((a, b) => b.errorRate - a.errorRate);
+      const commandRows = Object.values(result.metrics.byCommandPattern || {}).sort((a, b) => b.estimatedCostUSD - a.estimatedCostUSD);
+      if (options.format === 'json') {
+        console.log(JSON.stringify({ tools: toolRows, mcpServers: mcpRows, commands: commandRows, advice: result.toolAdvice || [] }, null, 2));
+        return;
+      }
+      console.log(colorize('Top Tools:', 'blue'));
+      for (const row of toolRows.slice(0, 8)) {
+        console.log(`  ${row.name.padEnd(18)} ${formatCurrency(row.estimatedCostUSD, 'USD').padStart(8)}  ${(row.errorRate * 100).toFixed(0).padStart(4)}% err`);
+      }
+      if (mcpRows.length > 0) {
+        console.log('\n' + colorize('MCP Health:', 'blue'));
+        for (const row of mcpRows.slice(0, 5)) {
+          console.log(`  ${row.name.padEnd(18)} ${(row.errorRate * 100).toFixed(0).padStart(4)}% err  ${row.invocationCount} calls`);
+        }
+      }
+      if (commandRows.length > 0) {
+        console.log('\n' + colorize('Command Patterns:', 'blue'));
+        for (const row of commandRows.slice(0, 5)) {
+          console.log(`  ${row.pattern.padEnd(18)} ${formatCurrency(row.estimatedCostUSD, 'USD').padStart(8)}  ${(row.errorRate * 100).toFixed(0).padStart(4)}% err`);
+        }
+      }
+      printAdvice(result.toolAdvice || [], 4);
+    } catch (err: any) {
+      console.error(colorize(`Error: ${err.message}`, 'red'));
+      process.exit(1);
+    }
+  });
+
+program
+  .command('digest')
+  .description('Show a daily or weekly optimization digest')
+  .option('--daily', 'Show the daily digest')
+  .option('--weekly', 'Show the weekly digest')
+  .option('--provider <provider>', 'Filter by provider')
+  .option('--format <type>', 'Output format: text, json', 'text')
+  .option('--full-reparse', 'Ignore incremental cache and reparse source sessions')
+  .action(async (options) => {
+    try {
+      const periodDays = options.daily ? 1 : 7;
+      const digestPeriod = options.daily ? 'daily' : 'weekly';
+      const filters = getFilters(options);
+      const result = await CoreEngine.runFull(periodDays, 'USD', filters);
+      const digest = (result.digests || []).find((entry) => entry.period === digestPeriod);
+      if (options.format === 'json') {
+        console.log(JSON.stringify(digest || null, null, 2));
+        return;
+      }
+      if (!digest) {
+        console.log(colorize('No digest available.', 'yellow'));
+        return;
+      }
+      console.log(colorize(digest.headline, 'cyan'));
+      for (const line of digest.summary) {
+        console.log(`  • ${line}`);
+      }
+    } catch (err: any) {
+      console.error(colorize(`Error: ${err.message}`, 'red'));
+      process.exit(1);
+    }
+  });
+
 program
   .command('export')
   .description('Export usage data to CSV or JSON')
@@ -590,6 +820,7 @@ program
   .option('--provider <provider>', 'Filter by provider')
   .option('--project <name>', 'Include projects (repeatable)', collect, [])
   .option('--exclude <name>', 'Exclude projects (repeatable)', collect, [])
+  .option('--full-reparse', 'Ignore incremental cache and reparse source sessions')
   .action(async (options) => {
     try {
       const periodDays = parsePeriod(options.period || 'week');
@@ -626,6 +857,7 @@ program
   .option('-p, --period <period>', 'Time period: today, week, month, all', '30days')
   .option('--provider <provider>', 'Filter by provider')
   .option('--format <type>', 'Output format: text, json', 'text')
+  .option('--full-reparse', 'Ignore incremental cache and reparse source sessions')
   .option('--model1 <model>', 'First model to compare')
   .option('--model2 <model>', 'Second model to compare')
   .action(async (options) => {

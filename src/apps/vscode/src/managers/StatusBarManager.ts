@@ -9,6 +9,7 @@ export class StatusBarManager {
   private providerBudgets: Record<string, number> = {};
   private notifiedWarnings: Set<string> = new Set();
   private currentProviderCosts: Record<string, number> = {};
+  private notifiedAlerts: Set<string> = new Set();
 
   constructor() {
     this.item = vscode.window.createStatusBarItem(
@@ -54,6 +55,7 @@ export class StatusBarManager {
 
     this.updateTooltip(status);
     this.checkBudgetNotifications(status);
+    this.checkOptimizationNotifications(status);
   }
 
   private determineState(status: LiveSessionStatus): StatusBarState {
@@ -122,6 +124,17 @@ export class StatusBarManager {
 
   clearNotifications(): void {
     this.notifiedWarnings.clear();
+    this.notifiedAlerts.clear();
+  }
+
+  private checkOptimizationNotifications(status: LiveSessionStatus): void {
+    if (!status.topAlert || status.topAlert.severity !== "High") return;
+    if (this.notifiedAlerts.has(status.topAlert.id)) return;
+    this.notifiedAlerts.add(status.topAlert.id);
+    const message = status.topAlert.recommendedAction
+      ? `${status.topAlert.title}: ${status.topAlert.recommendedAction}`
+      : `${status.topAlert.title}: ${status.topAlert.description}`;
+    vscode.window.showWarningMessage(`◊ AgentLens: ${message}`);
   }
 
   private showLoading(): void {
@@ -158,6 +171,9 @@ export class StatusBarManager {
     tooltip.appendMarkdown(`**◊ AgentLens**\n\n`);
     tooltip.appendMarkdown(`- Total Cost: $${status.totalCostLocal.toFixed(2)}\n`);
     tooltip.appendMarkdown(`- Tokens: ${tokensStr}\n`);
+    if ((status.activeIssuesCount || 0) > 0) {
+      tooltip.appendMarkdown(`- Active Issues: ${status.activeIssuesCount}\n`);
+    }
 
     // Show per-provider costs if available
     if (status.costsByProvider && Object.keys(status.costsByProvider).length > 0) {
@@ -175,6 +191,18 @@ export class StatusBarManager {
     }
     if (this.monthlyBudget > 0) {
       tooltip.appendMarkdown(`- Monthly Budget: $${this.monthlyBudget}`);
+    }
+
+    if (status.topAlert) {
+      tooltip.appendMarkdown(`\n**Top Alert:** ${status.topAlert.title}\n`);
+      tooltip.appendMarkdown(`- ${status.topAlert.description}\n`);
+    }
+
+    if (status.recommendations && status.recommendations.length > 0) {
+      tooltip.appendMarkdown(`\n**Recommendations:**\n`);
+      for (const recommendation of status.recommendations.slice(0, 3)) {
+        tooltip.appendMarkdown(`- ${recommendation}\n`);
+      }
     }
 
     this.item.tooltip = tooltip;

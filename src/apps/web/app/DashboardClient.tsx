@@ -51,6 +51,12 @@ type ReportResponse = {
   providers?: Array<{ id: string; name: string; available: boolean; sessionCount?: number }>;
   tools?: Array<{ name: string; count: number }>;
   commands?: Array<{ command: string; count: number }>;
+  events?: Array<{ id: string; title: string; severity: string; description: string; recommendedAction?: string }>;
+  digests?: Array<{ period: string; headline: string; summary: string[] }>;
+  toolAdvice?: Array<{ title: string; priority: string; description: string; suggestedAction: string }>;
+  toolBreakdown?: Array<{ name: string; estimatedCostUSD: number; errorRate: number; invocationCount: number }>;
+  mcpBreakdown?: Array<{ name: string; errorRate: number; invocationCount: number }>;
+  processing?: { filesReparsed?: number; cachedFilesReused?: number; sessionsLoadedFromCache?: number } | null;
 };
 
 const PERIODS = [
@@ -173,6 +179,12 @@ export default function Dashboard() {
   const tools = report.tools ?? [];
   const commands = report.commands ?? [];
   const insights = report.insights ?? [];
+  const events = report.events ?? [];
+  const digests = report.digests ?? [];
+  const toolAdvice = report.toolAdvice ?? [];
+  const toolBreakdown = report.toolBreakdown ?? [];
+  const mcpBreakdown = report.mcpBreakdown ?? [];
+  const processing = report.processing;
   const optimizeFindings = optimizeData?.findings ?? [];
   const optimizeInsights = optimizeData?.insights ?? [];
   const optimizeHealthScore = optimizeData?.healthScore;
@@ -180,6 +192,8 @@ export default function Dashboard() {
   const compareModels = compareData?.models ?? [];
   const compareTotalCost = compareData?.totalCostUSD ?? 0;
   const topFinding = findings[0];
+  const topEvent = events[0];
+  const dailyDigest = digests.find((entry) => entry.period === "daily");
   const activeProviderCount = providers.filter((provider) => provider.available).length;
   const currentPeriodLabel = PERIODS.find((entry) => entry.key === period)?.label ?? "7 Days";
 
@@ -315,6 +329,30 @@ export default function Dashboard() {
               <MetricCard title="Providers" value={activeProviderCount} subtitle="Active" icon={<Filter className="text-violet-300" />} />
             </div>
 
+            {(topEvent || processing) && (
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+                {topEvent ? (
+                  <div className={`rounded-2xl border px-6 py-4 ${severityTone(topEvent.severity)}`}>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="text-sm font-semibold uppercase tracking-wide">{topEvent.severity}</span>
+                      <span className="text-base font-semibold">{topEvent.title}</span>
+                    </div>
+                    <p className="mt-2 text-sm opacity-90">{topEvent.description}</p>
+                    {topEvent.recommendedAction && <p className="mt-2 text-sm font-medium opacity-95">{topEvent.recommendedAction}</p>}
+                  </div>
+                ) : <div />}
+                {processing ? (
+                  <SurfaceCard title="Processing">
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between"><span>Reparsed</span><span>{processing.filesReparsed ?? 0}</span></div>
+                      <div className="flex items-center justify-between"><span>Cached Reuse</span><span>{processing.cachedFilesReused ?? 0}</span></div>
+                      <div className="flex items-center justify-between"><span>Cache Sessions</span><span>{processing.sessionsLoadedFromCache ?? 0}</span></div>
+                    </div>
+                  </SurfaceCard>
+                ) : <div />}
+              </div>
+            )}
+
             <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.1fr_0.9fr]">
               <SurfaceCard title="Daily Activity">
                 <div className="h-64">
@@ -425,6 +463,73 @@ export default function Dashboard() {
                     {insights.map((insight, idx) => (
                       <div key={idx} className="rounded-xl bg-background/70 px-4 py-3 text-sm text-text-primary">
                         {insight.replace(/\*\*/g, "")}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </SurfaceCard>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1fr]">
+              <SurfaceCard title="Recommendations">
+                {toolAdvice.length === 0 ? (
+                  <p className="text-sm text-text-secondary">No optimization recommendations available.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {toolAdvice.slice(0, 5).map((item, idx) => (
+                      <div key={idx} className={`rounded-xl border px-4 py-3 ${severityTone(item.priority)}`}>
+                        <div className="font-medium">{item.title}</div>
+                        <p className="mt-1 text-sm opacity-90">{item.description}</p>
+                        <p className="mt-2 text-sm font-medium opacity-95">{item.suggestedAction}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </SurfaceCard>
+              <SurfaceCard title="Top Savings Opportunities">
+                {dailyDigest ? (
+                  <div className="space-y-3">
+                    <div className="rounded-xl bg-background/70 px-4 py-3 font-medium">{dailyDigest.headline}</div>
+                    {dailyDigest.summary.slice(0, 4).map((line, idx) => (
+                      <div key={idx} className="rounded-xl bg-background/70 px-4 py-3 text-sm text-text-primary">
+                        {line}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-text-secondary">No savings digest available.</p>
+                )}
+              </SurfaceCard>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1fr]">
+              <SurfaceCard title="Tool Efficiency">
+                {toolBreakdown.length === 0 ? (
+                  <p className="text-sm text-text-secondary">No tool metrics available.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {toolBreakdown.slice(0, 6).map((tool, idx) => (
+                      <div key={idx} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2 text-sm">
+                        <span className="truncate">{tool.name}</span>
+                        <span className="shrink-0 text-text-secondary">
+                          ${Number(tool.estimatedCostUSD || 0).toFixed(2)} · {(Number(tool.errorRate || 0) * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </SurfaceCard>
+              <SurfaceCard title="MCP Health">
+                {mcpBreakdown.length === 0 ? (
+                  <p className="text-sm text-text-secondary">No MCP usage detected.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {mcpBreakdown.slice(0, 6).map((mcp, idx) => (
+                      <div key={idx} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2 text-sm">
+                        <span className="truncate">{mcp.name}</span>
+                        <span className="shrink-0 text-text-secondary">
+                          {(Number(mcp.errorRate || 0) * 100).toFixed(0)}% · {mcp.invocationCount} calls
+                        </span>
                       </div>
                     ))}
                   </div>

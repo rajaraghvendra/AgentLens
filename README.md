@@ -2,7 +2,7 @@
 
 **Local-first AI developer analytics for Claude Code, Cursor, Codex, OpenCode, Pi, and GitHub Copilot.**
 
-AgentLens parses your local AI coding session history, computes cost and token usage, surfaces retry loops and waste patterns, and gives you CLI, TUI, web, and VS Code views over the same dataset.
+AgentLens parses your local AI coding session history, computes cost and token usage, surfaces retry loops and waste patterns, and now adds incremental processing, active optimization alerts, tool/MCP intelligence, and actionable advice across CLI, TUI, web, and VS Code.
 
 [![GitHub](https://img.shields.io/badge/GitHub-rajaraghvendra%2FAgentLens-blue.svg)](https://github.com/rajaraghvendra/AgentLens)
 [![npm](https://img.shields.io/badge/npm-@rajaraghvendra%2Fagentlens-orange.svg)](https://www.npmjs.com/~rajaraghvendra)
@@ -12,15 +12,28 @@ AgentLens parses your local AI coding session history, computes cost and token u
 - **Cross-provider analytics** for Claude Code, Cursor, Codex, OpenCode, Pi, and GitHub Copilot.
 - **Exact token accounting** for input, output, cache read, and cache write where provider data supports it.
 - **Cost tracking** with pricing lookup, currency conversion, and provider/model breakdowns.
+- **Incremental session processing** with local cache/index reuse so unchanged session files are not reparsed every time.
 - **Deterministic activity classification** across coding, debugging, git ops, testing, planning, delegation, and more.
 - **One-shot and retry-loop detection** to show where agents got it right first time and where they burned tokens.
-- **Optimizer findings** for waste patterns such as edit loops, excessive reads, missing context, and noisy shell usage.
+- **Optimizer findings and active alerts** for waste patterns such as edit loops, excessive reads, cache inefficiency, MCP failures, tool loops, and high-cost low-yield sessions.
+- **Tool and MCP intelligence** with rankings for instability, repeated loops, waste contribution, and command-pattern inefficiency.
+- **Actionable advice and digests** such as model right-sizing, session reset guidance, MCP stabilization advice, and savings opportunities.
 - **Multiple interfaces**:
   - `agentlens report`, `status`, `compare`, `optimize`
+  - `agentlens advise`, `anomalies`, `tools`, `digest`
+  - `agentlens cache status`, `agentlens cache rebuild`
   - `agentlens tui`
   - `agentlens dashboard`
   - VS Code extension with status-bar cost visibility
 - **Local-first execution**. Core parsing runs against local provider data on your machine.
+
+## New in 0.1.12
+
+- Incremental parsing cache with processing stats
+- Active optimization alerts in dashboard, CLI, TUI, and VS Code status flow
+- Tool, MCP, and command-pattern efficiency analysis
+- Daily and weekly advice digests
+- New CLI commands for advice, anomalies, tools, and cache management
 
 ## Screenshots
 
@@ -91,6 +104,12 @@ agentlens report --provider codex
 agentlens status                 # Quick budget/cost snapshot
 agentlens optimize               # Optimization findings
 agentlens compare                # Model comparison
+agentlens advise                 # Active issues + recommendations
+agentlens anomalies              # Current optimization alerts
+agentlens tools                  # Tool/MCP efficiency rankings
+agentlens digest --daily         # Daily optimization digest
+agentlens cache status           # Incremental processing cache status
+agentlens cache rebuild          # Rebuild local processing index
 agentlens dashboard              # Web dashboard on localhost:3000
 agentlens dashboard --port 3128
 agentlens tui                    # Terminal UI
@@ -118,8 +137,20 @@ AgentLens uses platform-specific local data directories internally, so the same 
 - `agentlens status`
 - `agentlens compare`
 - `agentlens optimize`
+- `agentlens advise`
+- `agentlens anomalies`
+- `agentlens tools`
+- `agentlens digest --daily|--weekly`
+- `agentlens cache status`
+- `agentlens cache rebuild`
 - `agentlens providers`
 - `agentlens budget:set`, `budget:status`, `budget:reset`
+
+Useful flags:
+
+- `--provider <provider>`
+- `--full-reparse` to bypass the incremental cache
+- `--format json` for machine-readable output
 
 ### TUI
 
@@ -127,7 +158,14 @@ AgentLens uses platform-specific local data directories internally, so the same 
 agentlens tui
 ```
 
-Use the keyboard shortcuts shown in the footer to switch period and provider.
+The TUI now surfaces:
+
+- active optimization alerts
+- daily breakdown with drill-down
+- project/model compare views
+- tool-advice summaries in the findings panel
+
+Use the keyboard shortcuts shown in the footer to switch period, provider, compare mode, sorting, and detail views.
 
 ### Web Dashboard
 
@@ -139,7 +177,16 @@ agentlens dashboard
 
 Then open `http://localhost:3000`.
 
-The dashboard now runs from packaged web source plus the target machine's own installed runtime dependencies, so npm resolves the correct native binaries for Windows, Linux, or macOS at install time instead of shipping a host-built web server.
+The dashboard now includes:
+
+- active alert banner
+- top savings digest
+- recommendations feed
+- tool efficiency
+- MCP health
+- processing/cache stats
+
+The dashboard runs from packaged web source plus the target machine's own installed runtime dependencies, so npm resolves the correct native binaries for Windows, Linux, or macOS at install time instead of shipping a host-built web server.
 
 The `web` command is kept as an alias for `dashboard`.
 
@@ -153,7 +200,13 @@ Install from the packaged `.vsix` attached to GitHub Releases:
 4. Use `...` -> `Install from VSIX...`
 5. Select the downloaded file.
 
-The extension surfaces live status-bar cost tracking and can open the AgentLens dashboard.
+The extension surfaces:
+
+- live status-bar cost tracking
+- budget warnings
+- active optimization alert notifications
+- top recommendation context in the tooltip
+- dashboard launch integration
 
 ## Publishing
 
@@ -168,6 +221,12 @@ npm install
 npm run build
 npm run test
 npm run dashboard
+```
+
+Source dashboard entry:
+
+```bash
+npm run dev -- dashboard
 ```
 
 Key project entry points:

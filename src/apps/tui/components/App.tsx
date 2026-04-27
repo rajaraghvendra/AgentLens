@@ -406,12 +406,34 @@ function SelectableBreakdown({
   );
 }
 
-function FindingsPanel({ findings, insights, width }: { findings: any[]; insights: string[]; width: number }) {
+function FindingsPanel({
+  findings,
+  insights,
+  events,
+  toolAdvice,
+  width,
+}: {
+  findings: any[];
+  insights: string[];
+  events: any[];
+  toolAdvice: any[];
+  width: number;
+}) {
   const topFindings = findings.slice(0, 3);
   const topInsights = insights.slice(0, 2).map((insight) => insight.replace(/\*\*/g, ''));
+  const topEvents = events.slice(0, 2);
+  const topAdvice = toolAdvice.slice(0, 2);
 
   return (
     <Panel title="Findings & Insights" color={PANEL_COLORS.findings} width={width}>
+      {topEvents.map((event, index) => (
+        <Box key={`${event.id || event.title}-${index}`} flexDirection="column" marginBottom={1}>
+          <Text color={event.severity?.toLowerCase() === 'high' ? RED : AMBER} bold wrap="truncate-end">
+            ALERT {event.title}
+          </Text>
+          <Text dimColor wrap="truncate-end">{event.recommendedAction || event.description}</Text>
+        </Box>
+      ))}
       {topFindings.length === 0 ? (
         <Text dimColor>No active findings. Session behavior looks stable.</Text>
       ) : (
@@ -429,6 +451,15 @@ function FindingsPanel({ findings, insights, width }: { findings: any[]; insight
           {topInsights.map((insight, index) => (
             <Text key={`${insight}-${index}`} color={CYAN} wrap="truncate-end">
               • {insight}
+            </Text>
+          ))}
+        </Box>
+      )}
+      {topAdvice.length > 0 && (
+        <Box flexDirection="column" marginTop={topFindings.length > 0 || topInsights.length > 0 ? 1 : 0}>
+          {topAdvice.map((advice, index) => (
+            <Text key={`${advice.title}-${index}`} color={SOFT} wrap="truncate-end">
+              → {advice.title}
             </Text>
           ))}
         </Box>
@@ -564,6 +595,8 @@ export const App: React.FC = () => {
         metrics: result.metrics,
         findings: result.findings,
         insights: result.insights,
+        events: result.events || [],
+        toolAdvice: result.toolAdvice || [],
         providers: allProviders,
         daily: exportData.byDay ?? [],
         projects: projectRows,
@@ -859,7 +892,7 @@ export const App: React.FC = () => {
     );
   }
 
-  const { metrics, daily = [], projects = [], models = [], providerRows = [], providers = [], findings = [], insights = [] } = data || {};
+  const { metrics, daily = [], projects = [], models = [], providerRows = [], providers = [], findings = [], insights = [], events = [], toolAdvice = [] } = data || {};
   const overview = metrics?.overview;
   const pw = wide ? halfWidth : dashWidth;
   const sortedDaily = sortRows(
@@ -929,7 +962,7 @@ export const App: React.FC = () => {
               valueForText={(row) => formatCost(row.cost || 0)}
               secondaryText={(row) => formatTokens(row.tokens || 0)}
             />
-            <FindingsPanel findings={findings} insights={insights} width={pw} />
+            <FindingsPanel findings={findings} insights={insights} events={events} toolAdvice={toolAdvice} width={pw} />
           </Row>
         </>
       )}

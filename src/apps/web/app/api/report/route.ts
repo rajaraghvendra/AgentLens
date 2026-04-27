@@ -7,8 +7,9 @@ async function GET(request: Request): Promise<NextResponse> {
     const { searchParams } = new URL(request.url);
     const period = sanitizePeriod(searchParams.get('period'), '7');
     const provider = sanitizeProvider(searchParams.get('provider'));
+    const fullReparse = searchParams.get('fullReparse') === '1';
     const periodDays = parsePeriod(period);
-    const filters = provider ? { provider } : undefined;
+    const filters = provider ? { provider, fullReparse } : { fullReparse };
     const result = await CoreEngine.runFull(periodDays, 'USD', filters);
     const exportData = CoreEngine.buildExportData(result.sessions, result.metrics, periodDays);
     const { metrics, findings, insights, providers } = result;
@@ -17,6 +18,10 @@ async function GET(request: Request): Promise<NextResponse> {
       metrics,
       findings,
       insights,
+      events: result.events ?? [],
+      digests: result.digests ?? [],
+      toolAdvice: result.toolAdvice ?? [],
+      processing: result.processing ?? null,
       providers,
       daily: exportData.byDay ?? [],
       projects: (exportData.byProject ?? []).filter((p: any) => p.name != null),
@@ -44,7 +49,10 @@ async function GET(request: Request): Promise<NextResponse> {
         cacheReadTokens: p.cacheReadTokens,
         cacheWriteTokens: p.cacheWriteTokens,
         messageCount: p.messageCount,
-      }))
+      })),
+      toolBreakdown: Object.values(metrics?.byTool || {}),
+      mcpBreakdown: Object.values(metrics?.byMcpServer || {}),
+      commandPatterns: Object.values(metrics?.byCommandPattern || {}),
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

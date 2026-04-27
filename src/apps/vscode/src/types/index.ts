@@ -10,6 +10,15 @@ export interface LiveSessionStatus {
   budgetUtilizationPercentage: number;
   activeProviders: string[];
   costsByProvider?: Record<string, number>;
+  activeIssuesCount?: number;
+  topAlert?: {
+    id: string;
+    title: string;
+    severity: "High" | "Medium" | "Low";
+    description: string;
+    recommendedAction?: string;
+  } | null;
+  recommendations?: string[];
 }
 
 export interface StatusBarConfig {
