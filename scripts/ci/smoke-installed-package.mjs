@@ -1,7 +1,7 @@
 import { mkdtemp, rm } from 'fs/promises';
 import { join, resolve } from 'path';
 import { tmpdir } from 'os';
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import { setTimeout as delay } from 'timers/promises';
 
 function normalizeCommand(command, args) {
@@ -15,27 +15,62 @@ function normalizeCommand(command, args) {
   return { command, args };
 }
 
+function killProcessTree(child) {
+  if (!child || child.killed) return;
+
+  if (process.platform === 'win32') {
+    if (child.pid) {
+      spawnSync('taskkill', ['/pid', String(child.pid), '/t', '/f'], { stdio: 'ignore' });
+    }
+    return;
+  }
+
+  child.kill('SIGTERM');
+}
+
 function run(command, args, options = {}) {
   return new Promise((resolveRun, rejectRun) => {
+    const { timeoutMs = 0, stream = false, ...spawnOptions } = options;
     const normalized = normalizeCommand(command, args);
     const child = spawn(normalized.command, normalized.args, {
       stdio: ['ignore', 'pipe', 'pipe'],
-      ...options,
+      ...spawnOptions,
     });
 
     let stdout = '';
     let stderr = '';
+    let timeoutId = null;
+
+    if (timeoutMs > 0) {
+      timeoutId = setTimeout(() => {
+        killProcessTree(child);
+        rejectRun(
+          new Error(
+            `${normalized.command} ${normalized.args.join(' ')} timed out after ${timeoutMs}ms\n${stdout}\n${stderr}`,
+          ),
+        );
+      }, timeoutMs);
+      timeoutId.unref?.();
+    }
 
     child.stdout?.on('data', (chunk) => {
-      stdout += chunk.toString();
+      const text = chunk.toString();
+      stdout += text;
+      if (stream) process.stdout.write(text);
     });
 
     child.stderr?.on('data', (chunk) => {
-      stderr += chunk.toString();
+      const text = chunk.toString();
+      stderr += text;
+      if (stream) process.stderr.write(text);
     });
 
-    child.on('error', rejectRun);
+    child.on('error', (error) => {
+      if (timeoutId) clearTimeout(timeoutId);
+      rejectRun(error);
+    });
     child.on('close', (code) => {
+      if (timeoutId) clearTimeout(timeoutId);
       if (code === 0) {
         resolveRun({ stdout, stderr });
         return;
@@ -57,6 +92,9 @@ async function waitForHttp(url, attempts = 60) {
       // Server not ready yet.
     }
 
+    if (index === 0 || (index + 1) % 5 === 0) {
+      console.log(`[smoke] waiting for ${url} (${index + 1}/${attempts})`);
+    }
     await delay(1000);
   }
 
@@ -111,14 +149,21 @@ async function main() {
   const npmCommand = getNpmCommand();
 
   try {
-    await run(npmCommand, ['install', '-g', packagePath, '--prefix', prefixDir]);
+    console.log(`[smoke] installing ${packagePath}`);
+    await run(npmCommand, ['install', '-g', packagePath, '--prefix', prefixDir, '--no-fund', '--no-audit'], {
+      timeoutMs: 8 * 60 * 1000,
+      stream: true,
+    });
 
     const cli = getInstalledCliCommand(prefixDir);
 
-    await run(cli.command, [...cli.args, 'report']);
-    await run(cli.command, [...cli.args, 'tui', '--help']);
+    console.log('[smoke] running report');
+    await run(cli.command, [...cli.args, 'report'], { timeoutMs: 60_000 });
+    console.log('[smoke] running tui --help');
+    await run(cli.command, [...cli.args, 'tui', '--help'], { timeoutMs: 60_000 });
 
     const port = process.env['AGENTLENS_SMOKE_PORT'] || '3123';
+    console.log(`[smoke] starting dashboard on port ${port}`);
     const dashboardCommand = normalizeCommand(cli.command, [...cli.args, 'dashboard', '--port', port, '--no-open']);
     const dashboard = spawn(dashboardCommand.command, dashboardCommand.args, {
       stdio: ['ignore', 'pipe', 'pipe'],
@@ -131,10 +176,14 @@ async function main() {
     let dashboardOutput = '';
     let dashboardError = null;
     dashboard.stdout?.on('data', (chunk) => {
-      dashboardOutput += chunk.toString();
+      const text = chunk.toString();
+      dashboardOutput += text;
+      process.stdout.write(text);
     });
     dashboard.stderr?.on('data', (chunk) => {
-      dashboardOutput += chunk.toString();
+      const text = chunk.toString();
+      dashboardOutput += text;
+      process.stderr.write(text);
     });
     dashboard.on('error', (error) => {
       dashboardError = error;
@@ -147,11 +196,12 @@ async function main() {
         throw dashboardError;
       }
 
-      dashboard.kill('SIGTERM');
+      console.log('[smoke] stopping dashboard');
+      killProcessTree(dashboard);
       await new Promise((resolveClose) => {
         dashboard.once('close', () => resolveClose(undefined));
         setTimeout(() => {
-          dashboard.kill('SIGKILL');
+          killProcessTree(dashboard);
           resolveClose(undefined);
         }, 5000).unref();
       });
@@ -161,6 +211,7 @@ async function main() {
       console.log('Dashboard smoke test passed without diagnostic output.');
     }
   } finally {
+    console.log('[smoke] cleaning up');
     await removeDirWithRetry(tempRoot);
   }
 }
