@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'fs';
-import { spawn, spawnSync } from 'child_process';
-import { createHash } from 'crypto';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { spawn } from 'child_process';
 import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
@@ -13,7 +12,6 @@ import { formatCurrency, formatSeverityBadge, colorize } from './formatters.js';
 import type { ProviderFilter } from '../../providers/index.js';
 import { getBudget, setBudget, resetBudget } from '../../core/budget.js';
 import { notify } from '../../core/notifier.js';
-import { getCacheDir } from '../../utils/paths.js';
 import { clearProcessingIndex, getProcessingIndexStatus } from '../../core/processing/index.js';
 import type { OptimizationEvent, ToolAdvice } from '../../types/index.js';
 
@@ -93,6 +91,10 @@ function getDashboardAppDir(): string {
   return path.join(getPackageRoot(), 'src', 'apps', 'web');
 }
 
+function getPackagedDashboardRuntimeDir(): string {
+  return path.join(getPackageRoot(), 'dist', 'apps', 'dashboard-runtime');
+}
+
 function sanitizeRelativeDistDir(rawValue: string | undefined): string {
   const fallback = '.agentlens-next';
   if (!rawValue) return fallback;
@@ -154,58 +156,6 @@ function isInstalledUnderNodeModules(targetPath: string): boolean {
   return targetPath.split(path.sep).includes('node_modules');
 }
 
-function copyDashboardRuntime(sourceRoot: string, targetRoot: string): void {
-  rmSync(targetRoot, { recursive: true, force: true });
-  mkdirSync(path.join(targetRoot, 'src', 'apps'), { recursive: true });
-
-  cpSync(path.join(sourceRoot, 'dist'), path.join(targetRoot, 'dist'), { recursive: true });
-  cpSync(path.join(sourceRoot, 'src', 'apps', 'web'), path.join(targetRoot, 'src', 'apps', 'web'), {
-    recursive: true,
-    filter: (sourcePath) => {
-      const relativePath = path.relative(path.join(sourceRoot, 'src', 'apps', 'web'), sourcePath);
-      if (!relativePath || relativePath === '') {
-        return true;
-      }
-
-      const segments = relativePath.split(path.sep);
-      return !segments.includes('node_modules') && !segments.includes('.agentlens-next');
-    },
-  });
-}
-
-function linkDashboardDependencies(sourceRoot: string, targetRoot: string): void {
-  const sourceNodeModules = path.join(sourceRoot, 'node_modules');
-  const targetNodeModules = path.join(targetRoot, 'node_modules');
-  const symlinkType = process.platform === 'win32' ? 'junction' : 'dir';
-
-  if (existsSync(targetNodeModules)) {
-    const stats = lstatSync(targetNodeModules);
-    if (stats.isSymbolicLink() || stats.isDirectory()) {
-      rmSync(targetNodeModules, { recursive: true, force: true });
-    }
-  }
-
-  symlinkSync(sourceNodeModules, targetNodeModules, symlinkType);
-}
-
-function getPackageRootHash(): string {
-  return createHash('sha256').update(getPackageRoot()).digest('hex').slice(0, 12);
-}
-
-function getDashboardRuntimeRoot(): string {
-  const runtimeKey = `${getPackageVersion()}-${getPackageRootHash()}`;
-  const cacheRoot = process.env['AGENTLENS_CACHE_DIR'] || getCacheDir('agentlens');
-  return path.join(cacheRoot, 'dashboard-runtime', runtimeKey);
-}
-
-function getDashboardBuildMarkerPath(appDir: string): string {
-  return path.join(appDir, getDashboardDistDir(), '.agentlens-build.json');
-}
-
-function hasDashboardBuild(appDir: string): boolean {
-  return existsSync(path.join(appDir, getDashboardDistDir(), 'BUILD_ID')) && existsSync(getDashboardBuildMarkerPath(appDir));
-}
-
 function openBrowser(url: string): void {
   const platform = process.platform;
 
@@ -240,27 +190,6 @@ async function waitForDashboard(url: string, timeoutMs = 30_000): Promise<void> 
   throw new Error(`Dashboard did not become ready within ${timeoutMs}ms`);
 }
 
-function ensureDashboardRuntimeAppDir(): string {
-  const packageRoot = getPackageRoot();
-
-  if (!isInstalledUnderNodeModules(packageRoot)) {
-    return getDashboardAppDir();
-  }
-
-  const runtimeRoot = getDashboardRuntimeRoot();
-  const runtimeAppDir = path.join(runtimeRoot, 'src', 'apps', 'web');
-  const sourceMarker = path.join(runtimeRoot, '.source-root');
-  const currentMarker = existsSync(sourceMarker) ? readFileSync(sourceMarker, 'utf8').trim() : '';
-
-  if (!existsSync(runtimeAppDir) || currentMarker !== packageRoot) {
-    copyDashboardRuntime(packageRoot, runtimeRoot);
-    linkDashboardDependencies(packageRoot, runtimeRoot);
-    writeFileSync(sourceMarker, packageRoot, 'utf8');
-  }
-
-  return runtimeAppDir;
-}
-
 function bindChildLifecycle(child: ReturnType<typeof spawn>): void {
   const forwardSignal = (signal: NodeJS.Signals) => {
     if (!child.killed) {
@@ -282,51 +211,22 @@ function bindChildLifecycle(child: ReturnType<typeof spawn>): void {
   });
 }
 
-function buildDashboardApp(appDir: string, nextBin: string): void {
-  if (hasDashboardBuild(appDir)) {
-    console.log(colorize('Using cached dashboard build', 'green'));
-    return;
-  }
-
-  console.log(colorize('Building dashboard for first use...', 'blue'));
-  const result = spawnSync(process.execPath, [nextBin, 'build'], {
-    cwd: appDir,
-    stdio: 'inherit',
-    env: {
-      ...process.env,
-      AGENTLENS_WEB_DIST_DIR: getDashboardDistDir(),
-      NEXT_TELEMETRY_DISABLED: '1',
-    },
-  });
-
-  if (result.status !== 0) {
-    throw new Error('Dashboard build failed. Try `agentlens dashboard:build` or clear the dashboard runtime cache.');
-  }
-
-  writeFileSync(
-    getDashboardBuildMarkerPath(appDir),
-    JSON.stringify(
-      {
-        version: getPackageVersion(),
-        packageRootHash: getPackageRootHash(),
-        builtAt: new Date().toISOString(),
-      },
-      null,
-      2,
-    ),
-    'utf8',
-  );
+function hasPackagedDashboardRuntime(appDir: string): boolean {
+  return existsSync(path.join(appDir, getDashboardDistDir(), 'BUILD_ID'));
 }
 
 function prepareDashboardRuntime(): { dashboardDir: string; nextBin: string; installedRuntime: boolean } {
   const packageRoot = getPackageRoot();
   const installedRuntime = isInstalledUnderNodeModules(packageRoot);
-  const dashboardDir = ensureDashboardRuntimeAppDir();
+  const dashboardDir = installedRuntime ? getPackagedDashboardRuntimeDir() : getDashboardAppDir();
   const nextBin = getDashboardBinPath(dashboardDir);
 
   if (installedRuntime) {
     console.log(colorize('Preparing dashboard runtime...', 'blue'));
-    buildDashboardApp(dashboardDir, nextBin);
+    if (!hasPackagedDashboardRuntime(dashboardDir)) {
+      throw new Error('Packaged dashboard runtime is missing from this install. Reinstall AgentLens or publish a package built with `npm run build:all`.');
+    }
+    console.log(colorize('Using packaged production dashboard runtime', 'green'));
   }
 
   return { dashboardDir, nextBin, installedRuntime };
@@ -412,15 +312,15 @@ program
 
 program
   .command('dashboard:build')
-  .description('Prepare the cached production dashboard runtime without launching it')
+  .description('Verify the packaged production dashboard runtime')
   .action(() => {
-    const { installedRuntime } = prepareDashboardRuntime();
+    const { installedRuntime, dashboardDir } = prepareDashboardRuntime();
     if (!installedRuntime) {
-      console.log(colorize('Source checkout detected. Use `npm --prefix src/apps/web run build` for the local web app build.', 'yellow'));
+      console.log(colorize('Source checkout detected. Use `npm run build:all` to build the packaged dashboard runtime.', 'yellow'));
       return;
     }
 
-    console.log(colorize('Dashboard runtime is ready.', 'green'));
+    console.log(colorize(`Dashboard runtime is ready at ${dashboardDir}.`, 'green'));
   });
 
 program

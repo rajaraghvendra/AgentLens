@@ -115,6 +115,7 @@ const PROVIDER_LABELS: Record<string, string> = {
 
 const DASHBOARD_SNAPSHOT_VERSION = 1;
 const DASHBOARD_SNAPSHOT_TTL_MS = 15 * 60 * 1000;
+const DASHBOARD_BACKGROUND_REFRESH_MIN_AGE_MS = 5 * 60 * 1000;
 
 function providerLabel(id: string): string {
   return PROVIDER_LABELS[id] ?? id;
@@ -283,6 +284,11 @@ export default function Dashboard({
 
   useEffect(() => {
     const cachedSnapshot = readDashboardSnapshot(period, selectedProvider);
+    const hasFreshSnapshot =
+      cachedSnapshot != null && cachedSnapshot.updatedAt != null && Date.now() - new Date(cachedSnapshot.updatedAt).getTime() < DASHBOARD_BACKGROUND_REFRESH_MIN_AGE_MS;
+    const hasServerOverview =
+      cachedSnapshot == null && period === "7days" && selectedProvider === "all" && defaultSnapshot?.overview != null;
+
     if (cachedSnapshot) {
       overviewRef.current = cachedSnapshot.overview;
       reportRef.current = cachedSnapshot.report;
@@ -312,33 +318,64 @@ export default function Dashboard({
       setLoadError(null);
     }
 
+    if (hasFreshSnapshot) {
+      return;
+    }
+
     let cancelled = false;
+    const shouldFetchOverview = !hasServerOverview;
+    const shouldFetchReport = reportRef.current == null || !hasFreshSnapshot;
+    let pendingRequests = 0;
+
+    if (shouldFetchOverview) pendingRequests += 1;
+    if (shouldFetchReport) pendingRequests += 1;
+
+    if (pendingRequests === 0) {
+      return;
+    }
+
     setRefreshing(true);
 
-    void fetchOverview()
-      .catch((error: any) => {
-        if (!cancelled) {
-          setLoadError(error?.message ?? "Failed to refresh dashboard overview.");
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setOverviewLoading(false);
-        }
-      });
+    const finishRequest = () => {
+      pendingRequests -= 1;
+      if (!cancelled && pendingRequests <= 0) {
+        setRefreshing(false);
+      }
+    };
 
-    void fetchReport()
-      .catch((error: any) => {
-        if (!cancelled) {
-          setLoadError((current) => current ?? error?.message ?? "Failed to refresh dashboard report.");
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setReportLoading(false);
-          setRefreshing(false);
-        }
-      });
+    if (shouldFetchOverview) {
+      void fetchOverview()
+        .catch((error: any) => {
+          if (!cancelled) {
+            setLoadError(error?.message ?? "Failed to refresh dashboard overview.");
+          }
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setOverviewLoading(false);
+          }
+          finishRequest();
+        });
+    } else {
+      setOverviewLoading(false);
+    }
+
+    if (shouldFetchReport) {
+      void fetchReport()
+        .catch((error: any) => {
+          if (!cancelled) {
+            setLoadError((current) => current ?? error?.message ?? "Failed to refresh dashboard report.");
+          }
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setReportLoading(false);
+          }
+          finishRequest();
+        });
+    } else {
+      setReportLoading(false);
+    }
 
     return () => {
       cancelled = true;

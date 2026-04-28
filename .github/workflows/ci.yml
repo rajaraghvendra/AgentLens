@@ -82,16 +82,8 @@ jobs:
       - name: TypeScript type check
         run: npm run lint
 
-  package-smoke:
-    name: Package Smoke (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+  package-artifact:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -108,13 +100,49 @@ jobs:
       - name: Install root dependencies
         run: npm ci
 
+      - name: Install web dependencies
+        working-directory: src/apps/web
+        run: npm install
+
       - name: Build publishable package
-        run: npm run build
+        run: npm run build:all
 
       - name: Pack npm tarball
         run: |
           mkdir -p artifacts
           npm pack --pack-destination artifacts
+
+      - name: Upload npm package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-package-tarball
+          path: artifacts/*.tgz
+          if-no-files-found: error
+
+  package-smoke:
+    name: Package Smoke (${{ matrix.os }})
+    needs: package-artifact
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Download npm package artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: npm-package-tarball
+          path: artifacts
 
       - name: Smoke test installed tarball
         run: |

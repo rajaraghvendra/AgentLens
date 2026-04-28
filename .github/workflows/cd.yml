@@ -35,17 +35,15 @@ jobs:
       - name: Install root dependencies
         run: npm ci
 
-      - name: Build CLI
-        run: npm run build
+      - name: Install web dependencies
+        working-directory: src/apps/web
+        run: npm install
+
+      - name: Build publishable package
+        run: npm run build:all
 
       - name: Run tests
         run: npm run test
-
-      - name: Build web dashboard
-        working-directory: src/apps/web
-        run: |
-          npm install
-          npm run build
 
       - name: Build VS Code extension
         working-directory: src/apps/vscode
