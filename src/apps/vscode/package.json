@@ -2,7 +2,7 @@
   "name": "agentlens",
   "displayName": "◊ AgentLens: AI Cost Tracker",
   "description": "Live AI token and cost tracking in your VS Code status bar",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "publisher": "rajaraghvendra",
   "license": "MIT",
   "repository": {

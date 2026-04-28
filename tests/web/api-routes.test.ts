@@ -37,6 +37,7 @@ vi.mock('../../src/apps/web/lib/server-core', () => ({
 }));
 
 import { GET as getStatus } from '../../src/apps/web/app/api/status/route.js';
+import { GET as getOverview } from '../../src/apps/web/app/api/overview/route.js';
 import { GET as getReport } from '../../src/apps/web/app/api/report/route.js';
 import { GET as getOptimize } from '../../src/apps/web/app/api/optimize/route.js';
 import { GET as getCompare } from '../../src/apps/web/app/api/compare/route.js';
@@ -50,20 +51,43 @@ describe('web api routes', () => {
   });
 
   it('status route returns status payload', async () => {
-    getQuickStatsMock
-      .mockResolvedValueOnce({ totalCostUSD: 1.2, totalTokens: 100, sessionsCount: 2 })
-      .mockResolvedValueOnce({ totalCostUSD: 4.5, totalTokens: 300, sessionsCount: 5 });
     getBudgetMock.mockResolvedValueOnce({ daily: 10, monthly: 100, currency: 'USD' });
     runFullMock.mockResolvedValueOnce({
-      metrics: { byProvider: { cursor: { costUSD: 1.2 } } },
+      metrics: {
+        overview: { totalCostLocal: 1.2, totalTokens: 100, sessionsCount: 2 },
+        byProvider: { cursor: { costUSD: 1.2 } },
+      },
+      providers: [{ id: 'cursor', name: 'Cursor', available: true, sessionCount: 2 }],
       events: [{ id: 'e1', title: 'Cache issue', severity: 'Medium', description: 'desc', recommendedAction: 'fix it' }],
-      toolAdvice: [{ title: 'Advice 1' }],
+      toolAdvice: [{ title: 'Advice 1', priority: 'Medium', description: 'desc', suggestedAction: 'fix it' }],
       processing: { filesReparsed: 1, cachedFilesReused: 2, sessionsLoadedFromCache: 2 },
     });
 
     const response = await getStatus(new Request('http://localhost/api/status?period=today'));
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({ period: 'today', totalCostUSD: 1.2 });
+  });
+
+  it('overview route returns lightweight dashboard payload', async () => {
+    runFullMock.mockResolvedValueOnce({
+      metrics: {
+        overview: { totalCostLocal: 3.4, totalTokens: 900, sessionsCount: 4, avgCostPerSession: 0.85, cacheHitRate: 50 },
+        byProvider: { claude: { costUSD: 3.4 } },
+      },
+      providers: [{ id: 'claude', name: 'Claude', available: true, sessionCount: 4 }],
+      events: [{ id: 'evt', title: 'Spend spike', severity: 'High', description: 'desc' }],
+      toolAdvice: [{ title: 'Use smaller model', priority: 'Medium', description: 'desc', suggestedAction: 'switch' }],
+      processing: { filesScanned: 3, filesReparsed: 1, cachedFilesReused: 2, sessionsLoadedFromCache: 5 },
+    });
+
+    const response = await getOverview(new Request('http://localhost/api/overview?period=7'));
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      metrics: { overview: { totalCostLocal: 3.4 } },
+      activeProviderCount: 1,
+      topEvent: { title: 'Spend spike' },
+      topRecommendation: { title: 'Use smaller model' },
+    });
   });
 
   it('report route normalizes response shape', async () => {

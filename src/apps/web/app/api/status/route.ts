@@ -1,45 +1,45 @@
 import { NextResponse } from 'next/server';
-import { CoreEngine, getBudget, getAllProviders } from '../../../lib/server-core';
-import { sanitizePeriod, parsePeriod } from '../../../lib/query-params';
+import { getBudget } from '../../../lib/server-core';
+import { getDashboardOverview } from '../../../lib/dashboard-data';
+import { sanitizePeriod, sanitizeProvider, parsePeriod } from '../../../lib/query-params';
 
 async function GET(request: Request): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(request.url);
     const period = sanitizePeriod(searchParams.get('period'), 'today');
+    const provider = sanitizeProvider(searchParams.get('provider'));
     const periodDays = parsePeriod(period);
     const fullReparse = searchParams.get('fullReparse') === '1';
 
-    const [today, rangeStats, budget, detailedToday] = await Promise.all([
-      CoreEngine.getQuickStats(1, { fullReparse }),
-      CoreEngine.getQuickStats(periodDays, { fullReparse }),
+    const [budget, overview] = await Promise.all([
       getBudget(),
-      CoreEngine.runFull(1, 'USD', { fullReparse }),
+      getDashboardOverview(periodDays, provider, fullReparse),
     ]);
 
+    const today = overview.metrics.overview ?? {};
     const dailyBudget = budget?.daily || 0;
-    const isBudgetExceeded = dailyBudget > 0 && today.totalCostUSD >= dailyBudget;
-    const budgetUtilization = dailyBudget > 0 ? (today.totalCostUSD / dailyBudget) * 100 : 0;
+    const totalCostUSD = today.totalCostLocal ?? 0;
+    const isBudgetExceeded = dailyBudget > 0 && totalCostUSD >= dailyBudget;
+    const budgetUtilization = dailyBudget > 0 ? (totalCostUSD / dailyBudget) * 100 : 0;
 
     return NextResponse.json({
       period,
-      totalCostLocal: today.totalCostUSD,
-      totalCostUSD: today.totalCostUSD,
+      totalCostLocal: totalCostUSD,
+      totalCostUSD,
       currencySymbol: '$',
-      totalTokens: today.totalTokens,
+      totalTokens: today.totalTokens ?? 0,
       budgetCapLocal: budget?.daily || null,
       budgetCapUSD: budget?.daily || null,
       isBudgetExceeded,
       budgetUtilizationPercentage: budgetUtilization,
-      activeProviders: getAllProviders().filter((provider) => provider.isAvailable()).map((provider) => provider.id),
-      costsByProvider: Object.fromEntries(
-        Object.entries(detailedToday.metrics.byProvider || {}).map(([provider, data]: [string, any]) => [provider, data.costUSD]),
-      ),
-      activeIssuesCount: detailedToday.events?.length || 0,
-      topAlert: detailedToday.events?.[0] || null,
-      recommendations: (detailedToday.toolAdvice || []).slice(0, 3).map((item: any) => item.title),
-      processing: detailedToday.processing ?? null,
-      sessionsToday: today.sessionsCount,
-      sessionsInPeriod: rangeStats.sessionsCount,
+      activeProviders: overview.providers.filter((providerItem) => providerItem.available).map((providerItem) => providerItem.id),
+      costsByProvider: overview.providerCosts,
+      activeIssuesCount: overview.topEvent ? 1 : 0,
+      topAlert: overview.topEvent,
+      recommendations: overview.topRecommendation ? [overview.topRecommendation.title] : [],
+      processing: overview.processing ?? null,
+      sessionsToday: periodDays === 1 ? (today.sessionsCount ?? 0) : null,
+      sessionsInPeriod: today.sessionsCount ?? 0,
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

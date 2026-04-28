@@ -2,7 +2,7 @@
 
 import { Command } from 'commander';
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'fs';
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import { createHash } from 'crypto';
 import { createRequire } from 'module';
 import path from 'path';
@@ -93,6 +93,36 @@ function getDashboardAppDir(): string {
   return path.join(getPackageRoot(), 'src', 'apps', 'web');
 }
 
+function sanitizeRelativeDistDir(rawValue: string | undefined): string {
+  const fallback = '.agentlens-next';
+  if (!rawValue) return fallback;
+
+  const normalized = rawValue.trim().replace(/\\/g, '/');
+  if (!normalized || normalized.startsWith('/') || /^[A-Za-z]:\//.test(normalized)) {
+    return fallback;
+  }
+
+  const segments = normalized.split('/').filter(Boolean);
+  if (segments.length === 0 || segments.includes('..')) {
+    return fallback;
+  }
+
+  return segments.join('/');
+}
+
+function getDashboardDistDir(): string {
+  return sanitizeRelativeDistDir(process.env['AGENTLENS_WEB_DIST_DIR']);
+}
+
+function normalizePort(portValue: string): string {
+  const parsed = Number.parseInt(portValue, 10);
+  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 65535) {
+    throw new Error(`Invalid port "${portValue}". Use a numeric port between 1 and 65535.`);
+  }
+
+  return String(parsed);
+}
+
 function getDashboardBinPath(appDir: string): string {
   const appLocalBin = path.join(appDir, 'node_modules', 'next', 'dist', 'bin', 'next');
   if (existsSync(appLocalBin)) {
@@ -166,6 +196,14 @@ function getDashboardRuntimeRoot(): string {
   const runtimeKey = `${getPackageVersion()}-${getPackageRootHash()}`;
   const cacheRoot = process.env['AGENTLENS_CACHE_DIR'] || getCacheDir('agentlens');
   return path.join(cacheRoot, 'dashboard-runtime', runtimeKey);
+}
+
+function getDashboardBuildMarkerPath(appDir: string): string {
+  return path.join(appDir, getDashboardDistDir(), '.agentlens-build.json');
+}
+
+function hasDashboardBuild(appDir: string): boolean {
+  return existsSync(path.join(appDir, getDashboardDistDir(), 'BUILD_ID')) && existsSync(getDashboardBuildMarkerPath(appDir));
 }
 
 function openBrowser(url: string): void {
@@ -244,6 +282,56 @@ function bindChildLifecycle(child: ReturnType<typeof spawn>): void {
   });
 }
 
+function buildDashboardApp(appDir: string, nextBin: string): void {
+  if (hasDashboardBuild(appDir)) {
+    console.log(colorize('Using cached dashboard build', 'green'));
+    return;
+  }
+
+  console.log(colorize('Building dashboard for first use...', 'blue'));
+  const result = spawnSync(process.execPath, [nextBin, 'build'], {
+    cwd: appDir,
+    stdio: 'inherit',
+    env: {
+      ...process.env,
+      AGENTLENS_WEB_DIST_DIR: getDashboardDistDir(),
+      NEXT_TELEMETRY_DISABLED: '1',
+    },
+  });
+
+  if (result.status !== 0) {
+    throw new Error('Dashboard build failed. Try `agentlens dashboard:build` or clear the dashboard runtime cache.');
+  }
+
+  writeFileSync(
+    getDashboardBuildMarkerPath(appDir),
+    JSON.stringify(
+      {
+        version: getPackageVersion(),
+        packageRootHash: getPackageRootHash(),
+        builtAt: new Date().toISOString(),
+      },
+      null,
+      2,
+    ),
+    'utf8',
+  );
+}
+
+function prepareDashboardRuntime(): { dashboardDir: string; nextBin: string; installedRuntime: boolean } {
+  const packageRoot = getPackageRoot();
+  const installedRuntime = isInstalledUnderNodeModules(packageRoot);
+  const dashboardDir = ensureDashboardRuntimeAppDir();
+  const nextBin = getDashboardBinPath(dashboardDir);
+
+  if (installedRuntime) {
+    console.log(colorize('Preparing dashboard runtime...', 'blue'));
+    buildDashboardApp(dashboardDir, nextBin);
+  }
+
+  return { dashboardDir, nextBin, installedRuntime };
+}
+
 const program = new Command();
 
 program
@@ -285,19 +373,19 @@ program
   .option('-p, --port <port>', 'Port to run on', '3000')
   .option('--no-open', 'Do not open the browser automatically')
   .action((options) => {
-    const port = options.port || '3000';
-    const dashboardDir = ensureDashboardRuntimeAppDir();
-    const nextBin = getDashboardBinPath(dashboardDir);
+    const port = normalizePort(options.port || '3000');
+    const { dashboardDir, nextBin, installedRuntime } = prepareDashboardRuntime();
     const dashboardUrl = `http://127.0.0.1:${port}`;
+    const dashboardMode = installedRuntime ? 'production' : 'development';
 
-    console.log(colorize('Starting AgentLens dashboard on http://localhost:' + port + '...', 'cyan'));
+    console.log(colorize(`Starting AgentLens dashboard (${dashboardMode}) on http://localhost:${port}...`, 'cyan'));
 
-    const child = spawn(process.execPath, [nextBin, 'dev', '--hostname', '127.0.0.1', '--port', port], {
+    const child = spawn(process.execPath, [nextBin, installedRuntime ? 'start' : 'dev', '--hostname', '127.0.0.1', '--port', port], {
       cwd: dashboardDir,
       stdio: 'inherit',
       env: {
         ...process.env,
-        AGENTLENS_WEB_DIST_DIR: process.env['AGENTLENS_WEB_DIST_DIR'] || '.agentlens-next',
+        AGENTLENS_WEB_DIST_DIR: getDashboardDistDir(),
         NEXT_TELEMETRY_DISABLED: '1',
       },
     });
@@ -320,6 +408,19 @@ program
           console.log(colorize(`Dashboard is running at ${dashboardUrl}`, 'yellow'));
         });
     }
+  });
+
+program
+  .command('dashboard:build')
+  .description('Prepare the cached production dashboard runtime without launching it')
+  .action(() => {
+    const { installedRuntime } = prepareDashboardRuntime();
+    if (!installedRuntime) {
+      console.log(colorize('Source checkout detected. Use `npm --prefix src/apps/web run build` for the local web app build.', 'yellow'));
+      return;
+    }
+
+    console.log(colorize('Dashboard runtime is ready.', 'green'));
   });
 
 program

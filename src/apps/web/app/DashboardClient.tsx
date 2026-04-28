@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import nextDynamic from "next/dynamic";
 import {
@@ -29,8 +29,37 @@ const ActiveHoursChart = nextDynamic(() => import("../components/ActiveHoursChar
 const InsightsPanel = nextDynamic(() => import("../components/InsightsPanel").then((mod) => mod.InsightsPanel), { ssr: false });
 
 type TabType = "dashboard" | "optimize" | "compare";
+type ProviderSummary = { id: string; name: string; available: boolean; sessionCount?: number };
+type EventSummary = { id: string; title: string; severity: string; description: string; recommendedAction?: string };
+type AdviceSummary = { title: string; priority: string; description: string; suggestedAction: string };
+type ProcessingSummary = { filesScanned?: number; filesReparsed?: number; cachedFilesReused?: number; sessionsLoadedFromCache?: number } | null;
+
+type OverviewResponse = {
+  responseVersion: number;
+  generatedAt: string;
+  periodDays: number;
+  provider: string;
+  metrics: {
+    overview?: {
+      totalCostLocal?: number;
+      localCurrency?: string;
+      sessionsCount?: number;
+      totalTokens?: number;
+      avgCostPerSession?: number;
+      cacheHitRate?: number;
+    };
+  };
+  providers?: ProviderSummary[];
+  activeProviderCount?: number;
+  topEvent?: EventSummary | null;
+  topRecommendation?: AdviceSummary | null;
+  processing?: ProcessingSummary;
+  providerCosts?: Record<string, number>;
+};
 
 type ReportResponse = {
+  responseVersion?: number;
+  generatedAt?: string;
   metrics?: {
     byActivity?: Record<string, any>;
     byModel?: Record<string, any>;
@@ -56,7 +85,15 @@ type ReportResponse = {
   toolAdvice?: Array<{ title: string; priority: string; description: string; suggestedAction: string }>;
   toolBreakdown?: Array<{ name: string; estimatedCostUSD: number; errorRate: number; invocationCount: number }>;
   mcpBreakdown?: Array<{ name: string; errorRate: number; invocationCount: number }>;
-  processing?: { filesReparsed?: number; cachedFilesReused?: number; sessionsLoadedFromCache?: number } | null;
+  processing?: { filesScanned?: number; filesReparsed?: number; cachedFilesReused?: number; sessionsLoadedFromCache?: number } | null;
+};
+
+type DashboardSnapshot = {
+  version: number;
+  updatedAt: string;
+  expiresAt: number;
+  overview: OverviewResponse | null;
+  report: ReportResponse | null;
 };
 
 const PERIODS = [
@@ -75,6 +112,9 @@ const PROVIDER_LABELS: Record<string, string> = {
   pi: "Pi",
   copilot: "Copilot",
 };
+
+const DASHBOARD_SNAPSHOT_VERSION = 1;
+const DASHBOARD_SNAPSHOT_TTL_MS = 15 * 60 * 1000;
 
 function providerLabel(id: string): string {
   return PROVIDER_LABELS[id] ?? id;
@@ -104,12 +144,75 @@ function formatProjectLabel(name: string, maxLength = 32): string {
   return `${tail.slice(0, Math.max(0, maxLength - 1))}…`;
 }
 
-export default function Dashboard() {
+function createQueryParams(period: string, selectedProvider: string): URLSearchParams {
+  const selected = PERIODS.find((entry) => entry.key === period);
+  const params = new URLSearchParams({ period: String(selected?.days ?? 7) });
+  if (selectedProvider !== "all") params.set("provider", selectedProvider);
+  return params;
+}
+
+function snapshotStorageKey(period: string, selectedProvider: string): string {
+  return `agentlens:dashboard:${period}:${selectedProvider}`;
+}
+
+function readDashboardSnapshot(period: string, selectedProvider: string): DashboardSnapshot | null {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const key = snapshotStorageKey(period, selectedProvider);
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as DashboardSnapshot;
+    if (parsed.version !== DASHBOARD_SNAPSHOT_VERSION || parsed.expiresAt <= Date.now()) {
+      window.localStorage.removeItem(key);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeDashboardSnapshot(period: string, selectedProvider: string, snapshot: DashboardSnapshot): void {
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.setItem(snapshotStorageKey(period, selectedProvider), JSON.stringify(snapshot));
+  } catch {
+    // Ignore storage quota and serialization failures.
+  }
+}
+
+export default function Dashboard({
+  initialOverview = null,
+  initialError = null,
+}: {
+  initialOverview?: OverviewResponse | null;
+  initialError?: string | null;
+}) {
+  const defaultSnapshot = useMemo<DashboardSnapshot | null>(
+    () =>
+      initialOverview
+        ? {
+            version: DASHBOARD_SNAPSHOT_VERSION,
+            updatedAt: initialOverview.generatedAt,
+            expiresAt: Date.now() + DASHBOARD_SNAPSHOT_TTL_MS,
+            overview: initialOverview,
+            report: null,
+          }
+        : null,
+    [initialOverview],
+  );
+
+  const [overviewData, setOverviewData] = useState<OverviewResponse | null>(initialOverview);
   const [report, setReport] = useState<ReportResponse | null>(null);
   const [optimizeData, setOptimizeData] = useState<any>(null);
   const [compareData, setCompareData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [overviewLoading, setOverviewLoading] = useState(!initialOverview);
+  const [reportLoading, setReportLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(initialError);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(initialOverview?.generatedAt ?? null);
   const [period, setPeriod] = useState<string>("7days");
   const [activeTab, setActiveTab] = useState<TabType>("dashboard");
   const [showBudgetSettings, setShowBudgetSettings] = useState(false);
@@ -117,74 +220,153 @@ export default function Dashboard() {
   const [showProviderDropdown, setShowProviderDropdown] = useState(false);
   const [compareSortBy, setCompareSortBy] = useState<"name" | "costUSD" | "totalTokens" | "messageCount">("costUSD");
   const [compareSortDir, setCompareSortDir] = useState<"asc" | "desc">("desc");
+  const overviewRef = useRef<OverviewResponse | null>(initialOverview);
+  const reportRef = useRef<ReportResponse | null>(null);
+
+  const persistSnapshot = useCallback(
+    (nextOverview: OverviewResponse | null, nextReport: ReportResponse | null, updatedAtOverride?: string | null) => {
+      const updatedAtValue = updatedAtOverride ?? nextReport?.generatedAt ?? nextOverview?.generatedAt ?? new Date().toISOString();
+      writeDashboardSnapshot(period, selectedProvider, {
+        version: DASHBOARD_SNAPSHOT_VERSION,
+        updatedAt: updatedAtValue,
+        expiresAt: Date.now() + DASHBOARD_SNAPSHOT_TTL_MS,
+        overview: nextOverview,
+        report: nextReport,
+      });
+    },
+    [period, selectedProvider],
+  );
+
+  const fetchOverview = useCallback(async () => {
+    const params = createQueryParams(period, selectedProvider);
+    const res = await fetch(`/api/overview?${params.toString()}`);
+    if (!res.ok) {
+      throw new Error(`Overview request failed with status ${res.status}`);
+    }
+
+    const data = (await res.json()) as OverviewResponse;
+    overviewRef.current = data;
+    setOverviewData(data);
+    setLastUpdated(data.generatedAt);
+    setLoadError(null);
+    persistSnapshot(data, reportRef.current, data.generatedAt);
+    return data;
+  }, [period, persistSnapshot, selectedProvider]);
 
   const fetchReport = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      const selected = PERIODS.find((p) => p.key === period);
-      const params = new URLSearchParams({ period: String(selected?.days ?? 7) });
-      if (selectedProvider !== "all") params.set("provider", selectedProvider);
-      const res = await fetch(`/api/report?${params.toString()}`);
-      setReport(await res.json());
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+    const params = createQueryParams(period, selectedProvider);
+    const res = await fetch(`/api/report?${params.toString()}`);
+    if (!res.ok) {
+      throw new Error(`Report request failed with status ${res.status}`);
     }
-  }, [period, selectedProvider]);
+
+    const data = (await res.json()) as ReportResponse;
+    reportRef.current = data;
+    setReport(data);
+    setLastUpdated(data.generatedAt ?? overviewRef.current?.generatedAt ?? null);
+    setLoadError(null);
+    persistSnapshot(overviewRef.current, data, data.generatedAt ?? overviewRef.current?.generatedAt ?? null);
+    return data;
+  }, [period, persistSnapshot, selectedProvider]);
 
   const fetchOptimize = useCallback(async () => {
-    const selected = PERIODS.find((p) => p.key === period);
-    const params = new URLSearchParams({ period: String(selected?.days ?? 7) });
-    if (selectedProvider !== "all") params.set("provider", selectedProvider);
+    const params = createQueryParams(period, selectedProvider);
     const res = await fetch(`/api/optimize?${params.toString()}`);
     setOptimizeData(await res.json());
   }, [period, selectedProvider]);
 
   const fetchCompare = useCallback(async () => {
-    const selected = PERIODS.find((p) => p.key === period);
-    const params = new URLSearchParams({ period: String(selected?.days ?? 7) });
-    if (selectedProvider !== "all") params.set("provider", selectedProvider);
+    const params = createQueryParams(period, selectedProvider);
     const res = await fetch(`/api/compare?${params.toString()}`);
     setCompareData(await res.json());
   }, [period, selectedProvider]);
 
   useEffect(() => {
-    void fetchReport();
-  }, [fetchReport]);
+    const cachedSnapshot = readDashboardSnapshot(period, selectedProvider);
+    if (cachedSnapshot) {
+      overviewRef.current = cachedSnapshot.overview;
+      reportRef.current = cachedSnapshot.report;
+      setOverviewData(cachedSnapshot.overview);
+      setReport(cachedSnapshot.report);
+      setLastUpdated(cachedSnapshot.updatedAt);
+      setOverviewLoading(false);
+      setReportLoading(cachedSnapshot.report == null);
+      setLoadError(null);
+    } else if (period === "7days" && selectedProvider === "all" && defaultSnapshot) {
+      overviewRef.current = defaultSnapshot.overview;
+      reportRef.current = defaultSnapshot.report;
+      setOverviewData(defaultSnapshot.overview);
+      setReport(defaultSnapshot.report);
+      setLastUpdated(defaultSnapshot.updatedAt);
+      setOverviewLoading(false);
+      setReportLoading(true);
+      setLoadError(initialError);
+    } else {
+      overviewRef.current = null;
+      reportRef.current = null;
+      setOverviewData(null);
+      setReport(null);
+      setLastUpdated(null);
+      setOverviewLoading(true);
+      setReportLoading(true);
+      setLoadError(null);
+    }
+
+    let cancelled = false;
+    setRefreshing(true);
+
+    void fetchOverview()
+      .catch((error: any) => {
+        if (!cancelled) {
+          setLoadError(error?.message ?? "Failed to refresh dashboard overview.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setOverviewLoading(false);
+        }
+      });
+
+    void fetchReport()
+      .catch((error: any) => {
+        if (!cancelled) {
+          setLoadError((current) => current ?? error?.message ?? "Failed to refresh dashboard report.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setReportLoading(false);
+          setRefreshing(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [defaultSnapshot, fetchOverview, fetchReport, initialError, period, selectedProvider]);
 
   useEffect(() => {
     if (activeTab === "optimize") void fetchOptimize();
     if (activeTab === "compare") void fetchCompare();
   }, [activeTab, fetchOptimize, fetchCompare]);
 
-  if (loading || !report) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <RefreshCw className="mx-auto h-12 w-12 animate-spin text-primary" />
-          <p className="mt-4 text-text-secondary">Loading AgentLens data...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const overview = report.metrics?.overview ?? {};
-  const hourly = report.metrics?.hourly ?? {};
-  const findings = report.findings ?? [];
-  const activities = Object.values(report.metrics?.byActivity ?? {}).sort((a: any, b: any) => b.costUSD - a.costUSD);
-  const models = Object.values(report.metrics?.byModel ?? {}).sort((a: any, b: any) => b.costUSD - a.costUSD);
-  const daily = report.daily ?? [];
-  const projects = report.projects ?? [];
-  const providers = report.providers ?? [];
-  const tools = report.tools ?? [];
-  const commands = report.commands ?? [];
-  const insights = report.insights ?? [];
-  const events = report.events ?? [];
-  const digests = report.digests ?? [];
-  const toolAdvice = report.toolAdvice ?? [];
-  const toolBreakdown = report.toolBreakdown ?? [];
-  const mcpBreakdown = report.mcpBreakdown ?? [];
-  const processing = report.processing;
+  const overview = overviewData?.metrics?.overview ?? report?.metrics?.overview ?? {};
+  const hourly = report?.metrics?.hourly ?? {};
+  const findings = report?.findings ?? [];
+  const activities = Object.values(report?.metrics?.byActivity ?? {}).sort((a: any, b: any) => b.costUSD - a.costUSD);
+  const models = Object.values(report?.metrics?.byModel ?? {}).sort((a: any, b: any) => b.costUSD - a.costUSD);
+  const daily = report?.daily ?? [];
+  const projects = report?.projects ?? [];
+  const providers = report?.providers ?? overviewData?.providers ?? [];
+  const tools = report?.tools ?? [];
+  const commands = report?.commands ?? [];
+  const insights = report?.insights ?? [];
+  const events = report?.events ?? (overviewData?.topEvent ? [overviewData.topEvent] : []);
+  const digests = report?.digests ?? [];
+  const toolAdvice = report?.toolAdvice ?? (overviewData?.topRecommendation ? [overviewData.topRecommendation] : []);
+  const toolBreakdown = report?.toolBreakdown ?? [];
+  const mcpBreakdown = report?.mcpBreakdown ?? [];
+  const processing = report?.processing ?? overviewData?.processing ?? null;
   const optimizeFindings = optimizeData?.findings ?? [];
   const optimizeInsights = optimizeData?.insights ?? [];
   const optimizeHealthScore = optimizeData?.healthScore;
@@ -194,8 +376,16 @@ export default function Dashboard() {
   const topFinding = findings[0];
   const topEvent = events[0];
   const dailyDigest = digests.find((entry) => entry.period === "daily");
-  const activeProviderCount = providers.filter((provider) => provider.available).length;
+  const activeProviderCount = overviewData?.activeProviderCount ?? providers.filter((provider) => provider.available).length;
   const currentPeriodLabel = PERIODS.find((entry) => entry.key === period)?.label ?? "7 Days";
+  const reportReady = report != null;
+  const statusLabel = refreshing
+    ? "Refreshing data"
+    : lastUpdated
+      ? `Updated ${new Date(lastUpdated).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+      : overviewLoading
+        ? "Loading overview"
+        : "Waiting for data";
 
   const sortedCompareModels = [...compareModels].sort((a: any, b: any) => {
     const aValue = a?.[compareSortBy];
@@ -222,7 +412,27 @@ export default function Dashboard() {
               <p className="mt-1 text-sm text-text-secondary">AI developer analytics dashboard</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => void fetchReport()} className="panel-button" title="Refresh">
+              <div className="hidden rounded-full border border-border/70 px-3 py-2 text-xs text-text-secondary md:block">
+                {statusLabel}
+              </div>
+              <button
+                onClick={() => {
+                  setRefreshing(true);
+                  setOverviewLoading(false);
+                  setReportLoading((current) => current || report == null);
+                  void fetchOverview()
+                    .catch((error: any) => setLoadError(error?.message ?? "Failed to refresh dashboard overview."))
+                    .finally(() => setOverviewLoading(false));
+                  void fetchReport()
+                    .catch((error: any) => setLoadError((current) => current ?? error?.message ?? "Failed to refresh dashboard report."))
+                    .finally(() => {
+                      setReportLoading(false);
+                      setRefreshing(false);
+                    });
+                }}
+                className="panel-button"
+                title="Refresh"
+              >
                 <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
               </button>
               <button onClick={() => setShowBudgetSettings(true)} className="panel-button" title="Budget Settings">
@@ -322,12 +532,18 @@ export default function Dashboard() {
         {activeTab === "dashboard" && (
           <div className="mt-6 space-y-6">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
-              <MetricCard title="Total Cost" value={`$${(overview.totalCostLocal ?? 0).toFixed(2)}`} subtitle={overview.localCurrency ?? "USD"} icon={<DollarSign className="text-emerald-400" />} highlight />
-              <MetricCard title="Sessions" value={overview.sessionsCount ?? 0} subtitle={`Avg $${(overview.avgCostPerSession ?? 0).toFixed(2)}/session`} icon={<Activity className="text-primary-300" />} />
-              <MetricCard title="Total Tokens" value={`${(((overview.totalTokens ?? 0) / 1_000_000).toFixed(1))}M`} subtitle="Processed" icon={<Database className="text-sky-300" />} />
-              <MetricCard title="Cache Efficiency" value={(overview.cacheHitRate ?? 0).toFixed(1) + "%"} subtitle="Context hit rate" icon={<Zap className="text-yellow-300" />} />
-              <MetricCard title="Providers" value={activeProviderCount} subtitle="Active" icon={<Filter className="text-violet-300" />} />
+              <MetricCard title="Total Cost" value={`$${(overview.totalCostLocal ?? 0).toFixed(2)}`} subtitle={overview.localCurrency ?? "USD"} icon={<DollarSign className="text-emerald-400" />} highlight loading={overviewLoading && !overviewData} />
+              <MetricCard title="Sessions" value={overview.sessionsCount ?? 0} subtitle={`Avg $${(overview.avgCostPerSession ?? 0).toFixed(2)}/session`} icon={<Activity className="text-primary-300" />} loading={overviewLoading && !overviewData} />
+              <MetricCard title="Total Tokens" value={`${(((overview.totalTokens ?? 0) / 1_000_000).toFixed(1))}M`} subtitle="Processed" icon={<Database className="text-sky-300" />} loading={overviewLoading && !overviewData} />
+              <MetricCard title="Cache Efficiency" value={(overview.cacheHitRate ?? 0).toFixed(1) + "%"} subtitle="Context hit rate" icon={<Zap className="text-yellow-300" />} loading={overviewLoading && !overviewData} />
+              <MetricCard title="Providers" value={activeProviderCount} subtitle="Active" icon={<Filter className="text-violet-300" />} loading={overviewLoading && !overviewData} />
             </div>
+
+            {loadError && (
+              <div className="rounded-2xl border border-amber-500/40 bg-amber-950/30 px-6 py-4 text-sm text-amber-100">
+                {loadError}
+              </div>
+            )}
 
             {(topEvent || processing) && (
               <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_0.8fr]">
@@ -344,6 +560,7 @@ export default function Dashboard() {
                 {processing ? (
                   <SurfaceCard title="Processing">
                     <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between"><span>Files Scanned</span><span>{processing.filesScanned ?? 0}</span></div>
                       <div className="flex items-center justify-between"><span>Reparsed</span><span>{processing.filesReparsed ?? 0}</span></div>
                       <div className="flex items-center justify-between"><span>Cached Reuse</span><span>{processing.cachedFilesReused ?? 0}</span></div>
                       <div className="flex items-center justify-between"><span>Cache Sessions</span><span>{processing.sessionsLoadedFromCache ?? 0}</span></div>
@@ -353,189 +570,195 @@ export default function Dashboard() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-              <SurfaceCard title="Daily Activity">
-                <div className="h-64">
-                  <CostTrendChart data={daily} />
-                </div>
-              </SurfaceCard>
-              <SurfaceCard title="Projects">
-                <div className="space-y-3">
-                  {projects.slice(0, 5).map((proj, idx) => (
-                    <div key={idx} className="rounded-xl bg-background/70 px-4 py-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="min-w-0 flex-1 truncate font-medium" title={proj.name}>
-                          {formatProjectLabel(proj.name)}
+            {!reportReady && reportLoading ? (
+              <DashboardLoadingShell />
+            ) : (
+              <>
+                <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+                  <SurfaceCard title="Daily Activity">
+                    <div className="h-64">
+                      <CostTrendChart data={daily} />
+                    </div>
+                  </SurfaceCard>
+                  <SurfaceCard title="Projects">
+                    <div className="space-y-3">
+                      {projects.slice(0, 5).map((proj, idx) => (
+                        <div key={idx} className="rounded-xl bg-background/70 px-4 py-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="min-w-0 flex-1 truncate font-medium" title={proj.name}>
+                              {formatProjectLabel(proj.name)}
+                            </div>
+                            <div className="shrink-0 text-sm font-semibold text-emerald-400">${proj.cost.toFixed(2)}</div>
+                          </div>
+                          <div className="mt-1 text-xs text-text-secondary">{proj.sessions} sessions</div>
                         </div>
-                        <div className="shrink-0 text-sm font-semibold text-emerald-400">${proj.cost.toFixed(2)}</div>
+                      ))}
+                      {projects.length === 0 && <p className="text-sm text-text-secondary">No project data available.</p>}
+                    </div>
+                  </SurfaceCard>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+                  <SurfaceCard title="Top Activities">
+                    <ActivityBreakdown activities={activities.slice(0, 10)} />
+                  </SurfaceCard>
+                  <SurfaceCard title="Models Used">
+                    <div className="h-64">
+                      <ModelUsageChart data={models.slice(0, 8)} />
+                    </div>
+                  </SurfaceCard>
+                </div>
+
+                <SurfaceCard title="Active Hours" icon={<Clock className="h-4 w-4 text-accent" />}>
+                  <p className="mb-4 text-sm text-text-secondary">When you are most active across the selected window.</p>
+                  <div className="h-52">
+                    <ActiveHoursChart hourly={hourly} />
+                  </div>
+                </SurfaceCard>
+
+                <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+                  <SurfaceCard title="Top Tools" icon={<Wrench className="h-4 w-4 text-accent" />}>
+                    <div className="space-y-2">
+                      {tools.slice(0, 8).map((tool, idx) => (
+                        <div key={idx} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2 text-sm">
+                          <span>{tool.name}</span>
+                          <span className="text-text-secondary">{tool.count}x</span>
+                        </div>
+                      ))}
+                      {tools.length === 0 && <p className="text-sm text-text-secondary">No tool usage data available.</p>}
+                    </div>
+                  </SurfaceCard>
+                  <SurfaceCard title="Top Commands" icon={<TerminalSquare className="h-4 w-4 text-accent" />}>
+                    <div className="space-y-2">
+                      {commands.slice(0, 8).map((cmd, idx) => (
+                        <div key={idx} className="flex items-center justify-between gap-3 rounded-xl bg-background/70 px-3 py-2 text-sm">
+                          <code className="truncate">{cmd.command}</code>
+                          <span className="shrink-0 text-text-secondary">{cmd.count}x</span>
+                        </div>
+                      ))}
+                      {commands.length === 0 && <p className="text-sm text-text-secondary">No command data available.</p>}
+                    </div>
+                  </SurfaceCard>
+                  <SurfaceCard title="Providers" icon={<Cpu className="h-4 w-4 text-accent" />}>
+                    <div className="space-y-2">
+                      {providers.map((provider, idx) => (
+                        <div key={idx} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2 text-sm">
+                          <span>{provider.name}</span>
+                          <span className={provider.available ? "text-emerald-400" : "text-text-secondary"}>{provider.sessionCount ?? 0}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </SurfaceCard>
+                </div>
+
+                {topFinding && (
+                  <div className={`rounded-2xl border px-6 py-4 ${severityTone(topFinding.severity)}`}>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="text-sm font-semibold uppercase tracking-wide">{topFinding.severity}</span>
+                      <span className="text-base font-semibold">{topFinding.title}</span>
+                    </div>
+                    <p className="mt-2 text-sm opacity-90">{topFinding.description}</p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1fr]">
+                  <SurfaceCard title="Findings">
+                    {findings.length === 0 ? (
+                      <p className="text-sm text-text-secondary">No findings available.</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {findings.map((finding, idx) => (
+                          <div key={idx} className={`rounded-xl border px-4 py-3 ${severityTone(finding.severity)}`}>
+                            <div className="font-medium">{finding.title}</div>
+                            <p className="mt-1 text-sm opacity-90">{finding.description}</p>
+                          </div>
+                        ))}
                       </div>
-                      <div className="mt-1 text-xs text-text-secondary">{proj.sessions} sessions</div>
-                    </div>
-                  ))}
-                  {projects.length === 0 && <p className="text-sm text-text-secondary">No project data available.</p>}
+                    )}
+                  </SurfaceCard>
+                  <SurfaceCard title="Insights">
+                    {insights.length === 0 ? (
+                      <p className="text-sm text-text-secondary">No insights available.</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {insights.map((insight, idx) => (
+                          <div key={idx} className="rounded-xl bg-background/70 px-4 py-3 text-sm text-text-primary">
+                            {insight.replace(/\*\*/g, "")}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </SurfaceCard>
                 </div>
-              </SurfaceCard>
-            </div>
 
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-              <SurfaceCard title="Top Activities">
-                <ActivityBreakdown activities={activities.slice(0, 10)} />
-              </SurfaceCard>
-              <SurfaceCard title="Models Used">
-                <div className="h-64">
-                  <ModelUsageChart data={models.slice(0, 8)} />
+                <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1fr]">
+                  <SurfaceCard title="Recommendations">
+                    {toolAdvice.length === 0 ? (
+                      <p className="text-sm text-text-secondary">No optimization recommendations available.</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {toolAdvice.slice(0, 5).map((item, idx) => (
+                          <div key={idx} className={`rounded-xl border px-4 py-3 ${severityTone(item.priority)}`}>
+                            <div className="font-medium">{item.title}</div>
+                            <p className="mt-1 text-sm opacity-90">{item.description}</p>
+                            <p className="mt-2 text-sm font-medium opacity-95">{item.suggestedAction}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </SurfaceCard>
+                  <SurfaceCard title="Top Savings Opportunities">
+                    {dailyDigest ? (
+                      <div className="space-y-3">
+                        <div className="rounded-xl bg-background/70 px-4 py-3 font-medium">{dailyDigest.headline}</div>
+                        {dailyDigest.summary.slice(0, 4).map((line, idx) => (
+                          <div key={idx} className="rounded-xl bg-background/70 px-4 py-3 text-sm text-text-primary">
+                            {line}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-text-secondary">No savings digest available.</p>
+                    )}
+                  </SurfaceCard>
                 </div>
-              </SurfaceCard>
-            </div>
 
-            <SurfaceCard title="Active Hours" icon={<Clock className="h-4 w-4 text-accent" />}>
-              <p className="mb-4 text-sm text-text-secondary">When you are most active across the selected window.</p>
-              <div className="h-52">
-                <ActiveHoursChart hourly={hourly} />
-              </div>
-            </SurfaceCard>
-
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-              <SurfaceCard title="Top Tools" icon={<Wrench className="h-4 w-4 text-accent" />}>
-                <div className="space-y-2">
-                  {tools.slice(0, 8).map((tool, idx) => (
-                    <div key={idx} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2 text-sm">
-                      <span>{tool.name}</span>
-                      <span className="text-text-secondary">{tool.count}x</span>
-                    </div>
-                  ))}
-                  {tools.length === 0 && <p className="text-sm text-text-secondary">No tool usage data available.</p>}
+                <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1fr]">
+                  <SurfaceCard title="Tool Efficiency">
+                    {toolBreakdown.length === 0 ? (
+                      <p className="text-sm text-text-secondary">No tool metrics available.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {toolBreakdown.slice(0, 6).map((tool, idx) => (
+                          <div key={idx} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2 text-sm">
+                            <span className="truncate">{tool.name}</span>
+                            <span className="shrink-0 text-text-secondary">
+                              ${Number(tool.estimatedCostUSD || 0).toFixed(2)} · {(Number(tool.errorRate || 0) * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </SurfaceCard>
+                  <SurfaceCard title="MCP Health">
+                    {mcpBreakdown.length === 0 ? (
+                      <p className="text-sm text-text-secondary">No MCP usage detected.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {mcpBreakdown.slice(0, 6).map((mcp, idx) => (
+                          <div key={idx} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2 text-sm">
+                            <span className="truncate">{mcp.name}</span>
+                            <span className="shrink-0 text-text-secondary">
+                              {(Number(mcp.errorRate || 0) * 100).toFixed(0)}% · {mcp.invocationCount} calls
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </SurfaceCard>
                 </div>
-              </SurfaceCard>
-              <SurfaceCard title="Top Commands" icon={<TerminalSquare className="h-4 w-4 text-accent" />}>
-                <div className="space-y-2">
-                  {commands.slice(0, 8).map((cmd, idx) => (
-                    <div key={idx} className="flex items-center justify-between gap-3 rounded-xl bg-background/70 px-3 py-2 text-sm">
-                      <code className="truncate">{cmd.command}</code>
-                      <span className="shrink-0 text-text-secondary">{cmd.count}x</span>
-                    </div>
-                  ))}
-                  {commands.length === 0 && <p className="text-sm text-text-secondary">No command data available.</p>}
-                </div>
-              </SurfaceCard>
-              <SurfaceCard title="Providers" icon={<Cpu className="h-4 w-4 text-accent" />}>
-                <div className="space-y-2">
-                  {providers.map((provider, idx) => (
-                    <div key={idx} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2 text-sm">
-                      <span>{provider.name}</span>
-                      <span className={provider.available ? "text-emerald-400" : "text-text-secondary"}>{provider.sessionCount ?? 0}</span>
-                    </div>
-                  ))}
-                </div>
-              </SurfaceCard>
-            </div>
-
-            {topFinding && (
-              <div className={`rounded-2xl border px-6 py-4 ${severityTone(topFinding.severity)}`}>
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-sm font-semibold uppercase tracking-wide">{topFinding.severity}</span>
-                  <span className="text-base font-semibold">{topFinding.title}</span>
-                </div>
-                <p className="mt-2 text-sm opacity-90">{topFinding.description}</p>
-              </div>
+              </>
             )}
-
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1fr]">
-              <SurfaceCard title="Findings">
-                {findings.length === 0 ? (
-                  <p className="text-sm text-text-secondary">No findings available.</p>
-                ) : (
-                  <div className="space-y-3">
-                    {findings.map((finding, idx) => (
-                      <div key={idx} className={`rounded-xl border px-4 py-3 ${severityTone(finding.severity)}`}>
-                        <div className="font-medium">{finding.title}</div>
-                        <p className="mt-1 text-sm opacity-90">{finding.description}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </SurfaceCard>
-              <SurfaceCard title="Insights">
-                {insights.length === 0 ? (
-                  <p className="text-sm text-text-secondary">No insights available.</p>
-                ) : (
-                  <div className="space-y-3">
-                    {insights.map((insight, idx) => (
-                      <div key={idx} className="rounded-xl bg-background/70 px-4 py-3 text-sm text-text-primary">
-                        {insight.replace(/\*\*/g, "")}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </SurfaceCard>
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1fr]">
-              <SurfaceCard title="Recommendations">
-                {toolAdvice.length === 0 ? (
-                  <p className="text-sm text-text-secondary">No optimization recommendations available.</p>
-                ) : (
-                  <div className="space-y-3">
-                    {toolAdvice.slice(0, 5).map((item, idx) => (
-                      <div key={idx} className={`rounded-xl border px-4 py-3 ${severityTone(item.priority)}`}>
-                        <div className="font-medium">{item.title}</div>
-                        <p className="mt-1 text-sm opacity-90">{item.description}</p>
-                        <p className="mt-2 text-sm font-medium opacity-95">{item.suggestedAction}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </SurfaceCard>
-              <SurfaceCard title="Top Savings Opportunities">
-                {dailyDigest ? (
-                  <div className="space-y-3">
-                    <div className="rounded-xl bg-background/70 px-4 py-3 font-medium">{dailyDigest.headline}</div>
-                    {dailyDigest.summary.slice(0, 4).map((line, idx) => (
-                      <div key={idx} className="rounded-xl bg-background/70 px-4 py-3 text-sm text-text-primary">
-                        {line}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-text-secondary">No savings digest available.</p>
-                )}
-              </SurfaceCard>
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1fr]">
-              <SurfaceCard title="Tool Efficiency">
-                {toolBreakdown.length === 0 ? (
-                  <p className="text-sm text-text-secondary">No tool metrics available.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {toolBreakdown.slice(0, 6).map((tool, idx) => (
-                      <div key={idx} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2 text-sm">
-                        <span className="truncate">{tool.name}</span>
-                        <span className="shrink-0 text-text-secondary">
-                          ${Number(tool.estimatedCostUSD || 0).toFixed(2)} · {(Number(tool.errorRate || 0) * 100).toFixed(0)}%
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </SurfaceCard>
-              <SurfaceCard title="MCP Health">
-                {mcpBreakdown.length === 0 ? (
-                  <p className="text-sm text-text-secondary">No MCP usage detected.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {mcpBreakdown.slice(0, 6).map((mcp, idx) => (
-                      <div key={idx} className="flex items-center justify-between rounded-xl bg-background/70 px-3 py-2 text-sm">
-                        <span className="truncate">{mcp.name}</span>
-                        <span className="shrink-0 text-text-secondary">
-                          {(Number(mcp.errorRate || 0) * 100).toFixed(0)}% · {mcp.invocationCount} calls
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </SurfaceCard>
-            </div>
           </div>
         )}
 
@@ -695,12 +918,14 @@ function MetricCard({
   subtitle,
   icon,
   highlight = false,
+  loading = false,
 }: {
   title: string;
   value: string | number;
   subtitle: string;
   icon: ReactNode;
   highlight?: boolean;
+  loading?: boolean;
 }) {
   return (
     <div className={`rounded-2xl border border-border/70 bg-surface/80 p-5 shadow-[0_16px_48px_rgba(0,0,0,0.25)] ${highlight ? "ring-1 ring-primary/30" : ""}`}>
@@ -708,8 +933,17 @@ function MetricCard({
         <span className="text-sm text-text-secondary">{title}</span>
         {icon}
       </div>
-      <div className="text-3xl font-semibold">{value}</div>
-      <div className="mt-1 text-xs text-text-secondary">{subtitle}</div>
+      {loading ? (
+        <>
+          <div className="h-9 w-24 animate-pulse rounded-lg bg-white/8" />
+          <div className="mt-2 h-3 w-28 animate-pulse rounded bg-white/8" />
+        </>
+      ) : (
+        <>
+          <div className="text-3xl font-semibold">{value}</div>
+          <div className="mt-1 text-xs text-text-secondary">{subtitle}</div>
+        </>
+      )}
     </div>
   );
 }
@@ -739,4 +973,52 @@ function SurfaceCard({
       {children}
     </section>
   );
+}
+
+function DashboardLoadingShell() {
+  return (
+    <>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <SurfaceCard title="Daily Activity">
+          <LoadingBlock className="h-64" />
+        </SurfaceCard>
+        <SurfaceCard title="Projects">
+          <LoadingRows rows={5} />
+        </SurfaceCard>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <SurfaceCard title="Top Activities">
+          <LoadingRows rows={6} />
+        </SurfaceCard>
+        <SurfaceCard title="Models Used">
+          <LoadingBlock className="h-64" />
+        </SurfaceCard>
+      </div>
+
+      <SurfaceCard title="Active Hours">
+        <LoadingBlock className="h-52" />
+      </SurfaceCard>
+    </>
+  );
+}
+
+function LoadingRows({ rows }: { rows: number }) {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: rows }).map((_, idx) => (
+        <div key={idx} className="rounded-xl bg-background/70 px-4 py-3">
+          <div className="flex items-center justify-between gap-3">
+            <LoadingBlock className="h-4 w-2/3" />
+            <LoadingBlock className="h-4 w-16" />
+          </div>
+          <LoadingBlock className="mt-2 h-3 w-24" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LoadingBlock({ className }: { className?: string }) {
+  return <div className={`animate-pulse rounded-xl bg-white/8 ${className ?? "h-4 w-full"}`} />;
 }
