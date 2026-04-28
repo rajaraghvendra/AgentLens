@@ -121,15 +121,18 @@ function createEmptyStats(cacheEnabled: boolean): IncrementalRunStats {
     sessionsLoadedFromCache: 0,
     cacheEnabled,
     indexPath: cacheEnabled ? getIndexPath() : undefined,
+    forceReparse: false,
   };
 }
 
 async function loadWithoutCache(
   providers: IProvider[],
   dateRange?: DateRange,
+  options: ProcessingOptions = {},
 ): Promise<IncrementalLoadResult> {
   const sessions: Session[] = [];
   const stats = createEmptyStats(false);
+  stats.forceReparse = options.forceReparse === true;
 
   for (const provider of providers) {
     const identifiers = await provider.discoverSessions(dateRange);
@@ -167,6 +170,7 @@ async function loadWithJsonCache(
     for (const identifier of identifiers) {
       const fileStats = parseIdentifierStats(identifier);
       if (!fileStats) continue;
+      stats.sourceLastModifiedAt = Math.max(stats.sourceLastModifiedAt || 0, fileStats.mtimeMs);
       const key = `${provider.id}:${identifier}`;
       const cached = state.entries[key];
       const canReuse = !forceReparse
@@ -180,11 +184,13 @@ async function loadWithJsonCache(
         sessions.push(cached.session as Session);
         stats.cachedFilesReused += 1;
         stats.sessionsLoadedFromCache += 1;
+        stats.lastParsedAt = Math.max(stats.lastParsedAt || 0, cached.lastParsedAt || 0);
         continue;
       }
 
       try {
         const session = await provider.parseSession(identifier);
+        const parsedAt = Date.now();
         state.entries[key] = {
           provider: provider.id,
           identifier,
@@ -192,12 +198,14 @@ async function loadWithJsonCache(
           mtimeMs: fileStats.mtimeMs,
           parseStatus: 'ok',
           sessionCount: 1,
-          lastParsedAt: Date.now(),
+          lastParsedAt: parsedAt,
           session,
         };
         sessions.push(session);
         stats.filesReparsed += 1;
+        stats.lastParsedAt = Math.max(stats.lastParsedAt || 0, parsedAt);
       } catch (error) {
+        const parsedAt = Date.now();
         state.entries[key] = {
           provider: provider.id,
           identifier,
@@ -205,9 +213,10 @@ async function loadWithJsonCache(
           mtimeMs: fileStats.mtimeMs,
           parseStatus: 'error',
           sessionCount: 0,
-          lastParsedAt: Date.now(),
+          lastParsedAt: parsedAt,
           error: error instanceof Error ? error.message : String(error),
         };
+        stats.lastParsedAt = Math.max(stats.lastParsedAt || 0, parsedAt);
       }
     }
 
@@ -239,6 +248,7 @@ export async function loadSessionsIncrementally(
   const stats = createEmptyStats(true);
   const sessions: Session[] = [];
   const forceReparse = options.forceReparse === true;
+  stats.forceReparse = forceReparse;
 
   const selectIndex = db.prepare(`
     SELECT provider, identifier, size, mtime_ms as mtimeMs, parse_status as parseStatus,
@@ -296,6 +306,7 @@ export async function loadSessionsIncrementally(
         if (!fileStats) {
           continue;
         }
+        stats.sourceLastModifiedAt = Math.max(stats.sourceLastModifiedAt || 0, fileStats.mtimeMs);
 
         const cachedIndex = selectIndex.get(provider.id, identifier) as ProcessingIndexEntry | undefined;
         const canReuse = !forceReparse
@@ -311,6 +322,7 @@ export async function loadSessionsIncrementally(
               sessions.push(JSON.parse(cached.sessionJson) as Session);
               stats.cachedFilesReused += 1;
               stats.sessionsLoadedFromCache += 1;
+              stats.lastParsedAt = Math.max(stats.lastParsedAt || 0, cachedIndex.lastParsedAt || 0);
               continue;
             } catch {
               // fall through and reparse
@@ -325,7 +337,9 @@ export async function loadSessionsIncrementally(
           upsertCachedSession.run(provider.id, identifier, JSON.stringify(session), now);
           sessions.push(session);
           stats.filesReparsed += 1;
+          stats.lastParsedAt = Math.max(stats.lastParsedAt || 0, now);
         } catch (error) {
+          const now = Date.now();
           upsertIndex.run(
             provider.id,
             identifier,
@@ -333,9 +347,10 @@ export async function loadSessionsIncrementally(
             fileStats.mtimeMs,
             'error',
             0,
-            Date.now(),
+            now,
             error instanceof Error ? error.message : String(error),
           );
+          stats.lastParsedAt = Math.max(stats.lastParsedAt || 0, now);
         }
       }
 

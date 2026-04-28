@@ -54,7 +54,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "node ./node_modules/typescript/bin/tsc --noEmit",
-    "dashboard": "npm --prefix src/apps/web run dev"
+    "dashboard": "node ./dist/apps/cli/index.js dashboard",
+    "dashboard:dev": "npm --prefix src/apps/web run dev"
   },
   "engines": {
     "node": ">=18.0.0"

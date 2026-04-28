@@ -10,10 +10,11 @@ async function GET(request: Request): Promise<NextResponse> {
     const provider = sanitizeProvider(searchParams.get('provider'));
     const periodDays = parsePeriod(period);
     const fullReparse = searchParams.get('fullReparse') === '1';
+    const forceRefresh = searchParams.get('forceRefresh') === '1';
 
     const [budget, overview] = await Promise.all([
       getBudget(),
-      getDashboardOverview(periodDays, provider, fullReparse),
+      getDashboardOverview(periodDays, provider, fullReparse, forceRefresh),
     ]);
 
     const today = overview.metrics.overview ?? {};
@@ -38,6 +39,7 @@ async function GET(request: Request): Promise<NextResponse> {
       topAlert: overview.topEvent,
       recommendations: overview.topRecommendation ? [overview.topRecommendation.title] : [],
       processing: overview.processing ?? null,
+      freshness: overview.freshness ?? null,
       sessionsToday: periodDays === 1 ? (today.sessionsCount ?? 0) : null,
       sessionsInPeriod: today.sessionsCount ?? 0,
     });

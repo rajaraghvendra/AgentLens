@@ -33,6 +33,17 @@ type ProviderSummary = { id: string; name: string; available: boolean; sessionCo
 type EventSummary = { id: string; title: string; severity: string; description: string; recommendedAction?: string };
 type AdviceSummary = { title: string; priority: string; description: string; suggestedAction: string };
 type ProcessingSummary = { filesScanned?: number; filesReparsed?: number; cachedFilesReused?: number; sessionsLoadedFromCache?: number } | null;
+type FreshnessSummary = {
+  responseGeneratedAt: string;
+  sourceLastModifiedAt?: string;
+  lastParsedAt?: string;
+  responseCacheTtlMs: number;
+  parseMode: "incremental" | "full-reparse";
+  filesScanned: number;
+  filesReparsed: number;
+  cachedFilesReused: number;
+  sessionsLoadedFromCache: number;
+} | null;
 
 type OverviewResponse = {
   responseVersion: number;
@@ -55,6 +66,7 @@ type OverviewResponse = {
   topRecommendation?: AdviceSummary | null;
   processing?: ProcessingSummary;
   providerCosts?: Record<string, number>;
+  freshness?: FreshnessSummary;
 };
 
 type ReportResponse = {
@@ -86,6 +98,7 @@ type ReportResponse = {
   toolBreakdown?: Array<{ name: string; estimatedCostUSD: number; errorRate: number; invocationCount: number }>;
   mcpBreakdown?: Array<{ name: string; errorRate: number; invocationCount: number }>;
   processing?: { filesScanned?: number; filesReparsed?: number; cachedFilesReused?: number; sessionsLoadedFromCache?: number } | null;
+  freshness?: FreshnessSummary;
 };
 
 type DashboardSnapshot = {
@@ -156,6 +169,21 @@ function snapshotStorageKey(period: string, selectedProvider: string): string {
   return `agentlens:dashboard:${period}:${selectedProvider}`;
 }
 
+function formatRelativeTime(timestamp?: string | null): string {
+  if (!timestamp) return "Unknown";
+  const diffMs = Date.now() - new Date(timestamp).getTime();
+  if (!Number.isFinite(diffMs)) return "Unknown";
+
+  const diffSeconds = Math.max(0, Math.round(diffMs / 1000));
+  if (diffSeconds < 10) return "just now";
+  if (diffSeconds < 60) return `${diffSeconds}s ago`;
+  const diffMinutes = Math.round(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return `${Math.round(diffHours / 24)}d ago`;
+}
+
 function readDashboardSnapshot(period: string, selectedProvider: string): DashboardSnapshot | null {
   if (typeof window === "undefined") return null;
 
@@ -212,6 +240,7 @@ export default function Dashboard({
   const [overviewLoading, setOverviewLoading] = useState(!initialOverview);
   const [reportLoading, setReportLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [refreshMode, setRefreshMode] = useState<"incremental" | "force-refresh" | "full-reparse">("incremental");
   const [loadError, setLoadError] = useState<string | null>(initialError);
   const [lastUpdated, setLastUpdated] = useState<string | null>(initialOverview?.generatedAt ?? null);
   const [period, setPeriod] = useState<string>("7days");
@@ -238,8 +267,10 @@ export default function Dashboard({
     [period, selectedProvider],
   );
 
-  const fetchOverview = useCallback(async () => {
+  const fetchOverview = useCallback(async (mode: "incremental" | "force-refresh" | "full-reparse" = "incremental") => {
     const params = createQueryParams(period, selectedProvider);
+    if (mode === "force-refresh" || mode === "full-reparse") params.set("forceRefresh", "1");
+    if (mode === "full-reparse") params.set("fullReparse", "1");
     const res = await fetch(`/api/overview?${params.toString()}`);
     if (!res.ok) {
       throw new Error(`Overview request failed with status ${res.status}`);
@@ -254,8 +285,10 @@ export default function Dashboard({
     return data;
   }, [period, persistSnapshot, selectedProvider]);
 
-  const fetchReport = useCallback(async () => {
+  const fetchReport = useCallback(async (mode: "incremental" | "force-refresh" | "full-reparse" = "incremental") => {
     const params = createQueryParams(period, selectedProvider);
+    if (mode === "force-refresh" || mode === "full-reparse") params.set("forceRefresh", "1");
+    if (mode === "full-reparse") params.set("fullReparse", "1");
     const res = await fetch(`/api/report?${params.toString()}`);
     if (!res.ok) {
       throw new Error(`Report request failed with status ${res.status}`);
@@ -344,7 +377,7 @@ export default function Dashboard({
     };
 
     if (shouldFetchOverview) {
-      void fetchOverview()
+      void fetchOverview("incremental")
         .catch((error: any) => {
           if (!cancelled) {
             setLoadError(error?.message ?? "Failed to refresh dashboard overview.");
@@ -361,7 +394,7 @@ export default function Dashboard({
     }
 
     if (shouldFetchReport) {
-      void fetchReport()
+      void fetchReport("incremental")
         .catch((error: any) => {
           if (!cancelled) {
             setLoadError((current) => current ?? error?.message ?? "Failed to refresh dashboard report.");
@@ -404,6 +437,7 @@ export default function Dashboard({
   const toolBreakdown = report?.toolBreakdown ?? [];
   const mcpBreakdown = report?.mcpBreakdown ?? [];
   const processing = report?.processing ?? overviewData?.processing ?? null;
+  const freshness = report?.freshness ?? overviewData?.freshness ?? null;
   const optimizeFindings = optimizeData?.findings ?? [];
   const optimizeInsights = optimizeData?.insights ?? [];
   const optimizeHealthScore = optimizeData?.healthScore;
@@ -417,12 +451,46 @@ export default function Dashboard({
   const currentPeriodLabel = PERIODS.find((entry) => entry.key === period)?.label ?? "7 Days";
   const reportReady = report != null;
   const statusLabel = refreshing
-    ? "Refreshing data"
+    ? refreshMode === "full-reparse"
+      ? "Full reparse in progress"
+      : refreshMode === "force-refresh"
+        ? "Force refreshing data"
+        : "Refreshing data"
     : lastUpdated
       ? `Updated ${new Date(lastUpdated).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
       : overviewLoading
         ? "Loading overview"
         : "Waiting for data";
+
+  const triggerRefresh = useCallback((mode: "incremental" | "force-refresh" | "full-reparse") => {
+    setRefreshMode(mode);
+    setRefreshing(true);
+    setOverviewLoading(false);
+    setReportLoading((current) => current || report == null);
+
+    let pendingRequests = 2;
+    const finishRequest = () => {
+      pendingRequests -= 1;
+      if (pendingRequests <= 0) {
+        setRefreshing(false);
+        setRefreshMode("incremental");
+      }
+    };
+
+    void fetchOverview(mode)
+      .catch((error: any) => setLoadError(error?.message ?? "Failed to refresh dashboard overview."))
+      .finally(() => {
+        setOverviewLoading(false);
+        finishRequest();
+      });
+
+    void fetchReport(mode)
+      .catch((error: any) => setLoadError((current) => current ?? error?.message ?? "Failed to refresh dashboard report."))
+      .finally(() => {
+        setReportLoading(false);
+        finishRequest();
+      });
+  }, [fetchOverview, fetchReport, report]);
 
   const sortedCompareModels = [...compareModels].sort((a: any, b: any) => {
     const aValue = a?.[compareSortBy];
@@ -453,24 +521,25 @@ export default function Dashboard({
                 {statusLabel}
               </div>
               <button
-                onClick={() => {
-                  setRefreshing(true);
-                  setOverviewLoading(false);
-                  setReportLoading((current) => current || report == null);
-                  void fetchOverview()
-                    .catch((error: any) => setLoadError(error?.message ?? "Failed to refresh dashboard overview."))
-                    .finally(() => setOverviewLoading(false));
-                  void fetchReport()
-                    .catch((error: any) => setLoadError((current) => current ?? error?.message ?? "Failed to refresh dashboard report."))
-                    .finally(() => {
-                      setReportLoading(false);
-                      setRefreshing(false);
-                    });
-                }}
+                onClick={() => triggerRefresh("incremental")}
                 className="panel-button"
-                title="Refresh"
+                title="Refresh (incremental)"
               >
                 <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+              </button>
+              <button
+                onClick={() => triggerRefresh("force-refresh")}
+                className="panel-button px-3 text-xs"
+                title="Force refresh (bypass response cache)"
+              >
+                Force
+              </button>
+              <button
+                onClick={() => triggerRefresh("full-reparse")}
+                className="panel-button px-3 text-xs"
+                title="Full reparse (ignore file cache)"
+              >
+                Reparse
               </button>
               <button onClick={() => setShowBudgetSettings(true)} className="panel-button" title="Budget Settings">
                 <Wallet className="h-4 w-4" />
@@ -582,28 +651,14 @@ export default function Dashboard({
               </div>
             )}
 
-            {(topEvent || processing) && (
-              <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_0.8fr]">
-                {topEvent ? (
-                  <div className={`rounded-2xl border px-6 py-4 ${severityTone(topEvent.severity)}`}>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="text-sm font-semibold uppercase tracking-wide">{topEvent.severity}</span>
-                      <span className="text-base font-semibold">{topEvent.title}</span>
-                    </div>
-                    <p className="mt-2 text-sm opacity-90">{topEvent.description}</p>
-                    {topEvent.recommendedAction && <p className="mt-2 text-sm font-medium opacity-95">{topEvent.recommendedAction}</p>}
-                  </div>
-                ) : <div />}
-                {processing ? (
-                  <SurfaceCard title="Processing">
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center justify-between"><span>Files Scanned</span><span>{processing.filesScanned ?? 0}</span></div>
-                      <div className="flex items-center justify-between"><span>Reparsed</span><span>{processing.filesReparsed ?? 0}</span></div>
-                      <div className="flex items-center justify-between"><span>Cached Reuse</span><span>{processing.cachedFilesReused ?? 0}</span></div>
-                      <div className="flex items-center justify-between"><span>Cache Sessions</span><span>{processing.sessionsLoadedFromCache ?? 0}</span></div>
-                    </div>
-                  </SurfaceCard>
-                ) : <div />}
+            {topEvent && (
+              <div className={`rounded-2xl border px-6 py-4 ${severityTone(topEvent.severity)}`}>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="text-sm font-semibold uppercase tracking-wide">{topEvent.severity}</span>
+                  <span className="text-base font-semibold">{topEvent.title}</span>
+                </div>
+                <p className="mt-2 text-sm opacity-90">{topEvent.description}</p>
+                {topEvent.recommendedAction && <p className="mt-2 text-sm font-medium opacity-95">{topEvent.recommendedAction}</p>}
               </div>
             )}
 
@@ -695,6 +750,32 @@ export default function Dashboard({
                       <span className="text-base font-semibold">{topFinding.title}</span>
                     </div>
                     <p className="mt-2 text-sm opacity-90">{topFinding.description}</p>
+                  </div>
+                )}
+
+                {(freshness || processing) && (
+                  <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                    {freshness ? (
+                      <SurfaceCard title="Freshness">
+                        <div className="space-y-2 text-sm">
+                          <div className="flex items-center justify-between gap-3"><span>Parse Mode</span><span className="font-medium">{freshness.parseMode}</span></div>
+                          <div className="flex items-center justify-between gap-3"><span>View Age</span><span>{formatRelativeTime(freshness.responseGeneratedAt)}</span></div>
+                          <div className="flex items-center justify-between gap-3"><span>Last Parsed</span><span>{formatRelativeTime(freshness.lastParsedAt)}</span></div>
+                          <div className="flex items-center justify-between gap-3"><span>Source Changed</span><span>{formatRelativeTime(freshness.sourceLastModifiedAt)}</span></div>
+                          <div className="flex items-center justify-between gap-3"><span>Response Cache</span><span>{Math.round((freshness.responseCacheTtlMs ?? 0) / 1000)}s</span></div>
+                        </div>
+                      </SurfaceCard>
+                    ) : <div />}
+                    {processing ? (
+                      <SurfaceCard title="Processing">
+                        <div className="space-y-2 text-sm">
+                          <div className="flex items-center justify-between"><span>Files Scanned</span><span>{processing.filesScanned ?? 0}</span></div>
+                          <div className="flex items-center justify-between"><span>Reparsed</span><span>{processing.filesReparsed ?? 0}</span></div>
+                          <div className="flex items-center justify-between"><span>Cached Reuse</span><span>{processing.cachedFilesReused ?? 0}</span></div>
+                          <div className="flex items-center justify-between"><span>Cache Sessions</span><span>{processing.sessionsLoadedFromCache ?? 0}</span></div>
+                        </div>
+                      </SurfaceCard>
+                    ) : <div />}
                   </div>
                 )}
 

@@ -215,21 +215,28 @@ function hasPackagedDashboardRuntime(appDir: string): boolean {
   return existsSync(path.join(appDir, getDashboardDistDir(), 'BUILD_ID'));
 }
 
-function prepareDashboardRuntime(): { dashboardDir: string; nextBin: string; installedRuntime: boolean } {
+function prepareDashboardRuntime(preferDevMode = false): { dashboardDir: string; nextBin: string; installedRuntime: boolean; usingProductionRuntime: boolean } {
   const packageRoot = getPackageRoot();
   const installedRuntime = isInstalledUnderNodeModules(packageRoot);
-  const dashboardDir = installedRuntime ? getPackagedDashboardRuntimeDir() : getDashboardAppDir();
+  const packagedRuntimeDir = getPackagedDashboardRuntimeDir();
+  const canUsePackagedRuntime = hasPackagedDashboardRuntime(packagedRuntimeDir);
+  const usingProductionRuntime = installedRuntime || !preferDevMode;
+  const dashboardDir = usingProductionRuntime ? packagedRuntimeDir : getDashboardAppDir();
   const nextBin = getDashboardBinPath(dashboardDir);
 
-  if (installedRuntime) {
+  if (usingProductionRuntime) {
     console.log(colorize('Preparing dashboard runtime...', 'blue'));
-    if (!hasPackagedDashboardRuntime(dashboardDir)) {
-      throw new Error('Packaged dashboard runtime is missing from this install. Reinstall AgentLens or publish a package built with `npm run build:all`.');
+    if (!canUsePackagedRuntime) {
+      if (installedRuntime) {
+        throw new Error('Packaged dashboard runtime is missing from this install. Reinstall AgentLens or publish a package built with `npm run build:all`.');
+      }
+
+      throw new Error('Packaged dashboard runtime is missing from this source checkout. Run `npm run build:all` or use `agentlens dashboard --dev`.');
     }
     console.log(colorize('Using packaged production dashboard runtime', 'green'));
   }
 
-  return { dashboardDir, nextBin, installedRuntime };
+  return { dashboardDir, nextBin, installedRuntime, usingProductionRuntime };
 }
 
 const program = new Command();
@@ -271,16 +278,17 @@ program
   .alias('web')
   .description('Start the web dashboard server')
   .option('-p, --port <port>', 'Port to run on', '3000')
+  .option('--dev', 'Run the dashboard with the Next.js dev server')
   .option('--no-open', 'Do not open the browser automatically')
   .action((options) => {
     const port = normalizePort(options.port || '3000');
-    const { dashboardDir, nextBin, installedRuntime } = prepareDashboardRuntime();
+    const { dashboardDir, nextBin, usingProductionRuntime } = prepareDashboardRuntime(options.dev === true);
     const dashboardUrl = `http://127.0.0.1:${port}`;
-    const dashboardMode = installedRuntime ? 'production' : 'development';
+    const dashboardMode = usingProductionRuntime ? 'production' : 'development';
 
     console.log(colorize(`Starting AgentLens dashboard (${dashboardMode}) on http://localhost:${port}...`, 'cyan'));
 
-    const child = spawn(process.execPath, [nextBin, installedRuntime ? 'start' : 'dev', '--hostname', '127.0.0.1', '--port', port], {
+    const child = spawn(process.execPath, [nextBin, usingProductionRuntime ? 'start' : 'dev', '--hostname', '127.0.0.1', '--port', port], {
       cwd: dashboardDir,
       stdio: 'inherit',
       env: {
@@ -314,9 +322,9 @@ program
   .command('dashboard:build')
   .description('Verify the packaged production dashboard runtime')
   .action(() => {
-    const { installedRuntime, dashboardDir } = prepareDashboardRuntime();
-    if (!installedRuntime) {
-      console.log(colorize('Source checkout detected. Use `npm run build:all` to build the packaged dashboard runtime.', 'yellow'));
+    const { usingProductionRuntime, dashboardDir } = prepareDashboardRuntime();
+    if (!usingProductionRuntime) {
+      console.log(colorize('Packaged dashboard runtime is unavailable. Use `npm run build:all` first.', 'yellow'));
       return;
     }
 

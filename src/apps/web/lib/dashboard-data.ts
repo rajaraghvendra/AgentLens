@@ -26,6 +26,18 @@ type OverviewMetrics = {
   cacheHitRate?: number;
 };
 
+type FreshnessSummary = {
+  responseGeneratedAt: string;
+  sourceLastModifiedAt?: string;
+  lastParsedAt?: string;
+  responseCacheTtlMs: number;
+  parseMode: 'incremental' | 'full-reparse';
+  filesScanned: number;
+  filesReparsed: number;
+  cachedFilesReused: number;
+  sessionsLoadedFromCache: number;
+};
+
 export type DashboardOverviewResponse = {
   responseVersion: number;
   generatedAt: string;
@@ -56,6 +68,7 @@ export type DashboardOverviewResponse = {
     sessionsLoadedFromCache?: number;
   } | null;
   providerCosts: Record<string, number>;
+  freshness: FreshnessSummary | null;
 };
 
 export type DashboardReportResponse = {
@@ -84,6 +97,7 @@ export type DashboardReportResponse = {
   toolBreakdown: any[];
   mcpBreakdown: any[];
   commandPatterns: any[];
+  freshness: FreshnessSummary | null;
 };
 
 const responseCache = new Map<string, CacheEntry<unknown>>();
@@ -111,9 +125,10 @@ async function withResponseCache<T>(
   periodDays: number,
   provider: ProviderFilter | undefined,
   fullReparse: boolean,
+  forceRefresh: boolean,
   loader: () => Promise<T>,
 ): Promise<T> {
-  if (fullReparse) {
+  if (fullReparse || forceRefresh) {
     return loader();
   }
 
@@ -137,20 +152,39 @@ function buildFilters(provider: ProviderFilter | undefined, fullReparse: boolean
   return provider ? { provider, fullReparse } : { fullReparse };
 }
 
+function buildFreshness(result: Awaited<ReturnType<typeof CoreEngine.runFull>>, generatedAt: string): FreshnessSummary | null {
+  const processing = result.processing;
+  if (!processing) return null;
+
+  return {
+    responseGeneratedAt: generatedAt,
+    sourceLastModifiedAt: processing.sourceLastModifiedAt ? new Date(processing.sourceLastModifiedAt).toISOString() : undefined,
+    lastParsedAt: processing.lastParsedAt ? new Date(processing.lastParsedAt).toISOString() : undefined,
+    responseCacheTtlMs: RESPONSE_CACHE_TTL_MS,
+    parseMode: processing.forceReparse ? 'full-reparse' : 'incremental',
+    filesScanned: processing.filesScanned ?? 0,
+    filesReparsed: processing.filesReparsed ?? 0,
+    cachedFilesReused: processing.cachedFilesReused ?? 0,
+    sessionsLoadedFromCache: processing.sessionsLoadedFromCache ?? 0,
+  };
+}
+
 export async function getDashboardOverview(
   periodDays: number,
   provider: ProviderFilter | undefined,
   fullReparse = false,
+  forceRefresh = false,
 ): Promise<DashboardOverviewResponse> {
-  return withResponseCache('overview', periodDays, provider, fullReparse, async () => {
+  return withResponseCache('overview', periodDays, provider, fullReparse, forceRefresh, async () => {
     const result = await CoreEngine.runFull(periodDays, 'USD', buildFilters(provider, fullReparse));
+    const generatedAt = new Date().toISOString();
     const providerCosts = Object.fromEntries(
       Object.entries(result.metrics.byProvider || {}).map(([providerId, data]: [string, any]) => [providerId, Number(data.costUSD || 0)]),
     );
 
     return {
       responseVersion: RESPONSE_VERSION,
-      generatedAt: new Date().toISOString(),
+      generatedAt,
       periodDays,
       provider: provider ?? 'all',
       metrics: {
@@ -162,6 +196,7 @@ export async function getDashboardOverview(
       topRecommendation: result.toolAdvice?.[0] ?? null,
       processing: result.processing ?? null,
       providerCosts,
+      freshness: buildFreshness(result, generatedAt),
     };
   });
 }
@@ -170,15 +205,17 @@ export async function getDashboardReport(
   periodDays: number,
   provider: ProviderFilter | undefined,
   fullReparse = false,
+  forceRefresh = false,
 ): Promise<DashboardReportResponse> {
-  return withResponseCache('report', periodDays, provider, fullReparse, async () => {
+  return withResponseCache('report', periodDays, provider, fullReparse, forceRefresh, async () => {
     const result = await CoreEngine.runFull(periodDays, 'USD', buildFilters(provider, fullReparse));
+    const generatedAt = new Date().toISOString();
     const exportData = CoreEngine.buildExportData(result.sessions, result.metrics, periodDays);
     const { metrics, findings, insights, providers } = result;
 
     return {
       responseVersion: RESPONSE_VERSION,
-      generatedAt: new Date().toISOString(),
+      generatedAt,
       metrics,
       findings,
       insights,
@@ -207,6 +244,7 @@ export async function getDashboardReport(
       toolBreakdown: Object.values(metrics?.byTool || {}),
       mcpBreakdown: Object.values(metrics?.byMcpServer || {}),
       commandPatterns: Object.values(metrics?.byCommandPattern || {}),
+      freshness: buildFreshness(result, generatedAt),
     };
   });
 }

@@ -290,6 +290,9 @@ export interface IncrementalRunStats {
   sessionsLoadedFromCache: number;
   cacheEnabled: boolean;
   indexPath?: string;
+  sourceLastModifiedAt?: number;
+  lastParsedAt?: number;
+  forceReparse?: boolean;
 }
 
 // ── Provider ─────────────────────────────────────────────────
