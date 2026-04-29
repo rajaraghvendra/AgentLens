@@ -317,3 +317,70 @@ export interface EngineResult {
   toolAdvice?: ToolAdvice[];
   processing?: IncrementalRunStats;
 }
+
+// ── Team View Sync DTOs ─────────────────────────────────────
+
+export interface TeamIdentityConfig {
+  orgId: string;
+  teamId: string;
+  userId: string;
+  machineId: string;
+  userName?: string;
+  userEmail?: string;
+}
+
+export interface TeamSyncConfig extends TeamIdentityConfig {
+  serverUrl: string;
+  apiKey?: string;
+  syncEnabled?: boolean;
+  syncIntervalMinutes?: number;
+}
+
+export interface TeamAggregateMetrics {
+  inputTokens: number;
+  outputTokens: number;
+  cacheReadTokens: number;
+  cacheWriteTokens: number;
+  totalTokens: number;
+  totalCostUSD: number;
+  sessions: number;
+  messages: number;
+  cacheHitRate?: number;
+  retryRate?: number;
+  oneShotRate?: number;
+  alertCount?: number;
+  suggestedSavingsUSD?: number;
+}
+
+export interface TeamAggregateRecord {
+  date: string;
+  project: string;
+  provider: string;
+  model?: string;
+  activityCategory?: ActivityCategory;
+  toolName?: string;
+  mcpServerName?: string;
+  recommendationKinds?: string[];
+  totals: TeamAggregateMetrics;
+}
+
+export interface TeamSyncWindow {
+  from: number;
+  to: number;
+}
+
+export interface TeamSyncBatch {
+  version: 1;
+  generatedAt: number;
+  window: TeamSyncWindow;
+  identity: TeamIdentityConfig;
+  records: TeamAggregateRecord[];
+}
+
+export interface TeamSyncResponse {
+  accepted: boolean;
+  receivedRecords: number;
+  upsertedRecords: number;
+  serverTime: number;
+  message?: string;
+}

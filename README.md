@@ -27,13 +27,14 @@ AgentLens parses your local AI coding session history, computes cost and token u
   - VS Code extension with status-bar cost visibility
 - **Local-first execution**. Core parsing runs against local provider data on your machine.
 
-## New in 0.1.12
+## New in 0.1.14
 
 - Incremental parsing cache with processing stats
 - Active optimization alerts in dashboard, CLI, TUI, and VS Code status flow
 - Tool, MCP, and command-pattern efficiency analysis
 - Daily and weekly advice digests
 - New CLI commands for advice, anomalies, tools, and cache management
+- Stable public-core package boundaries for future private enterprise reuse
 
 ## Screenshots
 
@@ -128,6 +129,31 @@ agentlens tui                    # Terminal UI
 | GitHub Copilot | Auto-discovered on macOS, Linux, and Windows |
 
 AgentLens uses platform-specific local data directories internally, so the same commands work across supported operating systems without changing flags.
+
+## Public Core Boundaries
+
+The public npm package now exposes stable subpath entrypoints so a separate private enterprise repo can reuse the analytics core without copying source:
+
+- `@rajaraghvendra/agentlens/core-types`
+- `@rajaraghvendra/agentlens/core-engine`
+- `@rajaraghvendra/agentlens/providers`
+- `@rajaraghvendra/agentlens/local-runtime`
+
+Example:
+
+```ts
+import type { TeamSyncBatch, Session } from "@rajaraghvendra/agentlens/core-types";
+import { CoreEngine, computeMetrics } from "@rajaraghvendra/agentlens/core-engine";
+import { getAllSessions } from "@rajaraghvendra/agentlens/providers";
+```
+
+These boundaries are intended for:
+
+- shared analytics logic in a future private enterprise repo
+- internal plugins or companion packages
+- type-safe team aggregate sync contracts
+
+The enterprise-only server, RBAC, entitlement checks, admin console, pricing imports, and deployment assets should stay outside this public package.
 
 ## Interfaces
 
@@ -226,7 +252,7 @@ npm run dashboard
 Source dashboard entry:
 
 ```bash
-npm run dev -- dashboard
+npm run dashboard:dev
 ```
 
 Key project entry points:
@@ -235,6 +261,7 @@ Key project entry points:
 - [TUI](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/src/apps/tui/index.ts)
 - [Web app](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/src/apps/web/app/page.tsx)
 - [VS Code extension](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/src/apps/vscode/src/extension.ts)
+- [Architecture split doc](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/doc/public-core-enterprise-split.md)
 
 ## License
 

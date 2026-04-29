@@ -4,6 +4,30 @@
   "description": "Local-first AI developer analytics — parse, classify, cost-track, and optimize your AI coding sessions.",
   "type": "module",
   "main": "dist/core/engine.js",
+  "types": "dist/core/engine.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/core/engine.d.ts",
+      "import": "./dist/core/engine.js"
+    },
+    "./core-types": {
+      "types": "./dist/core-types/index.d.ts",
+      "import": "./dist/core-types/index.js"
+    },
+    "./core-engine": {
+      "types": "./dist/core-engine/index.d.ts",
+      "import": "./dist/core-engine/index.js"
+    },
+    "./providers": {
+      "types": "./dist/providers/public.d.ts",
+      "import": "./dist/providers/public.js"
+    },
+    "./local-runtime": {
+      "types": "./dist/local-runtime/index.d.ts",
+      "import": "./dist/local-runtime/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist/adapters",
     "dist/apps/cli",
@@ -11,6 +35,9 @@
     "dist/apps/tui",
     "dist/config",
     "dist/core",
+    "dist/core-engine",
+    "dist/core-types",
+    "dist/local-runtime",
     "dist/providers",
     "src/apps/tui",
     "dist/types",
@@ -41,6 +68,22 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
+  },
+  "typesVersions": {
+    "*": {
+      "core-types": [
+        "dist/core-types/index.d.ts"
+      ],
+      "core-engine": [
+        "dist/core-engine/index.d.ts"
+      ],
+      "providers": [
+        "dist/providers/public.d.ts"
+      ],
+      "local-runtime": [
+        "dist/local-runtime/index.d.ts"
+      ]
+    }
   },
   "scripts": {
     "sync:version": "node scripts/sync-versions.mjs",

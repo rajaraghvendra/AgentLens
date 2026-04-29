@@ -17,6 +17,10 @@
     "jsxFactory": "React.createElement",
     "jsxFragmentFactory": "React.Fragment",
     "paths": {
+      "@agentlens/core-types": ["./src/core-types/index.ts"],
+      "@agentlens/core-engine": ["./src/core-engine/index.ts"],
+      "@agentlens/providers": ["./src/providers/public.ts"],
+      "@agentlens/local-runtime": ["./src/local-runtime/index.ts"],
       "@agentlens/core/*": ["./src/core/*"],
       "@agentlens/providers/*": ["./src/providers/*"],
       "@agentlens/types": ["./src/types/index.ts"],

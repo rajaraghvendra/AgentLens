@@ -184,6 +184,12 @@ npm run dashboard   # Start Next.js web dashboard
 
 ---
 
+## Architecture Docs
+
+- [Public Core + Private Enterprise Split](/Users/raghvendrasingh/Documents/Study/Python/LLM/AgentLens/doc/public-core-enterprise-split.md)
+
+---
+
 ## Web Dashboard API Endpoints
 
 When running the web dashboard (`npm run dashboard`):
