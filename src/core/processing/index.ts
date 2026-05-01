@@ -101,9 +101,15 @@ async function openWritableDatabase(): Promise<DatabaseHandle | null> {
   }
 }
 
+function getActualPath(identifier: string): string {
+  return identifier.includes('::') ? identifier.split('::')[0] : identifier;
+}
+
 function parseIdentifierStats(identifier: string): { size: number; mtimeMs: number } | null {
   try {
-    const stats = statSync(identifier);
+    // Handle compound identifiers like /path/to/db::sessionId
+    const actualPath = getActualPath(identifier);
+    const stats = statSync(actualPath);
     return {
       size: stats.size,
       mtimeMs: Math.floor(stats.mtimeMs),
@@ -223,7 +229,7 @@ async function loadWithJsonCache(
     for (const [key, entry] of Object.entries(state.entries)) {
       if (entry.provider !== provider.id) continue;
       if (currentIdentifiers.has(entry.identifier)) continue;
-      if (existsSync(entry.identifier)) continue;
+      if (existsSync(getActualPath(entry.identifier))) continue;
       delete state.entries[key];
     }
   }
@@ -240,6 +246,10 @@ export async function loadSessionsIncrementally(
   dateRange?: DateRange,
   options: ProcessingOptions = {},
 ): Promise<IncrementalLoadResult> {
+  if (process.env.AGENTLENS_DISABLE_CACHE === 'true' || process.env.AGENTLENS_DISABLE_CACHE === '1') {
+    return loadWithoutCache(providers, dateRange, options);
+  }
+
   const db = await openWritableDatabase();
   if (!db) {
     return loadWithJsonCache(providers, dateRange, options);
@@ -357,7 +367,7 @@ export async function loadSessionsIncrementally(
       const existingEntries = listProviderEntries.all(provider.id) as Array<{ identifier: string }>;
       for (const entry of existingEntries) {
         if (currentIdentifiers.has(entry.identifier)) continue;
-        if (existsSync(entry.identifier)) continue;
+        if (existsSync(getActualPath(entry.identifier))) continue;
         deleteProviderEntry.run(provider.id, entry.identifier);
         deleteProviderSession.run(provider.id, entry.identifier);
       }

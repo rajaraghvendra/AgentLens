@@ -693,6 +693,19 @@ cacheProgram
     }
   });
 
+cacheProgram
+  .command('clear')
+  .description('Clear the incremental processing index')
+  .action(async () => {
+    try {
+      await clearProcessingIndex();
+      console.log(colorize('Cache cleared successfully.', 'green'));
+    } catch (err: any) {
+      console.error(colorize(`Failed to clear cache: ${err.message}`, 'red'));
+      process.exit(1);
+    }
+  });
+
 program
   .command('advise')
   .description('Show optimization advice based on current session data')

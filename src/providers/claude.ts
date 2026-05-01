@@ -4,6 +4,7 @@
 
 import { accessSync, constants, statSync, readdirSync } from 'fs';
 import { join, basename, dirname } from 'path';
+import { homedir, platform } from 'os';
 import { IProvider } from './base.js';
 import type { Session, Message, DateRange, ToolUsage } from '../types/index.js';
 import { streamJsonlFile } from '../utils/fs-stream.js';
@@ -41,15 +42,40 @@ interface ClaudeEntry {
   }>;
 }
 
+// ── Claude Desktop agent-mode session paths ─────────────────
+// Claude Desktop stores local-agent-mode-sessions in a
+// platform-specific location, separate from ~/.claude/projects.
+function getDesktopSessionsDir(): string {
+  const home = homedir();
+  if (platform() === 'darwin') {
+    return join(home, 'Library', 'Application Support', 'Claude', 'local-agent-mode-sessions');
+  }
+  if (platform() === 'win32') {
+    return join(home, 'AppData', 'Roaming', 'Claude', 'local-agent-mode-sessions');
+  }
+  // Linux
+  return join(home, '.config', 'Claude', 'local-agent-mode-sessions');
+}
+
+// ── Get Claude config directory (respects CLAUDE_CONFIG_DIR) ─
+function getClaudeConfigDir(): string {
+  return process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude');
+}
+
 export class ClaudeProvider implements IProvider {
   readonly id = 'claude';
   readonly name = 'Claude Code';
 
   private getProjectRoots(): string[] {
-    return Array.from(new Set([config.claudeProjectsDir, ...getClaudeProjectsDirCandidates()]));
+    return Array.from(new Set([
+      config.claudeProjectsDir,
+      join(getClaudeConfigDir(), 'projects'),
+      ...getClaudeProjectsDirCandidates(),
+    ]));
   }
 
   isAvailable(): boolean {
+    // Check standard project directories
     for (const root of this.getProjectRoots()) {
       try {
         accessSync(root, constants.R_OK);
@@ -59,6 +85,14 @@ export class ClaudeProvider implements IProvider {
       }
     }
 
+    // Check Claude Desktop agent-mode sessions
+    try {
+      accessSync(getDesktopSessionsDir(), constants.R_OK);
+      return true;
+    } catch {
+      // continue
+    }
+
     return false;
   }
 
@@ -66,6 +100,8 @@ export class ClaudeProvider implements IProvider {
     if (!this.isAvailable()) return [];
 
     const discovered = new Set<string>();
+
+    // ── Standard ~/.claude/projects directories ───────────────
     for (const root of this.getProjectRoots()) {
       try {
         const files = this.findJsonlFiles(root);
@@ -86,6 +122,31 @@ export class ClaudeProvider implements IProvider {
       } catch {
         // Ignore unreadable roots
       }
+    }
+
+    // ── Claude Desktop local-agent-mode-sessions ─────────────
+    // These are nested: base → <hash> → projects → <project> → *.jsonl
+    try {
+      const desktopDirs = this.findDesktopProjectDirs(getDesktopSessionsDir());
+      for (const dir of desktopDirs) {
+        const files = this.findJsonlFiles(dir);
+        for (const file of files) {
+          try {
+            const mtimeMs = statSync(file).mtimeMs;
+            if (dateRange) {
+              if (isWithinRange(mtimeMs, dateRange)) {
+                discovered.add(file);
+              }
+            } else {
+              discovered.add(file);
+            }
+          } catch {
+            // Skip inaccessible files
+          }
+        }
+      }
+    } catch {
+      // Desktop sessions not available
     }
 
     return Array.from(discovered);
@@ -189,8 +250,18 @@ export class ClaudeProvider implements IProvider {
       'grep': 'Grep',
       'Task': 'Agent',
       'TaskCreate': 'TodoWrite',
+      // Additional tool names used in newer Claude versions
+      'bash': 'Bash',
+      'read': 'Read',
+      'write': 'Write',
+      'edit': 'Edit',
+      'mcp__': 'MCP',
     };
-    return map[rawName] || rawName;
+    // Check exact match
+    if (map[rawName]) return map[rawName];
+    // Check prefix match for MCP tools
+    if (rawName.startsWith('mcp__')) return 'MCP';
+    return rawName;
   }
 
   private findJsonlFiles(dir: string): string[] {
@@ -203,6 +274,43 @@ export class ClaudeProvider implements IProvider {
           results.push(...this.findJsonlFiles(full));
         } else if (entry.name.endsWith('.jsonl')) {
           results.push(full);
+        }
+      }
+    } catch {
+      // Ignore
+    }
+    return results;
+  }
+
+  /**
+   * Walk the Claude Desktop local-agent-mode-sessions tree to
+   * find project directories. Structure:
+   *   base/ → <hash>/ → projects/ → <project-name>/
+   */
+  private findDesktopProjectDirs(base: string, depth = 0): string[] {
+    if (depth > 8) return [];
+    const results: string[] = [];
+    try {
+      const entries = readdirSync(base, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.name === 'node_modules' || entry.name === '.git') continue;
+        const full = join(base, entry.name);
+        if (!entry.isDirectory()) continue;
+
+        if (entry.name === 'projects') {
+          // Found the projects dir — enumerate project subdirs
+          try {
+            const projectEntries = readdirSync(full, { withFileTypes: true });
+            for (const pe of projectEntries) {
+              if (pe.isDirectory()) {
+                results.push(join(full, pe.name));
+              }
+            }
+          } catch {
+            // Ignore
+          }
+        } else {
+          results.push(...this.findDesktopProjectDirs(full, depth + 1));
         }
       }
     } catch {

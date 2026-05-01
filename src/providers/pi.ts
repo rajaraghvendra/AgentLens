@@ -1,14 +1,13 @@
 // ─────────────────────────────────────────────────────────────
-// AgentLens – Pi Provider
+// AgentLens – Pi & OMP Providers
 // ─────────────────────────────────────────────────────────────
 
 import { IProvider } from './base.js';
 import type { Session, DateRange, Message, ToolUsage } from '../types/index.js';
 import { accessSync, constants, readdirSync, statSync, readFileSync } from 'fs';
 import { join, basename } from 'path';
-import { streamJsonlFile } from '../utils/fs-stream.js';
 import { isWithinRange } from '../utils/dates.js';
-import { getPiDataDir, getPiDataDirCandidates } from '../utils/paths.js';
+import { getPiDataDir, getPiDataDirCandidates, getOmpDataDir, getOmpDataDirCandidates } from '../utils/paths.js';
 
 interface PiEntry {
   type: string;
@@ -37,6 +36,9 @@ const modelDisplayNames: Record<string, string> = {
   'gpt-4o-mini': 'GPT-4o Mini',
 };
 
+// Pre-sorted by key length descending so longer/more-specific keys match first
+const modelDisplayEntries = Object.entries(modelDisplayNames).sort((a, b) => b[0].length - a[0].length);
+
 const toolNameMap: Record<string, string> = {
   bash: 'Bash',
   read: 'Read',
@@ -52,14 +54,38 @@ const toolNameMap: Record<string, string> = {
   patch: 'Patch',
 };
 
-export class PiProvider implements IProvider {
-  readonly id = 'pi';
-  readonly name = 'Pi';
+function extractBashCommands(cmd: string): string[] {
+  // Simplified implementation of CodeBurn's extractBashCommands
+  // Handles multi-line scripts and splits them logically
+  if (!cmd) return [];
+  const lines = cmd.split('\n');
+  const commands: string[] = [];
+  let current = '';
 
-  private sessionsDir = getPiDataDir();
-  private getSessionDirs(): string[] {
-    return Array.from(new Set([this.sessionsDir, ...getPiDataDirCandidates()]));
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    if (current) {
+      current += '\n' + trimmed;
+    } else {
+      current = trimmed;
+    }
+    
+    // Naive end-of-command check (real parser would be much more complex)
+    if (!current.endsWith('\\') && !current.match(/['"]$/)) {
+      commands.push(current);
+      current = '';
+    }
   }
+  
+  if (current) commands.push(current);
+  return commands;
+}
+
+abstract class BasePiProvider implements IProvider {
+  abstract readonly id: string;
+  abstract readonly name: string;
+  protected abstract getSessionDirs(): string[];
 
   isAvailable(): boolean {
     for (const dir of this.getSessionDirs()) {
@@ -85,7 +111,8 @@ export class PiProvider implements IProvider {
         
         for (const dirName of projectDirs) {
           const dirPath = join(sessionsDir, dirName);
-          const dirStat = statSync(dirPath);
+          let dirStat;
+          try { dirStat = statSync(dirPath); } catch { continue; }
           
           if (!dirStat.isDirectory()) continue;
 
@@ -100,8 +127,20 @@ export class PiProvider implements IProvider {
             if (!file.endsWith('.jsonl')) continue;
             
             const filePath = join(dirPath, file);
-            const fileStat = statSync(filePath);
+            let fileStat;
+            try { fileStat = statSync(filePath); } catch { continue; }
             
+            // CodeBurn only adds it if the first line is valid
+            try {
+              const content = readFileSync(filePath, 'utf-8');
+              const firstLine = content.split('\n')[0];
+              if (!firstLine?.trim()) continue;
+              const first = JSON.parse(firstLine);
+              if (first.type !== 'session') continue;
+            } catch {
+              continue;
+            }
+
             if (dateRange) {
               if (isWithinRange(fileStat.mtimeMs, dateRange)) {
                 discovered.add(filePath);
@@ -132,7 +171,7 @@ export class PiProvider implements IProvider {
       const dirName = basename(join(identifier, '..'));
       project = dirName;
 
-      for (const line of lines) {
+      for (const [lineIdx, line] of lines.entries()) {
         let entry: PiEntry;
         try {
           entry = JSON.parse(line) as PiEntry;
@@ -142,6 +181,7 @@ export class PiProvider implements IProvider {
 
         if (entry.type === 'session') {
           sessionId = entry.id ?? sessionId;
+          if (entry.cwd) project = basename(entry.cwd);
           continue;
         }
 
@@ -168,9 +208,9 @@ export class PiProvider implements IProvider {
         const responseId = msg.responseId ?? '';
 
         const message: Message = {
-          id: `pi-${sessionId}-${responseId || entry.id || String(messages.length)}`,
+          id: `${this.id}-${sessionId}-${responseId || entry.id || String(lineIdx)}`,
           role: 'assistant',
-          content: '',
+          content: pendingUserMessage,
           timestamp: entry.timestamp ? new Date(entry.timestamp).getTime() : Date.now(),
           model: this.modelDisplayName(model),
           tokens: {
@@ -187,26 +227,28 @@ export class PiProvider implements IProvider {
           message.tools = toolCalls.map((t): ToolUsage => ({
             name: this.normalizeToolName(t.name!),
             input: t.arguments ?? '',
-            outputLength: 0,
+            outputLength: 0, // In jsonl format we often don't have the output length directly
           }));
 
           const bashCommands = toolCalls
             .filter(c => c.name === 'bash')
             .flatMap(c => {
               const cmd = c.arguments?.['command'];
-              return typeof cmd === 'string' ? [cmd] : [];
+              return typeof cmd === 'string' ? extractBashCommands(cmd) : [];
             });
           
           if (bashCommands.length > 0 && message.tools.length > 0) {
+            // Assign extracted commands to bash tools
             for (const tool of message.tools) {
               if (tool.name === 'Bash') {
-                tool.input = bashCommands[0];
+                tool.input = { command: bashCommands.join(' ; ') };
               }
             }
           }
         }
 
         messages.push(message);
+        pendingUserMessage = '';
       }
     } catch (err) {
       // File read error
@@ -228,7 +270,7 @@ export class PiProvider implements IProvider {
   }
 
   private modelDisplayName(model: string): string {
-    for (const [key, name] of Object.entries(modelDisplayNames)) {
+    for (const [key, name] of modelDisplayEntries) {
       if (model.startsWith(key)) return name;
     }
     return model;
@@ -236,5 +278,23 @@ export class PiProvider implements IProvider {
 
   normalizeToolName(rawName: string): string {
     return toolNameMap[rawName] || rawName;
+  }
+}
+
+export class PiProvider extends BasePiProvider {
+  readonly id = 'pi';
+  readonly name = 'Pi';
+  
+  protected getSessionDirs(): string[] {
+    return Array.from(new Set([getPiDataDir(), ...getPiDataDirCandidates()]));
+  }
+}
+
+export class OmpProvider extends BasePiProvider {
+  readonly id = 'omp';
+  readonly name = 'OMP';
+  
+  protected getSessionDirs(): string[] {
+    return Array.from(new Set([getOmpDataDir(), ...getOmpDataDirCandidates()]));
   }
 }

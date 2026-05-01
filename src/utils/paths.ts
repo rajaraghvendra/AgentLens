@@ -89,22 +89,24 @@ export function getCursorDataDir(): string {
   const home = homedir();
   
   if (isWindows()) {
-    return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Cursor');
+    return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Cursor', 'User', 'globalStorage');
   }
   
   if (isMac()) {
-    // macOS: .cursor in home is the main data location
-    return join(home, '.cursor');
+    return join(home, 'Library', 'Application Support', 'Cursor', 'User', 'globalStorage');
   }
   
-  return join(home, '.cursor');
+  return join(home, '.config', 'Cursor', 'User', 'globalStorage');
 }
 
 export function getCursorDataDirCandidates(): string[] {
   const home = homedir();
   return uniquePaths([
+    join(home, 'Library', 'Application Support', 'Cursor', 'User', 'globalStorage'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Cursor', 'User', 'globalStorage'),
+    join(home, '.config', 'Cursor', 'User', 'globalStorage'),
+    // Legacy fallback paths
     join(home, '.cursor'),
-    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Cursor'),
     join(process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'), 'Cursor'),
   ]);
 }
@@ -116,8 +118,10 @@ export function getOpencodeDataDir(): string {
     return join(process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'), 'opencode');
   }
   
-  if (isMac()) {
-    return join(home, '.local', 'share', 'opencode');
+  // Respect XDG_DATA_HOME on Linux/macOS (matches opencode's own data dir resolution)
+  const xdgData = process.env.XDG_DATA_HOME;
+  if (xdgData) {
+    return join(xdgData, 'opencode');
   }
   
   return join(home, '.local', 'share', 'opencode');
@@ -125,12 +129,18 @@ export function getOpencodeDataDir(): string {
 
 export function getOpencodeDataDirCandidates(): string[] {
   const home = homedir();
-  return uniquePaths([
+  const candidates = [
     join(process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'), 'opencode'),
     join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'opencode'),
     join(home, '.local', 'share', 'opencode'),
     join(home, '.opencode'),
-  ]);
+  ];
+  // Respect XDG_DATA_HOME (standard on Linux, sometimes used on macOS)
+  const xdgData = process.env.XDG_DATA_HOME;
+  if (xdgData) {
+    candidates.unshift(join(xdgData, 'opencode'));
+  }
+  return uniquePaths(candidates);
 }
 
 export function getCopilotDataDir(): string {
@@ -197,5 +207,27 @@ export function getCodexDataDirCandidates(): string[] {
   return uniquePaths([
     join(home, '.codex', 'sessions'),
     join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'codex', 'sessions'),
+  ]);
+}
+
+export function getOmpDataDir(): string {
+  const home = homedir();
+  
+  if (isWindows()) {
+    return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'omp', 'agent', 'sessions');
+  }
+  
+  if (isMac()) {
+    return join(home, '.omp', 'agent', 'sessions');
+  }
+  
+  return join(home, '.omp', 'agent', 'sessions');
+}
+
+export function getOmpDataDirCandidates(): string[] {
+  const home = homedir();
+  return uniquePaths([
+    join(home, '.omp', 'agent', 'sessions'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'omp', 'agent', 'sessions'),
   ]);
 }

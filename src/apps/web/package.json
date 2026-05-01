@@ -1,6 +1,6 @@
 {
   "name": "@agentlens/web",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "private": true,
   "scripts": {
     "dev": "node ./node_modules/next/dist/bin/next dev",

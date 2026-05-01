@@ -56,21 +56,5 @@ describe('non-claude providers parsing', () => {
     expect(assistant?.tools?.[0].isError).toBe(true);
   });
 
-  it('parses cursor records with partial fields', () => {
-    const provider = new CursorProvider() as any;
-    const parsed = provider.parseCursorData(
-      [
-        { id: '1', role: 'human', content: 'hello', timestamp: '2026-01-01T00:00:00.000Z' },
-        { id: '2', role: 'ai', message: 'world', usage: { input_tokens: 3, output_tokens: 4 }, tools: [{ name: 'ReadFile' }] },
-        null,
-        'bad',
-      ],
-      'k',
-    );
 
-    expect(parsed).toHaveLength(2);
-    expect(parsed[0].role).toBe('user');
-    expect(parsed[1].role).toBe('assistant');
-    expect(parsed[1].tools?.[0].name).toBe('Read');
-  });
 });

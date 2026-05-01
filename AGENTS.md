@@ -1,74 +1,46 @@
 # AGENTS.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+Guidance for OpenCode sessions working in this repository.
 
-## Project Overview
-
-AgentLens is a local-first AI developer analytics tool that parses, classifies, and tracks AI coding sessions directly from your local disk. It supports multiple providers (Codex, Cursor, Codex, Pi, Opencode, GitHub Copilot), calculates exact costs, detects token-wasting patterns, and provides one-shot success rate tracking.
-
-## Development Commands
-
-To develop in this codebase, use these npm scripts:
+## Commands
 
 ```bash
-npm run dev           # Run CLI in dev mode (ts-node)
-npm run build         # Compile TypeScript to JavaScript in dist/
-npm run test          # Run all tests with Vitest
-npm run test:watch    # Run tests in watch mode
-npm run lint          # TypeScript compilation check
-npm run dashboard     # Start Next.js web dashboard
+npm run dev              # Run CLI via tsx (not ts-node)
+npm run build            # tsc → dist/ (runs sync:version first)
+npm run build:all       # Full build: core + web dashboard + dashboard-runtime
+npm test                # Vitest run (vitest run)
+npx vitest run tests/path/to/file.test.ts  # Single test file
+npm run lint            # TypeScript type check (tsc --noEmit), NOT a linter
 ```
 
-## Architecture Overview
+## Architecture
 
-The codebase follows a modular architecture with these key components:
+Monorepo with separate package contexts:
+- **Root**: CLI (`src/apps/cli/`), core engine, providers, metrics, optimizer
+- **`src/apps/web/`**: Next.js 15 dashboard (own package.json, private)
+- **`src/apps/tui/`**: Terminal UI via Ink/React (own package.json, private)
+- **`src/apps/vscode/`**: VS Code extension (own package.json, private)
 
-1. **Core Engine** (`src/core/engine.ts`): Main orchestrator that loads sessions, computes metrics, and runs analysis
-2. **Providers** (`src/providers/`): Adapter pattern implementations for each AI platform (Codex, Cursor, Codex, etc.)
-3. **Metrics** (`src/core/metrics/`): Computes cost, token usage, activity classification metrics
-4. **Optimizer** (`src/core/optimizer/`): Detects inefficiencies and generates insights
-5. **CLI Application** (`src/apps/cli/`): Command-line interface using Commander.js
-6. **Configuration** (`src/config/env.ts`): Centralized configuration management
+Path aliases (root `tsconfig.json`):
+- `@agentlens/core-types` → `src/core-types/`
+- `@agentlens/core-engine` → `src/core-engine/`
+- `@agentlens/providers` → `src/providers/public.ts`
+- `@agentlens/local-runtime` → `src/local-runtime/`
+- `@agentlens/core/*` → `src/core/*`
+- `@agentlens/config` → `src/config/env.ts`
 
-Data flows through the system as follows:
-- CLI commands → Core Engine
-- Core Engine → Provider discovery/parse → Session data
-- Session data → Metrics computation → Aggregated statistics
-- Session data + Metrics → Optimizer → Findings and insights
+Web app's `tsconfig.json` points aliases to `dist/` (built output), not `src/`.
 
-## Key Files and Directories
+## Gotchas
 
-- `src/apps/cli/index.ts`: Main CLI entry point with all commands
-- `src/core/engine.ts`: Core orchestration logic
-- `src/providers/`: Provider implementations for each AI platform
-- `src/config/env.ts`: Configuration and environment variables
-- `tests/`: Unit and integration tests
-- `package.json`: Dependencies and scripts
+- **`npm run lint` is type-checking only** — no ESLint configured at root
+- **Next.js 15 has breaking changes** — web app uses undocumented APIs; read `node_modules/next/dist/docs/` before editing `src/apps/web/`
+- **Version managed via `VERSION` file** — `npm run sync:version` propagates to all sub-package.json/lock files
+- **Web dashboard dev**: `npm run dashboard:dev` (runs `next dev` in `src/apps/web/`)
+- **TUI dev**: `npm run tui` (uses tsx directly)
 
-## Testing
+## Provider Pattern
 
-Tests are written with Vitest and can be run with:
-```bash
-npm run test          # Run all tests once
-npm run test:watch    # Run tests in watch mode
-```
-
-Test files follow the pattern `*.test.ts` and are organized to mirror the source structure.
-
-## Building and Deployment
-
-To build for production:
-```bash
-npm run build         # Compiles TypeScript to dist/
-```
-
-The built files are placed in the `dist/` directory and can be published to npm.
-
-## Provider Integration Pattern
-
-Each provider follows the `IProvider` interface with methods for:
-- `isAvailable()`: Check if provider data exists locally
-- `discoverSessions()`: Find session files in provider's data directory
-- `parseSession()`: Parse a session file into standardized Session objects
-
-Adding support for new providers requires implementing this interface and registering in `src/providers/index.ts`.
+Implement `IProvider` interface (`src/providers/index.ts`):
+- `isAvailable()` / `discoverSessions()` / `parseSession()`
+- Register new providers in `src/providers/index.ts`
