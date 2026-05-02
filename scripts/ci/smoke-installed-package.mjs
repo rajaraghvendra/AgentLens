@@ -161,6 +161,10 @@ async function main() {
     await run(cli.command, [...cli.args, 'report'], { timeoutMs: 60_000 });
     console.log('[smoke] running tui --help');
     await run(cli.command, [...cli.args, 'tui', '--help'], { timeoutMs: 60_000 });
+    console.log('[smoke] running version');
+    await run(cli.command, [...cli.args, '--version'], { timeoutMs: 60_000 });
+    console.log('[smoke] running providers');
+    await run(cli.command, [...cli.args, 'providers'], { timeoutMs: 60_000 });
 
     const port = process.env['AGENTLENS_SMOKE_PORT'] || '3123';
     console.log(`[smoke] starting dashboard on port ${port}`);
