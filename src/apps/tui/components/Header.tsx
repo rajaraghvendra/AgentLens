@@ -44,7 +44,6 @@ export function Header({ period, onPeriodChange, lastUpdated }: HeaderProps) {
                 bold={isActive}
                 underline={isActive}
                 dimColor={!isActive}
-                onPress={() => onPeriodChange(parseInt(days, 10))}
               >
                 {label}
               </Text>

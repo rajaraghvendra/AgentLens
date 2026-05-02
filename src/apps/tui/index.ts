@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { render } from 'ink';
-import { App } from './components/App';
+import { App } from './components/App.js';
 
 export function main() {
   render(React.createElement(App));

@@ -69,10 +69,10 @@ export function Dashboard({ data, period }: DashboardProps) {
 
       {/* Charts and Visualizations */}
       <Box flexDirection="row" gap={2} height={10}>
-        <Box flex={2}>
+        <Box flexGrow={2}>
           <ActivityBreakdown metrics={metrics} />
         </Box>
-        <Box flex={1}>
+        <Box flexGrow={1}>
           <OptimizationFindings findings={findings} />
         </Box>
       </Box>

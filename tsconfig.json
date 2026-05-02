@@ -29,6 +29,6 @@
       "@agentlens/adapters/*": ["./src/adapters/*"]
     }
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "tests", "src/apps/web", "src/apps/tui"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist", "tests", "src/apps/web"]
 }
