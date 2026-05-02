@@ -131,6 +131,19 @@ describe('web api routes', () => {
 
   it('compare route returns CLI payload', async () => {
     runMock.mockResolvedValueOnce({
+      sessions: [
+        {
+          id: 'session-1',
+          provider: 'claude',
+          messages: [
+            {
+              role: 'assistant',
+              model: 'model-a',
+              tokens: { input: 60, output: 40, cacheRead: 0, cacheWrite: 0 },
+            },
+          ],
+        },
+      ],
       metrics: {
         byModel: {
           'model-a': {
@@ -149,7 +162,8 @@ describe('web api routes', () => {
     });
     const response = await getCompare(new Request('http://localhost/api/compare?period=30'));
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toMatchObject({ models: [{ name: 'model-a' }] });
+    const body = await response.json();
+    expect(body.models[0]).toMatchObject({ model: 'model-a' });
   });
 
   it('providers route returns provider list from provider registry', async () => {

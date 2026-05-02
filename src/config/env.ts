@@ -29,6 +29,8 @@ export interface AppConfig {
   claudeProjectsDir: string;
   /** Codex directory */
   codexDir: string;
+  /** Path to custom pricing override JSON file */
+  pricingOverridePath?: string;
 }
 
 function env(key: string, fallback: string): string {
@@ -58,6 +60,7 @@ export const config: AppConfig = {
   claudeProjectsDir: env('AGENTLENS_CLAUDE_DIR', getClaudeProjectsDir()),
   codexDir: env('AGENTLENS_CODEX_DIR', getCodexDataDir()),
   budgetUSD: envFloat('AGENTLENS_BUDGET_USD', 0),
+  pricingOverridePath: env('AGENTLENS_PRICING_OVERRIDE', ''),
 };
 
 export default config;

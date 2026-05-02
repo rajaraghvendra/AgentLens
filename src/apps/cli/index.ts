@@ -14,6 +14,9 @@ import { getBudget, setBudget, resetBudget } from '../../core/budget.js';
 import { notify } from '../../core/notifier.js';
 import { clearProcessingIndex, getProcessingIndexStatus } from '../../core/processing/index.js';
 import type { OptimizationEvent, ToolAdvice } from '../../types/index.js';
+import config from '../../config/env.js';
+import { analyzeModels, compareModels, getModelSessions } from '../../core/compare.js';
+import { detectWaste, calculateHealthScore } from '../../core/waste-detector.js';
 
 interface CLIOptions {
   period?: string;
@@ -23,6 +26,7 @@ interface CLIOptions {
   format?: string;
   currency?: string;
   fullReparse?: boolean;
+  pricingOverride?: string;
 }
 
 function collect(val: string, acc: string[]): string[] {
@@ -875,75 +879,92 @@ program
 
 program
   .command('compare')
-  .description('Compare usage metrics across models')
+  .description('Compare usage metrics across models (enhanced)')
   .option('-p, --period <period>', 'Time period: today, week, month, all', '30days')
   .option('--provider <provider>', 'Filter by provider')
   .option('--format <type>', 'Output format: text, json', 'text')
   .option('--full-reparse', 'Ignore incremental cache and reparse source sessions')
   .option('--model1 <model>', 'First model to compare')
   .option('--model2 <model>', 'Second model to compare')
+  .option('--pricing-override <path>', 'Path to custom pricing JSON file')
   .action(async (options) => {
     try {
       const periodDays = parsePeriod(options.period || '30days');
       const filters = getFilters(options);
-      const { metrics } = await CoreEngine.run(periodDays, 'USD', filters);
 
-      const byModel = metrics.byModel;
-      const models = Object.values(byModel)
-        .sort((a, b) => b.costUSD - a.costUSD);
+      // Apply pricing override if specified
+      if (options.pricingOverride) {
+        config.pricingOverridePath = options.pricingOverride;
+      }
+
+      const { sessions } = await CoreEngine.run(periodDays, 'USD', filters);
+
+      // Use enhanced compare module
+      const modelStats = analyzeModels(sessions);
 
       if (options.format === 'json') {
-        const totalCost = models.reduce((sum, m) => sum + m.costUSD, 0);
-        const compare = models.map(m => ({
-          name: m.model,
-          costUSD: m.costUSD,
-          totalTokens: m.totalTokens,
-          inputTokens: m.inputTokens,
-          outputTokens: m.outputTokens,
-          cacheHitTokens: m.cacheReadTokens,
-          cacheWriteTokens: m.cacheWriteTokens,
-          messageCount: m.messageCount,
-          isEstimated: m.isEstimated,
+        const totalCost = modelStats.reduce((sum, m) => sum + m.costUSD, 0);
+        console.log(JSON.stringify({ 
+          models: modelStats, 
+          totalCostUSD: totalCost, 
+          period: periodDays,
+          wasteFindings: detectWaste(sessions),
         }));
-        console.log(JSON.stringify({ models: compare, totalCostUSD: totalCost, period: periodDays }));
         process.exit(0);
       }
 
-      const maxModelLen = Math.max(...models.map(m => (m.model || '').length), 15);
+      const maxModelLen = Math.max(...modelStats.map(m => (m.model || '').length), 15);
 
-      console.log('\n' + colorize('┌─ Model Comparison ───────────────────────────────┐', 'cyan'));
+      console.log('\n' + colorize('┌─ Enhanced Model Comparison ──────────────────────┐', 'cyan'));
       console.log(colorize('│', 'cyan') + ` Period: ${options.period || '30days'}`.padEnd(52) + colorize('│', 'cyan'));
       console.log(colorize('└' + '─'.repeat(52) + '┘', 'cyan'));
 
-      if (models.length === 0) {
+      if (modelStats.length === 0) {
         console.log(colorize('\nNo model data found.', 'yellow'));
         return;
       }
 
-      console.log(`\n${'Model'.padEnd(maxModelLen)} ${'Cost'.padStart(10)} ${'Tokens'.padStart(12)} ${'Cache Hit'.padStart(10)} ${'Calls'.padStart(8)}`);
+      console.log(`\n${'Model'.padEnd(maxModelLen)} ${'Cost'.padStart(10)} ${'Tokens'.padStart(12)} ${'Efficiency'.padStart(12)} ${'Calls'.padStart(8)}`);
       console.log('─'.repeat(maxModelLen + 45));
 
-      for (const m of models) {
-        const totalInput = m.inputTokens + m.cacheReadTokens + m.cacheWriteTokens;
-        const cacheRate = totalInput > 0 ? ((m.cacheReadTokens / totalInput) * 100) : 0;
+      for (const m of modelStats) {
         console.log(
           `${(m.model || 'unknown').padEnd(maxModelLen)} ` +
           `${formatCurrency(m.costUSD, 'USD').padStart(10)} ` +
           `${((m.totalTokens || 0) / 1_000_000).toFixed(2).padStart(10)}M ` +
-          `${cacheRate.toFixed(1).padStart(9)}% ` +
+          `${m.efficiency.toFixed(1).padStart(11)}% ` +
           `${String(m.messageCount).padStart(8)}`
         );
       }
 
-      if (models.length >= 2) {
-        const a = models[0];
-        const b = models[1];
-        const costDiff = a.costUSD > 0 && b.costUSD > 0
-          ? (((a.costUSD - b.costUSD) / b.costUSD) * 100).toFixed(1)
-          : 'N/A';
-        console.log(`\n${colorize('Top 2 comparison:', 'blue')}`);
-        console.log(`  ${a.model} costs ${costDiff}% ${parseFloat(costDiff) > 0 ? 'more' : 'less'} than ${b.model} per call`);
+      // Model-to-model comparison
+      if (options.model1 && options.model2) {
+        const comparison = compareModels(sessions, options.model1, options.model2);
+        if (comparison) {
+          console.log(`\n${colorize('Model Comparison:', 'blue')}`);
+          console.log(`  ${comparison.modelA.model} vs ${comparison.modelB.model}`);
+          console.log(`  Winner by efficiency: ${colorize(comparison.winner, 'green')}`);
+          console.log(`  Model A efficiency: ${comparison.modelA.efficiency.toFixed(1)}%`);
+          console.log(`  Model B efficiency: ${comparison.modelB.efficiency.toFixed(1)}%`);
+        }
       }
+
+      // Waste detection
+      const wasteFindings = detectWaste(sessions);
+      if (wasteFindings.length > 0) {
+        console.log(`\n${colorize('─'.repeat(50), 'yellow')}`);
+        console.log(`${colorize('⚠ Waste Findings:', 'yellow')}`);
+        for (const finding of wasteFindings) {
+          console.log(`  • [${formatSeverityBadge(finding.severity)}] ${finding.title}`);
+          console.log(`    ${finding.description}`);
+          console.log(`    Estimated waste: ${formatCurrency(finding.estimatedCostWastedUSD, 'USD')} (${finding.estimatedTokensWasted} tokens)`);
+          console.log(`    Fix: ${finding.suggestedFix}`);
+        }
+      }
+
+      // Health score
+      const health = calculateHealthScore(wasteFindings);
+      console.log(`\n${colorize('Health Score:', 'blue')} ${health.score}/100 (Grade: ${health.grade})`);
 
     } catch (err: any) {
       console.error(colorize(`Error: ${err.message}`, 'red'));

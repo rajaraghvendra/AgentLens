@@ -156,6 +156,7 @@ export class ClaudeProvider implements IProvider {
     const messages: Message[] = [];
     const project = inferClaudeProjectName(identifier);
     let sessionTimestamp = Date.now();
+    let lastModel: string | undefined = undefined;
 
     for await (const raw of streamJsonlFile<ClaudeEntry>(identifier)) {
       if (!raw.type || !raw.uuid) continue;
@@ -201,9 +202,14 @@ export class ClaudeProvider implements IProvider {
         }
 
         // Handle both old format (model at root) and new format (model in message)
-        const model = raw.model || raw.message?.model;
+        // Also inherit the last known model from the session if not specified
+        let model: string | undefined = raw.model || raw.message?.model;
+        if (!model && lastModel) {
+          model = lastModel;
+        }
         if (model) {
           msg.model = model;
+          lastModel = model;
         }
 
         if (raw.tools && Array.isArray(raw.tools)) {

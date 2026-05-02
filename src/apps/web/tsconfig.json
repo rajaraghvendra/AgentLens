@@ -31,6 +31,15 @@
       ],
       "@agentlens/types": [
         "../../../dist/types/index.d.ts"
+      ],
+      "@agentlens/config": [
+        "../../../dist/config/env.js"
+      ],
+      "@agentlens/core/compare": [
+        "../../../dist/core/compare.js"
+      ],
+      "@agentlens/core/waste-detector": [
+        "../../../dist/core/waste-detector.js"
       ]
     }
   },

@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Box, Text, useInput, useApp, useWindowSize } from 'ink';
-import { CoreEngine } from '../../../../dist/core/engine.js';
-import { getAllProviders } from '../../../../dist/providers/index.js';
-import { getHomeDir } from '../../../../dist/utils/paths.js';
+import { CoreEngine } from '../../../../src/core/engine.js';
+import { getAllProviders } from '../../../../src/providers/index.js';
+import { getHomeDir } from '../../../../src/utils/paths.js';
 
 type Period = 'today' | 'week' | '30days' | 'month' | 'all';
 type Mode = 'dashboard' | 'compare' | 'detail';
