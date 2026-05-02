@@ -1,4 +1,4 @@
-export { CoreEngine } from '../../../../dist/core/engine.js';
-export { getBudget, setBudget } from '../../../../dist/core/budget.js';
-export { computeHealthScore } from '../../../../dist/core/optimizer/index.js';
-export { getAllProviders } from '../../../../dist/providers/index.js';
+export { CoreEngine } from '@agentlens/core/engine';
+export { getBudget, setBudget } from '@agentlens/core/budget';
+export { computeHealthScore } from '@agentlens/core/optimizer/index';
+export { getAllProviders } from '@agentlens/providers/index';

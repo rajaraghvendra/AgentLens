@@ -1,1 +1,1 @@
-export { PricingEngine } from '../../../../dist/core/pricing/calculator.js';
+export { PricingEngine } from '@agentlens/core/pricing/calculator';

@@ -1,1 +1,1 @@
-export { detectWaste, calculateHealthScore } from '../../../../dist/core/waste-detector.js';
+export { detectWaste, calculateHealthScore } from '@agentlens/core/waste-detector';
