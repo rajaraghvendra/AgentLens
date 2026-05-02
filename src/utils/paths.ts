@@ -42,9 +42,26 @@ export function getDataDir(appName: string): string {
 
 export function getCacheDir(appName: string): string {
   const home = homedir();
-  
-  // All platforms: use .cache for POSIX compatibility
-  return join(home, '.cache', appName);
+
+  if (isWindows()) {
+    // Windows standard: %LOCALAPPDATA%\<app>\cache
+    return join(
+      process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'),
+      appName,
+      'cache',
+    );
+  }
+
+  if (isMac()) {
+    // macOS standard: ~/Library/Caches/<app>
+    return join(home, 'Library', 'Caches', appName);
+  }
+
+  // Linux: respect XDG_CACHE_HOME, fall back to ~/.cache
+  return join(
+    process.env.XDG_CACHE_HOME || join(home, '.cache'),
+    appName,
+  );
 }
 
 function uniquePaths(paths: string[]): string[] {

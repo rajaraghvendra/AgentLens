@@ -1,6 +1,6 @@
 {
   "name": "@rajaraghvendra/agentlens",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "Local-first AI developer analytics — parse, classify, cost-track, and optimize your AI coding sessions.",
   "type": "module",
   "main": "dist/core/engine.js",
@@ -42,6 +42,7 @@
     "src/apps/tui",
     "dist/types",
     "dist/utils",
+    "scripts",
     "LICENSE",
     "README.md"
   ],
@@ -87,9 +88,10 @@
   },
   "scripts": {
     "sync:version": "node scripts/sync-versions.mjs",
+    "postinstall": "node scripts/check-sqlite.mjs",
     "dev": "node --import tsx src/apps/cli/index.ts",
     "tui": "node --import tsx src/apps/tui/index.ts",
-    "build:core": "node ./node_modules/typescript/bin/tsc",
+    "build:core": "node ./node_modules/typescript/bin/tsc && node scripts/copy-assets.mjs",
     "build:dashboard-runtime": "node scripts/package-dashboard-runtime.mjs",
     "build": "npm run sync:version && npm run build:core",
     "build:all": "npm run sync:version && npm run build:core && npm --prefix src/apps/web run build && npm run build:dashboard-runtime",
@@ -105,30 +107,29 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
-    "@types/vscode": "^1.80.0",
-    "tsx": "^4.21.0",
-    "vitest": "^4.1.4"
-  },
-  "dependencies": {
-    "@tailwindcss/postcss": "^4.1.16",
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19",
-    "better-sqlite3": "^12.9.0",
+    "@types/vscode": "^1.80.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.4"
+  },
+  "dependencies": {
     "chalk": "^5.6.2",
     "clsx": "^2.1.1",
     "commander": "^14.0.3",
     "ink": "^7.0.1",
     "ink-spinner": "^5.0.0",
-    "lucide-react": "^1.8.0",
     "next": "^15.5.15",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "recharts": "^3.8.1",
     "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^4.1.16",
-    "tsx": "^4.21.0",
-    "typescript": "^6.0.3"
+    "lucide-react": "^1.8.0"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "^12.9.0"
   },
   "overrides": {
     "postcss": "^8.5.10"

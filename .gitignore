@@ -46,3 +46,7 @@ out/
 # Documentation (keep README.md but ignore other docs)
 docs/
 !docs/README.md
+
+# Build output and large reports
+report.json
+*.tgz

@@ -267,7 +267,17 @@ export class OpencodeProvider implements IProvider {
 
     const db = await openReadonly(dbPath);
     if (!db) {
-      throw new Error('Cannot open Opencode database');
+      if (process.env.AGENTLENS_DEBUG) {
+        console.warn(`[agentlens] Opencode data unavailable: better-sqlite3 not installed. Install Visual Studio Build Tools on Windows.`);
+      }
+      return {
+        id: identifier,
+        provider: this.id,
+        project: 'opencode-workspace',
+        timestamp: Date.now(),
+        durationMs: 0,
+        messages: [],
+      };
     }
 
     const messages: Message[] = [];

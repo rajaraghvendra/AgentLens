@@ -1,82 +1,6179 @@
 {
-  "claude-sonnet-4-20250514": {
-    "input_cost_per_token": 0.000003,
-    "output_cost_per_token": 0.000015,
-    "cache_read_input_token_cost": 0.0000003,
-    "cache_creation_input_token_cost": 0.00000375
+  "ai21.j2-mid-v1": {
+    "input_cost_per_token": 0.0000125,
+    "output_cost_per_token": 0.0000125,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8191,
+    "max_output_tokens": 8191,
+    "mode": "chat"
   },
-  "claude-3-5-sonnet-20240620": {
-    "input_cost_per_token": 0.000003,
-    "output_cost_per_token": 0.000015,
-    "cache_read_input_token_cost": 0.0000003,
-    "cache_creation_input_token_cost": 0.00000375
+  "ai21.j2-ultra-v1": {
+    "input_cost_per_token": 0.0000188,
+    "output_cost_per_token": 0.0000188,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8191,
+    "max_output_tokens": 8191,
+    "mode": "chat"
   },
-  "claude-3-5-haiku-20241022": {
-    "input_cost_per_token": 0.0000008,
+  "ai21.jamba-1-5-large-v1:0": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000008,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "ai21.jamba-1-5-mini-v1:0": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 4e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "ai21.jamba-instruct-v1:0": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 7e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 70000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.writer.palmyra-x4-v1:0": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "us.writer.palmyra-x5-v1:0": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "writer.palmyra-x4-v1:0": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "writer.palmyra-x5-v1:0": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "amazon.nova-lite-v1:0": {
+    "input_cost_per_token": 6e-8,
+    "output_cost_per_token": 2.4e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 300000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "amazon.nova-2-lite-v1:0": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "amazon.nova-2-pro-preview-20251202-v1:0": {
+    "input_cost_per_token": 0.0000021875,
+    "output_cost_per_token": 0.0000175,
+    "cache_read_input_token_cost": 5.46875e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "apac.amazon.nova-2-lite-v1:0": {
+    "input_cost_per_token": 3.3e-7,
+    "output_cost_per_token": 0.00000275,
+    "cache_read_input_token_cost": 8.25e-8,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "apac.amazon.nova-2-pro-preview-20251202-v1:0": {
+    "input_cost_per_token": 0.0000021875,
+    "output_cost_per_token": 0.0000175,
+    "cache_read_input_token_cost": 5.46875e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "eu.amazon.nova-2-lite-v1:0": {
+    "input_cost_per_token": 3.3e-7,
+    "output_cost_per_token": 0.00000275,
+    "cache_read_input_token_cost": 8.25e-8,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "eu.amazon.nova-2-pro-preview-20251202-v1:0": {
+    "input_cost_per_token": 0.0000021875,
+    "output_cost_per_token": 0.0000175,
+    "cache_read_input_token_cost": 5.46875e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "us.amazon.nova-2-lite-v1:0": {
+    "input_cost_per_token": 3.3e-7,
+    "output_cost_per_token": 0.00000275,
+    "cache_read_input_token_cost": 8.25e-8,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "us.amazon.nova-2-pro-preview-20251202-v1:0": {
+    "input_cost_per_token": 0.0000021875,
+    "output_cost_per_token": 0.0000175,
+    "cache_read_input_token_cost": 5.46875e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "amazon.nova-micro-v1:0": {
+    "input_cost_per_token": 3.5e-8,
+    "output_cost_per_token": 1.4e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "amazon.nova-pro-v1:0": {
+    "input_cost_per_token": 8e-7,
+    "output_cost_per_token": 0.0000032,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 300000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "twelvelabs.pegasus-1-2-v1:0": {
+    "input_cost_per_token": 0,
+    "output_cost_per_token": 0.0000075,
+    "litellm_provider": "bedrock",
+    "mode": "chat"
+  },
+  "us.twelvelabs.pegasus-1-2-v1:0": {
+    "input_cost_per_token": 0,
+    "output_cost_per_token": 0.0000075,
+    "litellm_provider": "bedrock",
+    "mode": "chat"
+  },
+  "eu.twelvelabs.pegasus-1-2-v1:0": {
+    "input_cost_per_token": 0,
+    "output_cost_per_token": 0.0000075,
+    "litellm_provider": "bedrock",
+    "mode": "chat"
+  },
+  "amazon.titan-text-express-v1": {
+    "input_cost_per_token": 0.0000013,
+    "output_cost_per_token": 0.0000017,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 42000,
+    "max_output_tokens": 8000,
+    "mode": "chat"
+  },
+  "amazon.titan-text-lite-v1": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 4e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 42000,
+    "max_output_tokens": 4000,
+    "mode": "chat"
+  },
+  "amazon.titan-text-premier-v1:0": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 42000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "anthropic.claude-3-5-haiku-20241022-v1:0": {
+    "input_cost_per_token": 8e-7,
     "output_cost_per_token": 0.000004,
-    "cache_read_input_token_cost": 0.00000008,
-    "cache_creation_input_token_cost": 0.000001
+    "cache_read_input_token_cost": 8e-8,
+    "cache_creation_input_token_cost": 0.000001,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "anthropic.claude-haiku-4-5-20251001-v1:0": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000005,
+    "cache_read_input_token_cost": 1e-7,
+    "cache_creation_input_token_cost": 0.00000125,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "anthropic.claude-haiku-4-5@20251001": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000005,
+    "cache_read_input_token_cost": 1e-7,
+    "cache_creation_input_token_cost": 0.00000125,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "anthropic.claude-3-5-sonnet-20240620-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "anthropic.claude-3-5-sonnet-20241022-v2:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "anthropic.claude-3-7-sonnet-20240620-v1:0": {
+    "input_cost_per_token": 0.0000036,
+    "output_cost_per_token": 0.000018,
+    "cache_read_input_token_cost": 3.6e-7,
+    "cache_creation_input_token_cost": 0.0000045,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "anthropic.claude-3-7-sonnet-20250219-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "anthropic.claude-3-haiku-20240307-v1:0": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.00000125,
+    "cache_read_input_token_cost": 2.5e-8,
+    "cache_creation_input_token_cost": 3.125e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "anthropic.claude-3-opus-20240229-v1:0": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "anthropic.claude-3-sonnet-20240229-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "anthropic.claude-instant-v1": {
+    "input_cost_per_token": 8e-7,
+    "output_cost_per_token": 0.0000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "anthropic.claude-opus-4-1-20250805-v1:0": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "anthropic.claude-opus-4-20250514-v1:0": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "anthropic.claude-opus-4-5-20251101-v1:0": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "anthropic.claude-opus-4-6-v1": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "global.anthropic.claude-opus-4-6-v1": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-opus-4-6-v1": {
+    "input_cost_per_token": 0.0000055,
+    "output_cost_per_token": 0.0000275,
+    "cache_read_input_token_cost": 5.5e-7,
+    "cache_creation_input_token_cost": 0.000006875,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-opus-4-6-v1": {
+    "input_cost_per_token": 0.0000055,
+    "output_cost_per_token": 0.0000275,
+    "cache_read_input_token_cost": 5.5e-7,
+    "cache_creation_input_token_cost": 0.000006875,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "au.anthropic.claude-opus-4-6-v1": {
+    "input_cost_per_token": 0.0000055,
+    "output_cost_per_token": 0.0000275,
+    "cache_read_input_token_cost": 5.5e-7,
+    "cache_creation_input_token_cost": 0.000006875,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "anthropic.claude-opus-4-7": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "global.anthropic.claude-opus-4-7": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-opus-4-7": {
+    "input_cost_per_token": 0.0000055,
+    "output_cost_per_token": 0.0000275,
+    "cache_read_input_token_cost": 5.5e-7,
+    "cache_creation_input_token_cost": 0.000006875,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-opus-4-7": {
+    "input_cost_per_token": 0.0000055,
+    "output_cost_per_token": 0.0000275,
+    "cache_read_input_token_cost": 5.5e-7,
+    "cache_creation_input_token_cost": 0.000006875,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "au.anthropic.claude-opus-4-7": {
+    "input_cost_per_token": 0.0000055,
+    "output_cost_per_token": 0.0000275,
+    "cache_read_input_token_cost": 5.5e-7,
+    "cache_creation_input_token_cost": 0.000006875,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "anthropic.claude-sonnet-4-6": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "global.anthropic.claude-sonnet-4-6": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-sonnet-4-6": {
+    "input_cost_per_token": 0.0000033,
+    "output_cost_per_token": 0.0000165,
+    "cache_read_input_token_cost": 3.3e-7,
+    "cache_creation_input_token_cost": 0.000004125,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-sonnet-4-6": {
+    "input_cost_per_token": 0.0000033,
+    "output_cost_per_token": 0.0000165,
+    "cache_read_input_token_cost": 3.3e-7,
+    "cache_creation_input_token_cost": 0.000004125,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "au.anthropic.claude-sonnet-4-6": {
+    "input_cost_per_token": 0.0000033,
+    "output_cost_per_token": 0.0000165,
+    "cache_read_input_token_cost": 3.3e-7,
+    "cache_creation_input_token_cost": 0.000004125,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "anthropic.claude-sonnet-4-20250514-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "anthropic.claude-sonnet-4-5-20250929-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "anthropic.claude-v1": {
+    "input_cost_per_token": 0.000008,
+    "output_cost_per_token": 0.000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "anthropic.claude-v2:1": {
+    "input_cost_per_token": 0.000008,
+    "output_cost_per_token": 0.000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "apac.amazon.nova-lite-v1:0": {
+    "input_cost_per_token": 6.3e-8,
+    "output_cost_per_token": 2.52e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 300000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "apac.amazon.nova-micro-v1:0": {
+    "input_cost_per_token": 3.7e-8,
+    "output_cost_per_token": 1.48e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "apac.amazon.nova-pro-v1:0": {
+    "input_cost_per_token": 8.4e-7,
+    "output_cost_per_token": 0.00000336,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 300000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "apac.anthropic.claude-3-5-sonnet-20240620-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "apac.anthropic.claude-3-5-sonnet-20241022-v2:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "apac.anthropic.claude-3-haiku-20240307-v1:0": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.00000125,
+    "cache_read_input_token_cost": 2.5e-8,
+    "cache_creation_input_token_cost": 3.125e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "apac.anthropic.claude-haiku-4-5-20251001-v1:0": {
+    "input_cost_per_token": 0.0000011,
+    "output_cost_per_token": 0.0000055,
+    "cache_read_input_token_cost": 1.1e-7,
+    "cache_creation_input_token_cost": 0.000001375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "apac.anthropic.claude-3-sonnet-20240229-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "apac.anthropic.claude-sonnet-4-20250514-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "au.anthropic.claude-sonnet-4-5-20250929-v1:0": {
+    "input_cost_per_token": 0.0000033,
+    "output_cost_per_token": 0.0000165,
+    "cache_read_input_token_cost": 3.3e-7,
+    "cache_creation_input_token_cost": 0.000004125,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "babbage-002": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 4e-7,
+    "litellm_provider": "text-completion-openai",
+    "max_input_tokens": 16384,
+    "max_output_tokens": 4096,
+    "mode": "completion"
+  },
+  "bedrock/ap-northeast-1/anthropic.claude-instant-v1": {
+    "input_cost_per_token": 0.00000223,
+    "output_cost_per_token": 0.00000755,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/ap-northeast-1/anthropic.claude-v1": {
+    "input_cost_per_token": 0.000008,
+    "output_cost_per_token": 0.000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/ap-northeast-1/anthropic.claude-v2:1": {
+    "input_cost_per_token": 0.000008,
+    "output_cost_per_token": 0.000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/ap-northeast-1/deepseek.v3.2": {
+    "input_cost_per_token": 7.4e-7,
+    "output_cost_per_token": 0.00000222,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "mode": "chat"
+  },
+  "bedrock/ap-northeast-1/minimax.minimax-m2.1": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 196000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/ap-northeast-1/minimax.minimax-m2.5": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/ap-northeast-1/moonshotai.kimi-k2-thinking": {
+    "input_cost_per_token": 7.3e-7,
+    "output_cost_per_token": 0.00000303,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/ap-northeast-1/moonshotai.kimi-k2.5": {
+    "input_cost_per_token": 7.2e-7,
+    "output_cost_per_token": 0.0000036,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/ap-northeast-1/qwen.qwen3-coder-next": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/moonshotai.kimi-k2-thinking": {
+    "input_cost_per_token": 7.3e-7,
+    "output_cost_per_token": 0.00000303,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/moonshotai.kimi-k2.5": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.00000303,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/ap-south-1/meta.llama3-70b-instruct-v1:0": {
+    "input_cost_per_token": 0.00000318,
+    "output_cost_per_token": 0.0000042,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/ap-south-1/meta.llama3-8b-instruct-v1:0": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 7.2e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/ap-south-1/deepseek.v3.2": {
+    "input_cost_per_token": 7.4e-7,
+    "output_cost_per_token": 0.00000222,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "mode": "chat"
+  },
+  "bedrock/ap-south-1/minimax.minimax-m2.1": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 196000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/ap-south-1/minimax.minimax-m2.5": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/ap-south-1/moonshotai.kimi-k2-thinking": {
+    "input_cost_per_token": 7.1e-7,
+    "output_cost_per_token": 0.00000294,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/ap-south-1/moonshotai.kimi-k2.5": {
+    "input_cost_per_token": 7.2e-7,
+    "output_cost_per_token": 0.0000036,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/ap-south-1/qwen.qwen3-coder-next": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/ap-southeast-2/minimax.minimax-m2.5": {
+    "input_cost_per_token": 3.09e-7,
+    "output_cost_per_token": 0.000001236,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/ap-southeast-3/deepseek.v3.2": {
+    "input_cost_per_token": 7.4e-7,
+    "output_cost_per_token": 0.00000222,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "mode": "chat"
+  },
+  "bedrock/ap-southeast-3/minimax.minimax-m2.1": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 196000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/ap-southeast-3/minimax.minimax-m2.5": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/ap-southeast-3/moonshotai.kimi-k2.5": {
+    "input_cost_per_token": 7.2e-7,
+    "output_cost_per_token": 0.0000036,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/ap-southeast-3/qwen.qwen3-coder-next": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/ca-central-1/meta.llama3-70b-instruct-v1:0": {
+    "input_cost_per_token": 0.00000305,
+    "output_cost_per_token": 0.00000403,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/ca-central-1/meta.llama3-8b-instruct-v1:0": {
+    "input_cost_per_token": 3.5e-7,
+    "output_cost_per_token": 6.9e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-north-1/deepseek.v3.2": {
+    "input_cost_per_token": 7.4e-7,
+    "output_cost_per_token": 0.00000222,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "mode": "chat"
+  },
+  "bedrock/eu-north-1/minimax.minimax-m2.1": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 196000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-north-1/minimax.minimax-m2.5": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-north-1/moonshotai.kimi-k2.5": {
+    "input_cost_per_token": 7.2e-7,
+    "output_cost_per_token": 0.0000036,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/eu-central-1/anthropic.claude-instant-v1": {
+    "input_cost_per_token": 0.00000248,
+    "output_cost_per_token": 0.00000838,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/eu-central-1/anthropic.claude-v1": {
+    "input_cost_per_token": 0.000008,
+    "output_cost_per_token": 0.000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/eu-central-1/anthropic.claude-v2:1": {
+    "input_cost_per_token": 0.000008,
+    "output_cost_per_token": 0.000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/eu-central-1/minimax.minimax-m2.1": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 196000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-central-1/minimax.minimax-m2.5": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-central-1/qwen.qwen3-coder-next": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-west-1/meta.llama3-70b-instruct-v1:0": {
+    "input_cost_per_token": 0.00000286,
+    "output_cost_per_token": 0.00000378,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-west-1/meta.llama3-8b-instruct-v1:0": {
+    "input_cost_per_token": 3.2e-7,
+    "output_cost_per_token": 6.5e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-west-1/minimax.minimax-m2.1": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 196000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-west-1/minimax.minimax-m2.5": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-west-1/qwen.qwen3-coder-next": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-west-2/meta.llama3-70b-instruct-v1:0": {
+    "input_cost_per_token": 0.00000345,
+    "output_cost_per_token": 0.00000455,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-west-2/meta.llama3-8b-instruct-v1:0": {
+    "input_cost_per_token": 3.9e-7,
+    "output_cost_per_token": 7.8e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-west-2/minimax.minimax-m2.1": {
+    "input_cost_per_token": 4.7e-7,
+    "output_cost_per_token": 0.00000186,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 196000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-west-2/minimax.minimax-m2.5": {
+    "input_cost_per_token": 4.7e-7,
+    "output_cost_per_token": 0.00000186,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-west-2/qwen.qwen3-coder-next": {
+    "input_cost_per_token": 7.8e-7,
+    "output_cost_per_token": 0.00000186,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-west-3/mistral.mistral-7b-instruct-v0:2": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 2.6e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/eu-west-3/mistral.mistral-large-2402-v1:0": {
+    "input_cost_per_token": 0.0000104,
+    "output_cost_per_token": 0.0000312,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/eu-west-3/mistral.mixtral-8x7b-instruct-v0:1": {
+    "input_cost_per_token": 5.9e-7,
+    "output_cost_per_token": 9.1e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/eu-south-1/minimax.minimax-m2.1": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 196000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-south-1/minimax.minimax-m2.5": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/eu-south-1/qwen.qwen3-coder-next": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/invoke/anthropic.claude-3-5-sonnet-20240620-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "bedrock/sa-east-1/meta.llama3-70b-instruct-v1:0": {
+    "input_cost_per_token": 0.00000445,
+    "output_cost_per_token": 0.00000588,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/sa-east-1/meta.llama3-8b-instruct-v1:0": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.00000101,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/sa-east-1/deepseek.v3.2": {
+    "input_cost_per_token": 7.4e-7,
+    "output_cost_per_token": 0.00000222,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "mode": "chat"
+  },
+  "bedrock/sa-east-1/minimax.minimax-m2.1": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 196000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/sa-east-1/minimax.minimax-m2.5": {
+    "input_cost_per_token": 3.6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/sa-east-1/moonshotai.kimi-k2-thinking": {
+    "input_cost_per_token": 7.3e-7,
+    "output_cost_per_token": 0.00000303,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/sa-east-1/moonshotai.kimi-k2.5": {
+    "input_cost_per_token": 7.2e-7,
+    "output_cost_per_token": 0.0000036,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/sa-east-1/qwen.qwen3-coder-next": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.00000144,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/anthropic.claude-instant-v1": {
+    "input_cost_per_token": 8e-7,
+    "output_cost_per_token": 0.0000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/anthropic.claude-v1": {
+    "input_cost_per_token": 0.000008,
+    "output_cost_per_token": 0.000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/anthropic.claude-v2:1": {
+    "input_cost_per_token": 0.000008,
+    "output_cost_per_token": 0.000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/meta.llama3-70b-instruct-v1:0": {
+    "input_cost_per_token": 0.00000265,
+    "output_cost_per_token": 0.0000035,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/meta.llama3-8b-instruct-v1:0": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/mistral.mistral-7b-instruct-v0:2": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 2e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/mistral.mistral-large-2402-v1:0": {
+    "input_cost_per_token": 0.000008,
+    "output_cost_per_token": 0.000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/mistral.mixtral-8x7b-instruct-v0:1": {
+    "input_cost_per_token": 4.5e-7,
+    "output_cost_per_token": 7e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/deepseek.v3.2": {
+    "input_cost_per_token": 6.2e-7,
+    "output_cost_per_token": 0.00000185,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/minimax.minimax-m2.1": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 196000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/minimax.minimax-m2.5": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/moonshotai.kimi-k2-thinking": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000025,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/moonshotai.kimi-k2.5": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.000003,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/qwen.qwen3-coder-next": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-east-2/deepseek.v3.2": {
+    "input_cost_per_token": 6.2e-7,
+    "output_cost_per_token": 0.00000185,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "mode": "chat"
+  },
+  "bedrock/us-east-2/minimax.minimax-m2.1": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 196000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-east-2/minimax.minimax-m2.5": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-east-2/moonshotai.kimi-k2-thinking": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000025,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/us-east-2/moonshotai.kimi-k2.5": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.000003,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/us-east-2/qwen.qwen3-coder-next": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-east-1/amazon.nova-pro-v1:0": {
+    "input_cost_per_token": 9.6e-7,
+    "output_cost_per_token": 0.00000384,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 300000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-east-1/amazon.titan-text-express-v1": {
+    "input_cost_per_token": 0.0000013,
+    "output_cost_per_token": 0.0000017,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 42000,
+    "max_output_tokens": 8000,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-east-1/amazon.titan-text-lite-v1": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 4e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 42000,
+    "max_output_tokens": 4000,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-east-1/amazon.titan-text-premier-v1:0": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 42000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-east-1/anthropic.claude-3-5-sonnet-20240620-v1:0": {
+    "input_cost_per_token": 0.0000036,
+    "output_cost_per_token": 0.000018,
+    "cache_read_input_token_cost": 3.6e-7,
+    "cache_creation_input_token_cost": 0.0000045,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-east-1/anthropic.claude-3-haiku-20240307-v1:0": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000015,
+    "cache_read_input_token_cost": 3e-8,
+    "cache_creation_input_token_cost": 3.75e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-east-1/anthropic.claude-sonnet-4-5-20250929-v1:0": {
+    "input_cost_per_token": 0.0000033,
+    "output_cost_per_token": 0.0000165,
+    "cache_read_input_token_cost": 3.3e-7,
+    "cache_creation_input_token_cost": 0.000004125,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-east-1/claude-sonnet-4-5-20250929-v1:0": {
+    "input_cost_per_token": 0.0000033,
+    "output_cost_per_token": 0.0000165,
+    "cache_read_input_token_cost": 3.3e-7,
+    "cache_creation_input_token_cost": 0.000004125,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-east-1/meta.llama3-70b-instruct-v1:0": {
+    "input_cost_per_token": 0.00000265,
+    "output_cost_per_token": 0.0000035,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8000,
+    "max_output_tokens": 2048,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-east-1/meta.llama3-8b-instruct-v1:0": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.00000265,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8000,
+    "max_output_tokens": 2048,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-west-1/amazon.nova-pro-v1:0": {
+    "input_cost_per_token": 9.6e-7,
+    "output_cost_per_token": 0.00000384,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 300000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-west-1/amazon.titan-text-express-v1": {
+    "input_cost_per_token": 0.0000013,
+    "output_cost_per_token": 0.0000017,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 42000,
+    "max_output_tokens": 8000,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-west-1/amazon.titan-text-lite-v1": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 4e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 42000,
+    "max_output_tokens": 4000,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-west-1/amazon.titan-text-premier-v1:0": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 42000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-west-1/anthropic.claude-3-7-sonnet-20250219-v1:0": {
+    "input_cost_per_token": 0.0000036,
+    "output_cost_per_token": 0.000018,
+    "cache_read_input_token_cost": 3.6e-7,
+    "cache_creation_input_token_cost": 0.0000045,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-west-1/anthropic.claude-3-5-sonnet-20240620-v1:0": {
+    "input_cost_per_token": 0.0000036,
+    "output_cost_per_token": 0.000018,
+    "cache_read_input_token_cost": 3.6e-7,
+    "cache_creation_input_token_cost": 0.0000045,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-west-1/anthropic.claude-3-haiku-20240307-v1:0": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000015,
+    "cache_read_input_token_cost": 3e-8,
+    "cache_creation_input_token_cost": 3.75e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-west-1/anthropic.claude-sonnet-4-5-20250929-v1:0": {
+    "input_cost_per_token": 0.0000033,
+    "output_cost_per_token": 0.0000165,
+    "cache_read_input_token_cost": 3.3e-7,
+    "cache_creation_input_token_cost": 0.000004125,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-west-1/claude-sonnet-4-5-20250929-v1:0": {
+    "input_cost_per_token": 0.0000033,
+    "output_cost_per_token": 0.0000165,
+    "cache_read_input_token_cost": 3.3e-7,
+    "cache_creation_input_token_cost": 0.000004125,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-west-1/meta.llama3-70b-instruct-v1:0": {
+    "input_cost_per_token": 0.00000265,
+    "output_cost_per_token": 0.0000035,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8000,
+    "max_output_tokens": 2048,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-west-1/meta.llama3-8b-instruct-v1:0": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.00000265,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8000,
+    "max_output_tokens": 2048,
+    "mode": "chat"
+  },
+  "bedrock/us-west-1/meta.llama3-70b-instruct-v1:0": {
+    "input_cost_per_token": 0.00000265,
+    "output_cost_per_token": 0.0000035,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-west-1/meta.llama3-8b-instruct-v1:0": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-west-2/anthropic.claude-instant-v1": {
+    "input_cost_per_token": 8e-7,
+    "output_cost_per_token": 0.0000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/us-west-2/anthropic.claude-v1": {
+    "input_cost_per_token": 0.000008,
+    "output_cost_per_token": 0.000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/us-west-2/anthropic.claude-v2:1": {
+    "input_cost_per_token": 0.000008,
+    "output_cost_per_token": 0.000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 100000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/us-west-2/mistral.mistral-7b-instruct-v0:2": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 2e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/us-west-2/mistral.mistral-large-2402-v1:0": {
+    "input_cost_per_token": 0.000008,
+    "output_cost_per_token": 0.000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/us-west-2/mistral.mixtral-8x7b-instruct-v0:1": {
+    "input_cost_per_token": 4.5e-7,
+    "output_cost_per_token": 7e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "bedrock/us-west-2/deepseek.v3.2": {
+    "input_cost_per_token": 6.2e-7,
+    "output_cost_per_token": 0.00000185,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "mode": "chat"
+  },
+  "bedrock/us-west-2/minimax.minimax-m2.1": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 196000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-west-2/minimax.minimax-m2.5": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us-west-2/moonshotai.kimi-k2-thinking": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000025,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/us-west-2/moonshotai.kimi-k2.5": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.000003,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "bedrock/us-west-2/qwen.qwen3-coder-next": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "bedrock/us.anthropic.claude-3-5-haiku-20241022-v1:0": {
+    "input_cost_per_token": 8e-7,
+    "output_cost_per_token": 0.000004,
+    "cache_read_input_token_cost": 8e-8,
+    "cache_creation_input_token_cost": 0.000001,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "chatgpt-4o-latest": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000015,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "claude-haiku-4-5-20251001": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000005,
+    "cache_read_input_token_cost": 1e-7,
+    "cache_creation_input_token_cost": 0.00000125,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "claude-haiku-4-5": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000005,
+    "cache_read_input_token_cost": 1e-7,
+    "cache_creation_input_token_cost": 0.00000125,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "claude-3-7-sonnet-20250219": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "claude-3-haiku-20240307": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.00000125,
+    "cache_read_input_token_cost": 3e-8,
+    "cache_creation_input_token_cost": 3e-7,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
   },
   "claude-3-opus-20240229": {
     "input_cost_per_token": 0.000015,
     "output_cost_per_token": 0.000075,
     "cache_read_input_token_cost": 0.0000015,
-    "cache_creation_input_token_cost": 0.00001875
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "claude-4-opus-20250514": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "claude-4-sonnet-20250514": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "claude-sonnet-4-5": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "claude-sonnet-4-5-20250929": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "claude-sonnet-4-6": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "claude-sonnet-4-5-20250929-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "claude-opus-4-1": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "claude-opus-4-1-20250805": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "claude-opus-4-20250514": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "claude-opus-4-5-20251101": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "claude-opus-4-5": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "claude-opus-4-6": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "claude-opus-4-6-20260205": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "claude-opus-4-7": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "claude-opus-4-7-20260416": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "claude-sonnet-4-20250514": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "cohere.command-light-text-v14": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "cohere.command-r-plus-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "cohere.command-r-v1:0": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "cohere.command-text-v14": {
+    "input_cost_per_token": 0.0000015,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "command": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "cohere",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "completion"
+  },
+  "command-a-03-2025": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "cohere_chat",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 8000,
+    "mode": "chat"
+  },
+  "command-light": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "cohere_chat",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "command-nightly": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "cohere",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "completion"
+  },
+  "command-r": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "cohere_chat",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "command-r-08-2024": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "cohere_chat",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "command-r-plus": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "cohere_chat",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "command-r-plus-08-2024": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "cohere_chat",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "command-r7b-12-2024": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 3.75e-8,
+    "litellm_provider": "cohere_chat",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "deepseek-chat": {
+    "input_cost_per_token": 2.8e-7,
+    "output_cost_per_token": 4.2e-7,
+    "cache_read_input_token_cost": 2.8e-8,
+    "litellm_provider": "deepseek",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "deepseek-reasoner": {
+    "input_cost_per_token": 2.8e-7,
+    "output_cost_per_token": 4.2e-7,
+    "cache_read_input_token_cost": 2.8e-8,
+    "litellm_provider": "deepseek",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "davinci-002": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "text-completion-openai",
+    "max_input_tokens": 16384,
+    "max_output_tokens": 4096,
+    "mode": "completion"
+  },
+  "deepseek/deepseek-chat": {
+    "input_cost_per_token": 2.8e-7,
+    "output_cost_per_token": 4.2e-7,
+    "cache_read_input_token_cost": 2.8e-8,
+    "litellm_provider": "deepseek",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "deepseek/deepseek-coder": {
+    "input_cost_per_token": 1.4e-7,
+    "output_cost_per_token": 2.8e-7,
+    "litellm_provider": "deepseek",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "deepseek/deepseek-r1": {
+    "input_cost_per_token": 5.5e-7,
+    "output_cost_per_token": 0.00000219,
+    "litellm_provider": "deepseek",
+    "max_input_tokens": 65536,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "deepseek/deepseek-reasoner": {
+    "input_cost_per_token": 2.8e-7,
+    "output_cost_per_token": 4.2e-7,
+    "cache_read_input_token_cost": 2.8e-8,
+    "litellm_provider": "deepseek",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "deepseek/deepseek-v3": {
+    "input_cost_per_token": 2.7e-7,
+    "output_cost_per_token": 0.0000011,
+    "cache_read_input_token_cost": 7e-8,
+    "litellm_provider": "deepseek",
+    "max_input_tokens": 65536,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "deepseek/deepseek-v3.2": {
+    "input_cost_per_token": 2.8e-7,
+    "output_cost_per_token": 4e-7,
+    "litellm_provider": "deepseek",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "mode": "chat"
+  },
+  "deepseek.v3-v1:0": {
+    "input_cost_per_token": 5.8e-7,
+    "output_cost_per_token": 0.00000168,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 81920,
+    "mode": "chat"
+  },
+  "deepseek.v3.2": {
+    "input_cost_per_token": 6.2e-7,
+    "output_cost_per_token": 0.00000185,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "mode": "chat"
+  },
+  "eu.amazon.nova-lite-v1:0": {
+    "input_cost_per_token": 7.8e-8,
+    "output_cost_per_token": 3.12e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 300000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "eu.amazon.nova-micro-v1:0": {
+    "input_cost_per_token": 4.6e-8,
+    "output_cost_per_token": 1.84e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "eu.amazon.nova-pro-v1:0": {
+    "input_cost_per_token": 0.00000105,
+    "output_cost_per_token": 0.0000042,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 300000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-3-5-haiku-20241022-v1:0": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.00000125,
+    "cache_read_input_token_cost": 2.5e-8,
+    "cache_creation_input_token_cost": 3.125e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-haiku-4-5-20251001-v1:0": {
+    "input_cost_per_token": 0.0000011,
+    "output_cost_per_token": 0.0000055,
+    "cache_read_input_token_cost": 1.1e-7,
+    "cache_creation_input_token_cost": 0.000001375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-3-5-sonnet-20240620-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-3-5-sonnet-20241022-v2:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-3-7-sonnet-20250219-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-3-haiku-20240307-v1:0": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.00000125,
+    "cache_read_input_token_cost": 2.5e-8,
+    "cache_creation_input_token_cost": 3.125e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-3-opus-20240229-v1:0": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-3-sonnet-20240229-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-opus-4-1-20250805-v1:0": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-opus-4-20250514-v1:0": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-sonnet-4-20250514-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-sonnet-4-5-20250929-v1:0": {
+    "input_cost_per_token": 0.0000033,
+    "output_cost_per_token": 0.0000165,
+    "cache_read_input_token_cost": 3.3e-7,
+    "cache_creation_input_token_cost": 0.000004125,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "eu.meta.llama3-2-1b-instruct-v1:0": {
+    "input_cost_per_token": 1.3e-7,
+    "output_cost_per_token": 1.3e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "eu.meta.llama3-2-3b-instruct-v1:0": {
+    "input_cost_per_token": 1.9e-7,
+    "output_cost_per_token": 1.9e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "eu.mistral.pixtral-large-2502-v1:0": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "ft:babbage-002": {
+    "input_cost_per_token": 0.0000016,
+    "output_cost_per_token": 0.0000016,
+    "litellm_provider": "text-completion-openai",
+    "max_input_tokens": 16384,
+    "max_output_tokens": 4096,
+    "mode": "completion"
+  },
+  "ft:davinci-002": {
+    "input_cost_per_token": 0.000012,
+    "output_cost_per_token": 0.000012,
+    "litellm_provider": "text-completion-openai",
+    "max_input_tokens": 16384,
+    "max_output_tokens": 4096,
+    "mode": "completion"
+  },
+  "ft:gpt-3.5-turbo": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "openai",
+    "max_input_tokens": 16385,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "ft:gpt-3.5-turbo-0125": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "openai",
+    "max_input_tokens": 16385,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "ft:gpt-3.5-turbo-0613": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "openai",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "ft:gpt-3.5-turbo-1106": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "openai",
+    "max_input_tokens": 16385,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "ft:gpt-4-0613": {
+    "input_cost_per_token": 0.00003,
+    "output_cost_per_token": 0.00006,
+    "litellm_provider": "openai",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "ft:gpt-4o-2024-08-06": {
+    "input_cost_per_token": 0.00000375,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 0.000001875,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "ft:gpt-4o-2024-11-20": {
+    "input_cost_per_token": 0.00000375,
+    "output_cost_per_token": 0.000015,
+    "cache_creation_input_token_cost": 0.000001875,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "ft:gpt-4o-mini-2024-07-18": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000012,
+    "cache_read_input_token_cost": 1.5e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "ft:gpt-4.1-2025-04-14": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000012,
+    "cache_read_input_token_cost": 7.5e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 1047576,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "ft:gpt-4.1-mini-2025-04-14": {
+    "input_cost_per_token": 8e-7,
+    "output_cost_per_token": 0.0000032,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 1047576,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "ft:gpt-4.1-nano-2025-04-14": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 8e-7,
+    "cache_read_input_token_cost": 5e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 1047576,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "ft:o4-mini-2025-04-16": {
+    "input_cost_per_token": 0.000004,
+    "output_cost_per_token": 0.000016,
+    "cache_read_input_token_cost": 0.000001,
+    "litellm_provider": "openai",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 100000,
+    "mode": "chat"
+  },
+  "gemini-2.0-flash": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 2.5e-8,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini-2.0-flash-001": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "cache_read_input_token_cost": 3.75e-8,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini-2.0-flash-lite": {
+    "input_cost_per_token": 7.5e-8,
+    "output_cost_per_token": 3e-7,
+    "cache_read_input_token_cost": 1.875e-8,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini-2.0-flash-lite-001": {
+    "input_cost_per_token": 7.5e-8,
+    "output_cost_per_token": 3e-7,
+    "cache_read_input_token_cost": 1.875e-8,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini-2.5-flash": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "cache_read_input_token_cost": 3e-8,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini-3.1-flash-lite-preview": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.0000015,
+    "cache_read_input_token_cost": 2.5e-8,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "gemini-2.5-flash-lite": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 1e-8,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini-2.5-flash-lite-preview-09-2025": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 1e-8,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini-2.5-flash-preview-09-2025": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini-2.5-flash-lite-preview-06-17": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 2.5e-8,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini-2.5-pro": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini-3-pro-preview": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000012,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini-3.1-pro-preview": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000012,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "gemini-3.1-pro-preview-customtools": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000012,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "vertex_ai/gemini-3-pro-preview": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000012,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "vertex_ai",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "vertex_ai/gemini-3-flash-preview": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.000003,
+    "cache_read_input_token_cost": 5e-8,
+    "litellm_provider": "vertex_ai",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "vertex_ai/gemini-3.1-pro-preview": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000012,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "vertex_ai",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "vertex_ai/gemini-3.1-pro-preview-customtools": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000012,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "vertex_ai",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "gemini-2.5-pro-preview-tts": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini-robotics-er-1.5-preview": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-robotics-er-1.5-preview": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini-2.5-computer-use-preview-10-2025": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.0-flash": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 2.5e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.0-flash-001": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 2.5e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.0-flash-lite": {
+    "input_cost_per_token": 7.5e-8,
+    "output_cost_per_token": 3e-7,
+    "cache_read_input_token_cost": 1.875e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.5-flash": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "cache_read_input_token_cost": 3e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.5-flash-lite": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 1e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.5-flash-lite-preview-09-2025": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 1e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.5-flash-preview-09-2025": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-flash-latest": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-flash-lite-latest": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 2.5e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.5-flash-lite-preview-06-17": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 2.5e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.5-pro": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.5-computer-use-preview-10-2025": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "gemini/gemini-3-pro-preview": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000012,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-3.1-flash-lite-preview": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.0000015,
+    "cache_read_input_token_cost": 2.5e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "gemini/gemini-3-flash-preview": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.000003,
+    "cache_read_input_token_cost": 5e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-3.1-pro-preview": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000012,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "gemini/gemini-3.1-pro-preview-customtools": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000012,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "gemini-3-flash-preview": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.000003,
+    "cache_read_input_token_cost": 5e-8,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.5-pro-preview-tts": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-gemma-2-27b-it": {
+    "input_cost_per_token": 3.5e-7,
+    "output_cost_per_token": 0.00000105,
+    "litellm_provider": "gemini",
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini/gemini-gemma-2-9b-it": {
+    "input_cost_per_token": 3.5e-7,
+    "output_cost_per_token": 0.00000105,
+    "litellm_provider": "gemini",
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "google.gemma-3-12b-it": {
+    "input_cost_per_token": 9e-8,
+    "output_cost_per_token": 2.9e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "google.gemma-3-27b-it": {
+    "input_cost_per_token": 2.3e-7,
+    "output_cost_per_token": 3.8e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "google.gemma-3-4b-it": {
+    "input_cost_per_token": 4e-8,
+    "output_cost_per_token": 8e-8,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "global.anthropic.claude-sonnet-4-5-20250929-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "global.anthropic.claude-sonnet-4-20250514-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "global.anthropic.claude-haiku-4-5-20251001-v1:0": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000005,
+    "cache_read_input_token_cost": 1e-7,
+    "cache_creation_input_token_cost": 0.00000125,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "global.amazon.nova-2-lite-v1:0": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "gpt-3.5-turbo": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "openai",
+    "max_input_tokens": 16385,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-3.5-turbo-0125": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "openai",
+    "max_input_tokens": 16385,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-3.5-turbo-1106": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "openai",
+    "max_input_tokens": 16385,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-3.5-turbo-16k": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000004,
+    "litellm_provider": "openai",
+    "max_input_tokens": 16385,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-3.5-turbo-instruct": {
+    "input_cost_per_token": 0.0000015,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "text-completion-openai",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 4096,
+    "mode": "completion"
+  },
+  "gpt-3.5-turbo-instruct-0914": {
+    "input_cost_per_token": 0.0000015,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "text-completion-openai",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 4097,
+    "mode": "completion"
+  },
+  "gpt-4": {
+    "input_cost_per_token": 0.00003,
+    "output_cost_per_token": 0.00006,
+    "litellm_provider": "openai",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4-0125-preview": {
+    "input_cost_per_token": 0.00001,
+    "output_cost_per_token": 0.00003,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4-0314": {
+    "input_cost_per_token": 0.00003,
+    "output_cost_per_token": 0.00006,
+    "litellm_provider": "openai",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4-0613": {
+    "input_cost_per_token": 0.00003,
+    "output_cost_per_token": 0.00006,
+    "litellm_provider": "openai",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4-1106-preview": {
+    "input_cost_per_token": 0.00001,
+    "output_cost_per_token": 0.00003,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4-turbo": {
+    "input_cost_per_token": 0.00001,
+    "output_cost_per_token": 0.00003,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4-turbo-2024-04-09": {
+    "input_cost_per_token": 0.00001,
+    "output_cost_per_token": 0.00003,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4-turbo-preview": {
+    "input_cost_per_token": 0.00001,
+    "output_cost_per_token": 0.00003,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4.1": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000008,
+    "cache_read_input_token_cost": 5e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 1047576,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "gpt-4.1-2025-04-14": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000008,
+    "cache_read_input_token_cost": 5e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 1047576,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "gpt-4.1-mini": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.0000016,
+    "cache_read_input_token_cost": 1e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 1047576,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "gpt-4.1-mini-2025-04-14": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.0000016,
+    "cache_read_input_token_cost": 1e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 1047576,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "gpt-4.1-nano": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 2.5e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 1047576,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "gpt-4.1-nano-2025-04-14": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 2.5e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 1047576,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "gpt-4o": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 0.00000125,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-4o-2024-05-13": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000015,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4o-2024-08-06": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 0.00000125,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-4o-2024-11-20": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 0.00000125,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-4o-audio-preview": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-4o-audio-preview-2024-12-17": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-4o-audio-preview-2025-06-03": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-audio": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-audio-1.5": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-audio-2025-08-28": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-audio-mini": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000024,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-audio-mini-2025-10-06": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000024,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-audio-mini-2025-12-15": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000024,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-4o-mini": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-4o-mini-2024-07-18": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-4o-mini-audio-preview": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-4o-mini-audio-preview-2024-12-17": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-4o-mini-realtime-preview": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000024,
+    "cache_read_input_token_cost": 3e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4o-mini-realtime-preview-2024-12-17": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000024,
+    "cache_read_input_token_cost": 3e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4o-mini-search-preview": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-4o-mini-search-preview-2025-03-11": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-4o-realtime-preview": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.00002,
+    "cache_read_input_token_cost": 0.0000025,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4o-realtime-preview-2024-12-17": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.00002,
+    "cache_read_input_token_cost": 0.0000025,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4o-realtime-preview-2025-06-03": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.00002,
+    "cache_read_input_token_cost": 0.0000025,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-4o-search-preview": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 0.00000125,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-4o-search-preview-2025-03-11": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 0.00000125,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-5": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5.1": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5.1-2025-11-13": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5.1-chat-latest": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-5.2": {
+    "input_cost_per_token": 0.00000175,
+    "output_cost_per_token": 0.000014,
+    "cache_read_input_token_cost": 1.75e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5.2-2025-12-11": {
+    "input_cost_per_token": 0.00000175,
+    "output_cost_per_token": 0.000014,
+    "cache_read_input_token_cost": 1.75e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5.2-chat-latest": {
+    "input_cost_per_token": 0.00000175,
+    "output_cost_per_token": 0.000014,
+    "cache_read_input_token_cost": 1.75e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-5.3-chat-latest": {
+    "input_cost_per_token": 0.00000175,
+    "output_cost_per_token": 0.000014,
+    "cache_read_input_token_cost": 1.75e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-5.5": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.00003,
+    "cache_read_input_token_cost": 5e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 1050000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5.5-2026-04-23": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.00003,
+    "cache_read_input_token_cost": 5e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 1050000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5.4": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 2.5e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 1050000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5.4-2026-03-05": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 2.5e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 1050000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5.4-mini": {
+    "input_cost_per_token": 7.5e-7,
+    "output_cost_per_token": 0.0000045,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5.4-mini-2026-03-17": {
+    "input_cost_per_token": 7.5e-7,
+    "output_cost_per_token": 0.0000045,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5.4-nano": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 0.00000125,
+    "cache_read_input_token_cost": 2e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5.4-nano-2026-03-17": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 0.00000125,
+    "cache_read_input_token_cost": 2e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5-2025-08-07": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5-chat": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-5-chat-latest": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "gpt-5-mini": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.000002,
+    "cache_read_input_token_cost": 2.5e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5-mini-2025-08-07": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.000002,
+    "cache_read_input_token_cost": 2.5e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5-nano": {
+    "input_cost_per_token": 5e-8,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 5e-9,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5-nano-2025-08-07": {
+    "input_cost_per_token": 5e-8,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 5e-9,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-realtime": {
+    "input_cost_per_token": 0.000004,
+    "output_cost_per_token": 0.000016,
+    "cache_read_input_token_cost": 4e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-realtime-1.5": {
+    "input_cost_per_token": 0.000004,
+    "output_cost_per_token": 0.000016,
+    "cache_read_input_token_cost": 4e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-realtime-mini": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000024,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-realtime-2025-08-28": {
+    "input_cost_per_token": 0.000004,
+    "output_cost_per_token": 0.000016,
+    "cache_read_input_token_cost": 4e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "groq/llama-3.1-8b-instant": {
+    "input_cost_per_token": 5e-8,
+    "output_cost_per_token": 8e-8,
+    "litellm_provider": "groq",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "groq/llama-3.3-70b-versatile": {
+    "input_cost_per_token": 5.9e-7,
+    "output_cost_per_token": 7.9e-7,
+    "litellm_provider": "groq",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "groq/gemma-7b-it": {
+    "input_cost_per_token": 5e-8,
+    "output_cost_per_token": 8e-8,
+    "litellm_provider": "groq",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "groq/meta-llama/llama-guard-4-12b": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 2e-7,
+    "litellm_provider": "groq",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "groq/meta-llama/llama-4-maverick-17b-128e-instruct": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "groq",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "groq/meta-llama/llama-4-scout-17b-16e-instruct": {
+    "input_cost_per_token": 1.1e-7,
+    "output_cost_per_token": 3.4e-7,
+    "litellm_provider": "groq",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "groq/moonshotai/kimi-k2-instruct-0905": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000003,
+    "cache_read_input_token_cost": 5e-7,
+    "litellm_provider": "groq",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "groq/openai/gpt-oss-120b": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "groq",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 32766,
+    "mode": "chat"
+  },
+  "groq/openai/gpt-oss-20b": {
+    "input_cost_per_token": 7.5e-8,
+    "output_cost_per_token": 3e-7,
+    "cache_read_input_token_cost": 3.75e-8,
+    "litellm_provider": "groq",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "groq/openai/gpt-oss-safeguard-20b": {
+    "input_cost_per_token": 7.5e-8,
+    "output_cost_per_token": 3e-7,
+    "cache_read_input_token_cost": 3.7e-8,
+    "litellm_provider": "groq",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "groq/qwen/qwen3-32b": {
+    "input_cost_per_token": 2.9e-7,
+    "output_cost_per_token": 5.9e-7,
+    "litellm_provider": "groq",
+    "max_input_tokens": 131000,
+    "max_output_tokens": 131000,
+    "mode": "chat"
+  },
+  "jp.anthropic.claude-sonnet-4-5-20250929-v1:0": {
+    "input_cost_per_token": 0.0000033,
+    "output_cost_per_token": 0.0000165,
+    "cache_read_input_token_cost": 3.3e-7,
+    "cache_creation_input_token_cost": 0.000004125,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "jp.anthropic.claude-haiku-4-5-20251001-v1:0": {
+    "input_cost_per_token": 0.0000011,
+    "output_cost_per_token": 0.0000055,
+    "cache_read_input_token_cost": 1.1e-7,
+    "cache_creation_input_token_cost": 0.000001375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "meta.llama2-13b-chat-v1": {
+    "input_cost_per_token": 7.5e-7,
+    "output_cost_per_token": 0.000001,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "meta.llama2-70b-chat-v1": {
+    "input_cost_per_token": 0.00000195,
+    "output_cost_per_token": 0.00000256,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "meta.llama3-1-405b-instruct-v1:0": {
+    "input_cost_per_token": 0.00000532,
+    "output_cost_per_token": 0.000016,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "meta.llama3-1-70b-instruct-v1:0": {
+    "input_cost_per_token": 9.9e-7,
+    "output_cost_per_token": 9.9e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 2048,
+    "mode": "chat"
+  },
+  "meta.llama3-1-8b-instruct-v1:0": {
+    "input_cost_per_token": 2.2e-7,
+    "output_cost_per_token": 2.2e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 2048,
+    "mode": "chat"
+  },
+  "meta.llama3-2-11b-instruct-v1:0": {
+    "input_cost_per_token": 3.5e-7,
+    "output_cost_per_token": 3.5e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "meta.llama3-2-1b-instruct-v1:0": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 1e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "meta.llama3-2-3b-instruct-v1:0": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 1.5e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "meta.llama3-2-90b-instruct-v1:0": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "meta.llama3-3-70b-instruct-v1:0": {
+    "input_cost_per_token": 7.2e-7,
+    "output_cost_per_token": 7.2e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "meta.llama3-70b-instruct-v1:0": {
+    "input_cost_per_token": 0.00000265,
+    "output_cost_per_token": 0.0000035,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "meta.llama3-8b-instruct-v1:0": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "meta.llama4-maverick-17b-instruct-v1:0": {
+    "input_cost_per_token": 2.4e-7,
+    "output_cost_per_token": 9.7e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "meta.llama4-scout-17b-instruct-v1:0": {
+    "input_cost_per_token": 1.7e-7,
+    "output_cost_per_token": 6.6e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "minimax.minimax-m2": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "minimax.minimax-m2.1": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 196000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "minimax.minimax-m2.5": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "mistral.devstral-2-123b": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "mistral.magistral-small-2509": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "mistral.ministral-3-14b-instruct": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 2e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "mistral.ministral-3-3b-instruct": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 1e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "mistral.ministral-3-8b-instruct": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 1.5e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "mistral.mistral-7b-instruct-v0:2": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 2e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral.mistral-large-2402-v1:0": {
+    "input_cost_per_token": 0.000008,
+    "output_cost_per_token": 0.000024,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral.mistral-large-2407-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000009,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral.mistral-large-3-675b-instruct": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "mistral.mistral-small-2402-v1:0": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000003,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral.mixtral-8x7b-instruct-v0:1": {
+    "input_cost_per_token": 4.5e-7,
+    "output_cost_per_token": 7e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral.voxtral-mini-3b-2507": {
+    "input_cost_per_token": 4e-8,
+    "output_cost_per_token": 4e-8,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "mistral.voxtral-small-24b-2507": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 3e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "mistral/codestral-2405": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000003,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral/codestral-2508": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 9e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "mistral/codestral-latest": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000003,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral/codestral-mamba-latest": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 2.5e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "mistral/devstral-medium-2507": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "mistral/devstral-small-2505": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 3e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "mistral/devstral-small-2507": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 3e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "mistral/devstral-small-latest": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 3e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "mistral/labs-devstral-small-2512": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 3e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "mistral/devstral-latest": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "mistral/devstral-medium-latest": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "mistral/devstral-2512": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "mistral/magistral-medium-2506": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000005,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 40000,
+    "max_output_tokens": 40000,
+    "mode": "chat"
+  },
+  "mistral/magistral-medium-2509": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000005,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 40000,
+    "max_output_tokens": 40000,
+    "mode": "chat"
+  },
+  "mistral/magistral-medium-1-2-2509": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000005,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 40000,
+    "max_output_tokens": 40000,
+    "mode": "chat"
+  },
+  "mistral/magistral-medium-latest": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000005,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 40000,
+    "max_output_tokens": 40000,
+    "mode": "chat"
+  },
+  "mistral/magistral-small-2506": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 40000,
+    "max_output_tokens": 40000,
+    "mode": "chat"
+  },
+  "mistral/magistral-small-latest": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 40000,
+    "max_output_tokens": 40000,
+    "mode": "chat"
+  },
+  "mistral/magistral-small-1-2-2509": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 40000,
+    "max_output_tokens": 40000,
+    "mode": "chat"
+  },
+  "mistral/mistral-large-2402": {
+    "input_cost_per_token": 0.000004,
+    "output_cost_per_token": 0.000012,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral/mistral-large-2407": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000009,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "mistral/mistral-large-2411": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "mistral/mistral-large-latest": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "mistral/mistral-large-3": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "mistral/mistral-large-2512": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "mistral/mistral-medium": {
+    "input_cost_per_token": 0.0000027,
+    "output_cost_per_token": 0.0000081,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral/mistral-medium-2312": {
+    "input_cost_per_token": 0.0000027,
+    "output_cost_per_token": 0.0000081,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral/mistral-medium-2505": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral/mistral-medium-latest": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "mistral/mistral-medium-3-1-2508": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "mistral/mistral-small": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 3e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral/mistral-small-latest": {
+    "input_cost_per_token": 6e-8,
+    "output_cost_per_token": 1.8e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "mistral/mistral-small-3-2-2506": {
+    "input_cost_per_token": 6e-8,
+    "output_cost_per_token": 1.8e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "mistral/ministral-3-3b-2512": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 1e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "mistral/ministral-3-8b-2512": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 1.5e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "mistral/ministral-3-14b-2512": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 2e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "mistral/mistral-tiny": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 2.5e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral/open-codestral-mamba": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 2.5e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "mistral/open-mistral-7b": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 2.5e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral/open-mistral-nemo": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 3e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "mistral/open-mistral-nemo-2407": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 3e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "mistral/open-mixtral-8x22b": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 65336,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral/open-mixtral-8x7b": {
+    "input_cost_per_token": 7e-7,
+    "output_cost_per_token": 7e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "mistral/pixtral-12b-2409": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 1.5e-7,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "mistral/pixtral-large-2411": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "mistral/pixtral-large-latest": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "mistral",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "moonshot.kimi-k2-thinking": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000025,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "moonshotai.kimi-k2.5": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.000003,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "nvidia.nemotron-nano-12b-v2": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "nvidia.nemotron-nano-9b-v2": {
+    "input_cost_per_token": 6e-8,
+    "output_cost_per_token": 2.3e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "nvidia.nemotron-nano-3-30b": {
+    "input_cost_per_token": 6e-8,
+    "output_cost_per_token": 2.4e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "nvidia.nemotron-super-3-120b": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6.5e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "o1": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.00006,
+    "cache_read_input_token_cost": 0.0000075,
+    "litellm_provider": "openai",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 100000,
+    "mode": "chat"
+  },
+  "o1-2024-12-17": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.00006,
+    "cache_read_input_token_cost": 0.0000075,
+    "litellm_provider": "openai",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 100000,
+    "mode": "chat"
+  },
+  "o3": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000008,
+    "cache_read_input_token_cost": 5e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 100000,
+    "mode": "chat"
+  },
+  "o3-2025-04-16": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000008,
+    "cache_read_input_token_cost": 5e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 100000,
+    "mode": "chat"
+  },
+  "o3-mini": {
+    "input_cost_per_token": 0.0000011,
+    "output_cost_per_token": 0.0000044,
+    "cache_read_input_token_cost": 5.5e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 100000,
+    "mode": "chat"
+  },
+  "o3-mini-2025-01-31": {
+    "input_cost_per_token": 0.0000011,
+    "output_cost_per_token": 0.0000044,
+    "cache_read_input_token_cost": 5.5e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 100000,
+    "mode": "chat"
+  },
+  "o4-mini": {
+    "input_cost_per_token": 0.0000011,
+    "output_cost_per_token": 0.0000044,
+    "cache_read_input_token_cost": 2.75e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 100000,
+    "mode": "chat"
+  },
+  "o4-mini-2025-04-16": {
+    "input_cost_per_token": 0.0000011,
+    "output_cost_per_token": 0.0000044,
+    "cache_read_input_token_cost": 2.75e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 100000,
+    "mode": "chat"
+  },
+  "openai.gpt-oss-120b-1:0": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "openai.gpt-oss-20b-1:0": {
+    "input_cost_per_token": 7e-8,
+    "output_cost_per_token": 3e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "openai.gpt-oss-safeguard-120b": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "openai.gpt-oss-safeguard-20b": {
+    "input_cost_per_token": 7e-8,
+    "output_cost_per_token": 2e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "perplexity/codellama-34b-instruct": {
+    "input_cost_per_token": 3.5e-7,
+    "output_cost_per_token": 0.0000014,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 16384,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "perplexity/codellama-70b-instruct": {
+    "input_cost_per_token": 7e-7,
+    "output_cost_per_token": 0.0000028,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 16384,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "perplexity/llama-2-70b-chat": {
+    "input_cost_per_token": 7e-7,
+    "output_cost_per_token": 0.0000028,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "perplexity/llama-3.1-70b-instruct": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000001,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "perplexity/llama-3.1-8b-instruct": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 2e-7,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "perplexity/mistral-7b-instruct": {
+    "input_cost_per_token": 7e-8,
+    "output_cost_per_token": 2.8e-7,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "perplexity/mixtral-8x7b-instruct": {
+    "input_cost_per_token": 7e-8,
+    "output_cost_per_token": 2.8e-7,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "perplexity/pplx-70b-chat": {
+    "input_cost_per_token": 7e-7,
+    "output_cost_per_token": 0.0000028,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "perplexity/pplx-70b-online": {
+    "input_cost_per_token": 0,
+    "output_cost_per_token": 0.0000028,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "perplexity/pplx-7b-chat": {
+    "input_cost_per_token": 7e-8,
+    "output_cost_per_token": 2.8e-7,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "perplexity/pplx-7b-online": {
+    "input_cost_per_token": 0,
+    "output_cost_per_token": 2.8e-7,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "perplexity/sonar": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000001,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 128000,
+    "mode": "chat"
+  },
+  "perplexity/sonar-deep-research": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000008,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 128000,
+    "mode": "chat"
+  },
+  "perplexity/sonar-medium-chat": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000018,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 16384,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "perplexity/sonar-medium-online": {
+    "input_cost_per_token": 0,
+    "output_cost_per_token": 0.0000018,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 12000,
+    "max_output_tokens": 12000,
+    "mode": "chat"
+  },
+  "perplexity/sonar-pro": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8000,
+    "mode": "chat"
+  },
+  "perplexity/sonar-reasoning": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000005,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 128000,
+    "mode": "chat"
+  },
+  "perplexity/sonar-reasoning-pro": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000008,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 128000,
+    "mode": "chat"
+  },
+  "perplexity/sonar-small-chat": {
+    "input_cost_per_token": 7e-8,
+    "output_cost_per_token": 2.8e-7,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 16384,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "perplexity/sonar-small-online": {
+    "input_cost_per_token": 0,
+    "output_cost_per_token": 2.8e-7,
+    "litellm_provider": "perplexity",
+    "max_input_tokens": 12000,
+    "max_output_tokens": 12000,
+    "mode": "chat"
+  },
+  "qwen.qwen3-coder-480b-a35b-v1:0": {
+    "input_cost_per_token": 2.2e-7,
+    "output_cost_per_token": 0.0000018,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 262000,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "qwen.qwen3-235b-a22b-2507-v1:0": {
+    "input_cost_per_token": 2.2e-7,
+    "output_cost_per_token": 8.8e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "qwen.qwen3-coder-30b-a3b-v1:0": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "qwen.qwen3-32b-v1:0": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "qwen.qwen3-next-80b-a3b": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "qwen.qwen3-vl-235b-a22b": {
+    "input_cost_per_token": 5.3e-7,
+    "output_cost_per_token": 0.00000266,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "qwen.qwen3-coder-next": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "text-unicorn": {
+    "input_cost_per_token": 0.00001,
+    "output_cost_per_token": 0.000028,
+    "litellm_provider": "vertex_ai-text-models",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 1024,
+    "mode": "completion"
+  },
+  "text-unicorn@001": {
+    "input_cost_per_token": 0.00001,
+    "output_cost_per_token": 0.000028,
+    "litellm_provider": "vertex_ai-text-models",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 1024,
+    "mode": "completion"
+  },
+  "us.amazon.nova-lite-v1:0": {
+    "input_cost_per_token": 6e-8,
+    "output_cost_per_token": 2.4e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 300000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "us.amazon.nova-micro-v1:0": {
+    "input_cost_per_token": 3.5e-8,
+    "output_cost_per_token": 1.4e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "us.amazon.nova-premier-v1:0": {
+    "input_cost_per_token": 0.0000025,
+    "output_cost_per_token": 0.0000125,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "us.amazon.nova-pro-v1:0": {
+    "input_cost_per_token": 8e-7,
+    "output_cost_per_token": 0.0000032,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 300000,
+    "max_output_tokens": 10000,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-3-5-haiku-20241022-v1:0": {
+    "input_cost_per_token": 8e-7,
+    "output_cost_per_token": 0.000004,
+    "cache_read_input_token_cost": 8e-8,
+    "cache_creation_input_token_cost": 0.000001,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-haiku-4-5-20251001-v1:0": {
+    "input_cost_per_token": 0.0000011,
+    "output_cost_per_token": 0.0000055,
+    "cache_read_input_token_cost": 1.1e-7,
+    "cache_creation_input_token_cost": 0.000001375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-3-5-sonnet-20240620-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-3-5-sonnet-20241022-v2:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-3-7-sonnet-20250219-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-3-haiku-20240307-v1:0": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.00000125,
+    "cache_read_input_token_cost": 2.5e-8,
+    "cache_creation_input_token_cost": 3.125e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-3-opus-20240229-v1:0": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-3-sonnet-20240229-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-opus-4-1-20250805-v1:0": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-sonnet-4-5-20250929-v1:0": {
+    "input_cost_per_token": 0.0000033,
+    "output_cost_per_token": 0.0000165,
+    "cache_read_input_token_cost": 3.3e-7,
+    "cache_creation_input_token_cost": 0.000004125,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0": {
+    "input_cost_per_token": 0.0000033,
+    "output_cost_per_token": 0.0000165,
+    "cache_read_input_token_cost": 3.3e-7,
+    "cache_creation_input_token_cost": 0.000004125,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "au.anthropic.claude-haiku-4-5-20251001-v1:0": {
+    "input_cost_per_token": 0.0000011,
+    "output_cost_per_token": 0.0000055,
+    "cache_read_input_token_cost": 1.1e-7,
+    "cache_creation_input_token_cost": 0.000001375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-opus-4-20250514-v1:0": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-opus-4-5-20251101-v1:0": {
+    "input_cost_per_token": 0.0000055,
+    "output_cost_per_token": 0.0000275,
+    "cache_read_input_token_cost": 5.5e-7,
+    "cache_creation_input_token_cost": 0.000006875,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "global.anthropic.claude-opus-4-5-20251101-v1:0": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "eu.anthropic.claude-opus-4-5-20251101-v1:0": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "us.anthropic.claude-sonnet-4-20250514-v1:0": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "us.deepseek.r1-v1:0": {
+    "input_cost_per_token": 0.00000135,
+    "output_cost_per_token": 0.0000054,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.deepseek.v3.2": {
+    "input_cost_per_token": 6.2e-7,
+    "output_cost_per_token": 0.00000185,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "mode": "chat"
+  },
+  "eu.deepseek.v3.2": {
+    "input_cost_per_token": 7.4e-7,
+    "output_cost_per_token": 0.00000222,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "mode": "chat"
+  },
+  "us.meta.llama3-1-405b-instruct-v1:0": {
+    "input_cost_per_token": 0.00000532,
+    "output_cost_per_token": 0.000016,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.meta.llama3-1-70b-instruct-v1:0": {
+    "input_cost_per_token": 9.9e-7,
+    "output_cost_per_token": 9.9e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 2048,
+    "mode": "chat"
+  },
+  "us.meta.llama3-1-8b-instruct-v1:0": {
+    "input_cost_per_token": 2.2e-7,
+    "output_cost_per_token": 2.2e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 2048,
+    "mode": "chat"
+  },
+  "us.meta.llama3-2-11b-instruct-v1:0": {
+    "input_cost_per_token": 3.5e-7,
+    "output_cost_per_token": 3.5e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.meta.llama3-2-1b-instruct-v1:0": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 1e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.meta.llama3-2-3b-instruct-v1:0": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 1.5e-7,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.meta.llama3-2-90b-instruct-v1:0": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.meta.llama3-3-70b-instruct-v1:0": {
+    "input_cost_per_token": 7.2e-7,
+    "output_cost_per_token": 7.2e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.meta.llama4-maverick-17b-instruct-v1:0": {
+    "input_cost_per_token": 2.4e-7,
+    "output_cost_per_token": 9.7e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.meta.llama4-scout-17b-instruct-v1:0": {
+    "input_cost_per_token": 1.7e-7,
+    "output_cost_per_token": 6.6e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "us.mistral.pixtral-large-2502-v1:0": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-3-5-haiku": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000005,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-3-5-haiku@20241022": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000005,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-haiku-4-5": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000005,
+    "cache_read_input_token_cost": 1e-7,
+    "cache_creation_input_token_cost": 0.00000125,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-haiku-4-5@20251001": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000005,
+    "cache_read_input_token_cost": 1e-7,
+    "cache_creation_input_token_cost": 0.00000125,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-3-5-sonnet": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-3-5-sonnet@20240620": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-3-7-sonnet@20250219": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-3-haiku": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.00000125,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-3-haiku@20240307": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.00000125,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-3-opus": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-3-opus@20240229": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-3-sonnet": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-3-sonnet@20240229": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-opus-4": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-opus-4-1": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-opus-4-1@20250805": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-opus-4-5": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-opus-4-5@20251101": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-opus-4-6": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-opus-4-6@default": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-opus-4-7": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-opus-4-7@default": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 5e-7,
+    "cache_creation_input_token_cost": 0.00000625,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-sonnet-4-5": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-sonnet-4-6": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-sonnet-4-5@20250929": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-opus-4@20250514": {
+    "input_cost_per_token": 0.000015,
+    "output_cost_per_token": 0.000075,
+    "cache_read_input_token_cost": 0.0000015,
+    "cache_creation_input_token_cost": 0.00001875,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 32000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-sonnet-4": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-sonnet-4@20250514": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "vertex_ai/mistralai/codestral-2@001": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 9e-7,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/codestral-2": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 9e-7,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/codestral-2@001": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 9e-7,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/mistralai/codestral-2": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 9e-7,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/codestral-2501": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/codestral@2405": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/codestral@latest": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/deepseek-ai/deepseek-v3.1-maas": {
+    "input_cost_per_token": 0.00000135,
+    "output_cost_per_token": 0.0000054,
+    "litellm_provider": "vertex_ai-deepseek_models",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "vertex_ai/deepseek-ai/deepseek-v3.2-maas": {
+    "input_cost_per_token": 5.6e-7,
+    "output_cost_per_token": 0.00000168,
+    "litellm_provider": "vertex_ai-deepseek_models",
+    "max_input_tokens": 163840,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "vertex_ai/deepseek-ai/deepseek-r1-0528-maas": {
+    "input_cost_per_token": 0.00000135,
+    "output_cost_per_token": 0.0000054,
+    "litellm_provider": "vertex_ai-deepseek_models",
+    "max_input_tokens": 65336,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "vertex_ai/gemini-3.1-flash-lite-preview": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.0000015,
+    "cache_read_input_token_cost": 2.5e-8,
+    "litellm_provider": "vertex_ai-language-models",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "vertex_ai/jamba-1.5": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 4e-7,
+    "litellm_provider": "vertex_ai-ai21_models",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "vertex_ai/jamba-1.5-large": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000008,
+    "litellm_provider": "vertex_ai-ai21_models",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "vertex_ai/jamba-1.5-large@001": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000008,
+    "litellm_provider": "vertex_ai-ai21_models",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "vertex_ai/jamba-1.5-mini": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 4e-7,
+    "litellm_provider": "vertex_ai-ai21_models",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "vertex_ai/jamba-1.5-mini@001": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 4e-7,
+    "litellm_provider": "vertex_ai-ai21_models",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "vertex_ai/meta/llama-3.1-405b-instruct-maas": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000016,
+    "litellm_provider": "vertex_ai-llama_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 2048,
+    "mode": "chat"
+  },
+  "vertex_ai/meta/llama-4-maverick-17b-128e-instruct-maas": {
+    "input_cost_per_token": 3.5e-7,
+    "output_cost_per_token": 0.00000115,
+    "litellm_provider": "vertex_ai-llama_models",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 1000000,
+    "mode": "chat"
+  },
+  "vertex_ai/meta/llama-4-maverick-17b-16e-instruct-maas": {
+    "input_cost_per_token": 3.5e-7,
+    "output_cost_per_token": 0.00000115,
+    "litellm_provider": "vertex_ai-llama_models",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 1000000,
+    "mode": "chat"
+  },
+  "vertex_ai/meta/llama-4-scout-17b-128e-instruct-maas": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 7e-7,
+    "litellm_provider": "vertex_ai-llama_models",
+    "max_input_tokens": 10000000,
+    "max_output_tokens": 10000000,
+    "mode": "chat"
+  },
+  "vertex_ai/meta/llama-4-scout-17b-16e-instruct-maas": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 7e-7,
+    "litellm_provider": "vertex_ai-llama_models",
+    "max_input_tokens": 10000000,
+    "max_output_tokens": 10000000,
+    "mode": "chat"
+  },
+  "vertex_ai/minimaxai/minimax-m2-maas": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "vertex_ai-minimax_models",
+    "max_input_tokens": 196608,
+    "max_output_tokens": 196608,
+    "mode": "chat"
+  },
+  "vertex_ai/moonshotai/kimi-k2-thinking-maas": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000025,
+    "litellm_provider": "vertex_ai-moonshot_models",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "vertex_ai/zai-org/glm-4.7-maas": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000022,
+    "litellm_provider": "vertex_ai-zai_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/zai-org/glm-5-maas": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.0000032,
+    "cache_read_input_token_cost": 1e-7,
+    "litellm_provider": "vertex_ai-zai_models",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/mistral-medium-3": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "vertex_ai/mistral-medium-3@001": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "vertex_ai/mistralai/mistral-medium-3": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "vertex_ai/mistralai/mistral-medium-3@001": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "vertex_ai/mistral-large-2411": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "vertex_ai/mistral-large@2407": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "vertex_ai/mistral-large@2411-001": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "vertex_ai/mistral-large@latest": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "vertex_ai/mistral-nemo@2407": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000003,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/mistral-nemo@latest": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 1.5e-7,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/mistral-small-2503": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000003,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "vertex_ai/mistral-small-2503@001": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000003,
+    "litellm_provider": "vertex_ai-mistral_models",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
+  },
+  "vertex_ai/openai/gpt-oss-120b-maas": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "vertex_ai-openai_models",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "vertex_ai/openai/gpt-oss-20b-maas": {
+    "input_cost_per_token": 7.5e-8,
+    "output_cost_per_token": 3e-7,
+    "litellm_provider": "vertex_ai-openai_models",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "vertex_ai/qwen/qwen3-235b-a22b-instruct-2507-maas": {
+    "input_cost_per_token": 2.5e-7,
+    "output_cost_per_token": 0.000001,
+    "litellm_provider": "vertex_ai-qwen_models",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "vertex_ai/qwen/qwen3-coder-480b-a35b-instruct-maas": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.000004,
+    "litellm_provider": "vertex_ai-qwen_models",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "vertex_ai/qwen/qwen3-next-80b-a3b-instruct-maas": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "vertex_ai-qwen_models",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "vertex_ai/qwen/qwen3-next-80b-a3b-thinking-maas": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 0.0000012,
+    "litellm_provider": "vertex_ai-qwen_models",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
+  },
+  "xai/grok-2": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-2-1212": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-2-latest": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-2-vision": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "xai",
+    "max_input_tokens": 32768,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "xai/grok-2-vision-1212": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "xai",
+    "max_input_tokens": 32768,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "xai/grok-2-vision-latest": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.00001,
+    "litellm_provider": "xai",
+    "max_input_tokens": 32768,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "xai/grok-3": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 7.5e-7,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-3-beta": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 7.5e-7,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-3-fast-beta": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 0.00000125,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-3-fast-latest": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000025,
+    "cache_read_input_token_cost": 0.00000125,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-3-latest": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 7.5e-7,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-3-mini": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 5e-7,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-3-mini-beta": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 5e-7,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-3-mini-fast": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.000004,
+    "cache_read_input_token_cost": 1.5e-7,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-3-mini-fast-beta": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.000004,
+    "cache_read_input_token_cost": 1.5e-7,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-3-mini-fast-latest": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.000004,
+    "cache_read_input_token_cost": 1.5e-7,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-3-mini-latest": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 5e-7,
+    "cache_read_input_token_cost": 7.5e-8,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-4": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "litellm_provider": "xai",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "xai/grok-4-fast-reasoning": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 5e-7,
+    "cache_read_input_token_cost": 5e-8,
+    "litellm_provider": "xai",
+    "max_input_tokens": 2000000,
+    "max_output_tokens": 2000000,
+    "mode": "chat"
+  },
+  "xai/grok-4-fast-non-reasoning": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 5e-7,
+    "cache_read_input_token_cost": 5e-8,
+    "litellm_provider": "xai",
+    "max_input_tokens": 2000000,
+    "max_output_tokens": 2000000,
+    "mode": "chat"
+  },
+  "xai/grok-4-0709": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "litellm_provider": "xai",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "xai/grok-4-latest": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "litellm_provider": "xai",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "xai/grok-4-1-fast": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 5e-7,
+    "cache_read_input_token_cost": 5e-8,
+    "litellm_provider": "xai",
+    "max_input_tokens": 2000000,
+    "max_output_tokens": 2000000,
+    "mode": "chat"
+  },
+  "xai/grok-4-1-fast-reasoning": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 5e-7,
+    "cache_read_input_token_cost": 5e-8,
+    "litellm_provider": "xai",
+    "max_input_tokens": 2000000,
+    "max_output_tokens": 2000000,
+    "mode": "chat"
+  },
+  "xai/grok-4-1-fast-reasoning-latest": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 5e-7,
+    "cache_read_input_token_cost": 5e-8,
+    "litellm_provider": "xai",
+    "max_input_tokens": 2000000,
+    "max_output_tokens": 2000000,
+    "mode": "chat"
+  },
+  "xai/grok-4-1-fast-non-reasoning": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 5e-7,
+    "cache_read_input_token_cost": 5e-8,
+    "litellm_provider": "xai",
+    "max_input_tokens": 2000000,
+    "max_output_tokens": 2000000,
+    "mode": "chat"
+  },
+  "xai/grok-4-1-fast-non-reasoning-latest": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 5e-7,
+    "cache_read_input_token_cost": 5e-8,
+    "litellm_provider": "xai",
+    "max_input_tokens": 2000000,
+    "max_output_tokens": 2000000,
+    "mode": "chat"
+  },
+  "xai/grok-4.20-multi-agent-beta-0309": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "xai",
+    "max_input_tokens": 2000000,
+    "max_output_tokens": 2000000,
+    "mode": "chat"
+  },
+  "xai/grok-4.20-beta-0309-reasoning": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "xai",
+    "max_input_tokens": 2000000,
+    "max_output_tokens": 2000000,
+    "mode": "chat"
+  },
+  "xai/grok-4.20-0309-reasoning": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "xai",
+    "max_input_tokens": 2000000,
+    "max_output_tokens": 2000000,
+    "mode": "chat"
+  },
+  "xai/grok-4.20-beta-0309-non-reasoning": {
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000006,
+    "cache_read_input_token_cost": 2e-7,
+    "litellm_provider": "xai",
+    "max_input_tokens": 2000000,
+    "max_output_tokens": 2000000,
+    "mode": "chat"
+  },
+  "xai/grok-beta": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000015,
+    "litellm_provider": "xai",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
+  },
+  "xai/grok-code-fast": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 0.0000015,
+    "cache_read_input_token_cost": 2e-8,
+    "litellm_provider": "xai",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "xai/grok-code-fast-1": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 0.0000015,
+    "cache_read_input_token_cost": 2e-8,
+    "litellm_provider": "xai",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "xai/grok-code-fast-1-0825": {
+    "input_cost_per_token": 2e-7,
+    "output_cost_per_token": 0.0000015,
+    "cache_read_input_token_cost": 2e-8,
+    "litellm_provider": "xai",
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "mode": "chat"
+  },
+  "xai/grok-vision-beta": {
+    "input_cost_per_token": 0.000005,
+    "output_cost_per_token": 0.000015,
+    "litellm_provider": "xai",
+    "max_input_tokens": 8192,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "zai.glm-4.7": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000022,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "zai.glm-4.7-flash": {
+    "input_cost_per_token": 7e-8,
+    "output_cost_per_token": 4e-7,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "zai.glm-5": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.0000032,
+    "litellm_provider": "bedrock_converse",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "llamagate/llama-3.1-8b": {
+    "input_cost_per_token": 3e-8,
+    "output_cost_per_token": 5e-8,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "llamagate/llama-3.2-3b": {
+    "input_cost_per_token": 4e-8,
+    "output_cost_per_token": 8e-8,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "llamagate/mistral-7b-v0.3": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 1.5e-7,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 32768,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "llamagate/qwen3-8b": {
+    "input_cost_per_token": 4e-8,
+    "output_cost_per_token": 1.4e-7,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 32768,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "llamagate/dolphin3-8b": {
+    "input_cost_per_token": 8e-8,
+    "output_cost_per_token": 1.5e-7,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "llamagate/deepseek-r1-8b": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 2e-7,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 65536,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "llamagate/deepseek-r1-7b-qwen": {
+    "input_cost_per_token": 8e-8,
+    "output_cost_per_token": 1.5e-7,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 16384,
+    "mode": "chat"
+  },
+  "llamagate/openthinker-7b": {
+    "input_cost_per_token": 8e-8,
+    "output_cost_per_token": 1.5e-7,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 32768,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "llamagate/qwen2.5-coder-7b": {
+    "input_cost_per_token": 6e-8,
+    "output_cost_per_token": 1.2e-7,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 32768,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "llamagate/deepseek-coder-6.7b": {
+    "input_cost_per_token": 6e-8,
+    "output_cost_per_token": 1.2e-7,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 16384,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "llamagate/codellama-7b": {
+    "input_cost_per_token": 6e-8,
+    "output_cost_per_token": 1.2e-7,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 16384,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "llamagate/qwen3-vl-8b": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 5.5e-7,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 32768,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "llamagate/llava-7b": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 2e-7,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 4096,
+    "max_output_tokens": 2048,
+    "mode": "chat"
+  },
+  "llamagate/gemma3-4b": {
+    "input_cost_per_token": 3e-8,
+    "output_cost_per_token": 8e-8,
+    "litellm_provider": "llamagate",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gpt-5-search-api": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-5-search-api-2025-10-14": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "openai",
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "gpt-realtime-mini-2025-10-06": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000024,
+    "cache_read_input_token_cost": 6e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gpt-realtime-mini-2025-12-15": {
+    "input_cost_per_token": 6e-7,
+    "output_cost_per_token": 0.0000024,
+    "cache_read_input_token_cost": 6e-8,
+    "litellm_provider": "openai",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.0-flash-lite-001": {
+    "input_cost_per_token": 7.5e-8,
+    "output_cost_per_token": 3e-7,
+    "cache_read_input_token_cost": 1.875e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini-2.5-flash-native-audio-latest": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini-2.5-flash-native-audio-preview-09-2025": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini-2.5-flash-native-audio-preview-12-2025": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini-3.1-flash-live-preview": {
+    "input_cost_per_token": 7.5e-7,
+    "output_cost_per_token": 0.0000045,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.5-flash-native-audio-latest": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.5-flash-native-audio-preview-09-2025": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini/gemini-2.5-flash-native-audio-preview-12-2025": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "gemini/gemini-3.1-flash-live-preview": {
+    "input_cost_per_token": 7.5e-7,
+    "output_cost_per_token": 0.0000045,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "gemini-flash-latest": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "cache_read_input_token_cost": 3e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini-flash-lite-latest": {
+    "input_cost_per_token": 1e-7,
+    "output_cost_per_token": 4e-7,
+    "cache_read_input_token_cost": 1e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini-pro-latest": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini/gemini-pro-latest": {
+    "input_cost_per_token": 0.00000125,
+    "output_cost_per_token": 0.00001,
+    "cache_read_input_token_cost": 1.25e-7,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "gemini-exp-1206": {
+    "input_cost_per_token": 3e-7,
+    "output_cost_per_token": 0.0000025,
+    "cache_read_input_token_cost": 3e-8,
+    "litellm_provider": "gemini",
+    "max_input_tokens": 1048576,
+    "max_output_tokens": 65535,
+    "mode": "chat"
+  },
+  "vertex_ai/claude-sonnet-4-6@default": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "vertex_ai-anthropic_models",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "bedrock_mantle/openai.gpt-oss-120b": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "bedrock_mantle",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "bedrock_mantle/openai.gpt-oss-20b": {
+    "input_cost_per_token": 7.5e-8,
+    "output_cost_per_token": 3e-7,
+    "litellm_provider": "bedrock_mantle",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 32768,
+    "mode": "chat"
+  },
+  "bedrock_mantle/openai.gpt-oss-safeguard-120b": {
+    "input_cost_per_token": 1.5e-7,
+    "output_cost_per_token": 6e-7,
+    "litellm_provider": "bedrock_mantle",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "bedrock_mantle/openai.gpt-oss-safeguard-20b": {
+    "input_cost_per_token": 7.5e-8,
+    "output_cost_per_token": 3e-7,
+    "litellm_provider": "bedrock_mantle",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 65536,
+    "mode": "chat"
+  },
+  "bedrock/us-east-1/zai.glm-5": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.0000032,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "bedrock/us-west-2/zai.glm-5": {
+    "input_cost_per_token": 0.000001,
+    "output_cost_per_token": 0.0000032,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-east-1/anthropic.claude-haiku-4-5-20251001-v1:0": {
+    "input_cost_per_token": 0.0000012,
+    "output_cost_per_token": 0.000006,
+    "cache_read_input_token_cost": 1.2e-7,
+    "cache_creation_input_token_cost": 0.0000015,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "bedrock/us-gov-west-1/anthropic.claude-haiku-4-5-20251001-v1:0": {
+    "input_cost_per_token": 0.0000012,
+    "output_cost_per_token": 0.000006,
+    "cache_read_input_token_cost": 1.2e-7,
+    "cache_creation_input_token_cost": 0.0000015,
+    "litellm_provider": "bedrock",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "mode": "chat"
+  },
+  "claude-3-5-sonnet-20241022": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "claude-3-5-sonnet-20240620": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
+  },
+  "claude-3-5-sonnet-latest": {
+    "input_cost_per_token": 0.000003,
+    "output_cost_per_token": 0.000015,
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "claude-3-5-haiku-20241022": {
+    "input_cost_per_token": 8e-7,
+    "output_cost_per_token": 0.000004,
+    "cache_read_input_token_cost": 8e-8,
+    "cache_creation_input_token_cost": 0.000001,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
+  },
+  "claude-3-5-haiku-latest": {
+    "input_cost_per_token": 8e-7,
+    "output_cost_per_token": 0.000004,
+    "cache_read_input_token_cost": 8e-8,
+    "cache_creation_input_token_cost": 0.000001,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 8192,
+    "mode": "chat"
   },
   "claude-3-sonnet-20240229": {
     "input_cost_per_token": 0.000003,
     "output_cost_per_token": 0.000015,
-    "cache_read_input_token_cost": 0.0000003,
-    "cache_creation_input_token_cost": 0.00000375
+    "cache_read_input_token_cost": 3e-7,
+    "cache_creation_input_token_cost": 0.00000375,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 200000,
+    "max_output_tokens": 4096,
+    "mode": "chat"
   },
-  "claude-3-haiku-20240307": {
-    "input_cost_per_token": 0.00000025,
-    "output_cost_per_token": 0.00000125,
-    "cache_read_input_token_cost": 0.000000025,
-    "cache_creation_input_token_cost": 0.0000003125
+  "mistral-large-latest": {
+    "input_cost_per_token": 5e-7,
+    "output_cost_per_token": 0.0000015,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 262144,
+    "max_output_tokens": 262144,
+    "mode": "chat"
   },
-  "gpt-4o": {
-    "input_cost_per_token": 0.0000025,
-    "output_cost_per_token": 0.00001
-  },
-  "gpt-4o-mini": {
-    "input_cost_per_token": 0.00000015,
-    "output_cost_per_token": 0.0000006
-  },
-  "gpt-4-turbo": {
-    "input_cost_per_token": 0.00001,
-    "output_cost_per_token": 0.00003
-  },
-  "gpt-4": {
-    "input_cost_per_token": 0.00003,
-    "output_cost_per_token": 0.00006
-  },
-  "gpt-3.5-turbo": {
-    "input_cost_per_token": 0.0000005,
-    "output_cost_per_token": 0.0000015
-  },
-  "cursor-default": {
+  "mistral-large-2407": {
     "input_cost_per_token": 0.000003,
-    "output_cost_per_token": 0.000015,
-    "cache_read_input_token_cost": 0.0000003,
-    "cache_creation_input_token_cost": 0.00000375
+    "output_cost_per_token": 0.000009,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "mode": "chat"
   },
-  "codex": {
-    "input_cost_per_token": 0.0000015,
-    "output_cost_per_token": 0.000003,
-    "cache_read_input_token_cost": 0.0000002,
-    "cache_creation_input_token_cost": 0.000002
+  "mistral-medium-latest": {
+    "input_cost_per_token": 4e-7,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
   },
-  "openai": {
-    "input_cost_per_token": 0.0000025,
-    "output_cost_per_token": 0.00001
+  "mistral-small-latest": {
+    "input_cost_per_token": 6e-8,
+    "output_cost_per_token": 1.8e-7,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "mode": "chat"
   },
-  "gemini-2.0-flash": {
-    "input_cost_per_token": 0.0000001,
-    "output_cost_per_token": 0.0000004
-  },
-  "gemini-pro": {
-    "input_cost_per_token": 0.00000125,
-    "output_cost_per_token": 0.000005
+  "mixtral-8x7b-instruct": {
+    "input_cost_per_token": 7e-7,
+    "output_cost_per_token": 7e-7,
+    "litellm_provider": "anthropic",
+    "max_input_tokens": 32000,
+    "max_output_tokens": 8191,
+    "mode": "chat"
   }
 }

@@ -22,6 +22,13 @@ export async function* streamJsonlFile<T = unknown>(filePath: string): AsyncGene
     for await (const line of rl) {
       const trimmed = line.trim();
       if (trimmed.length === 0) continue;
+      
+      if (trimmed.length > 10_000_000) {
+        if (process.env.AGENTLENS_DEBUG) {
+          console.error(`[agentlens] Skipping oversized line (${trimmed.length} bytes) in ${filePath}`);
+        }
+        continue;
+      }
 
       try {
         yield JSON.parse(trimmed) as T;

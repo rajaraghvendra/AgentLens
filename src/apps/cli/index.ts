@@ -169,7 +169,7 @@ function openBrowser(url: string): void {
   }
 
   if (platform === 'win32') {
-    spawn('cmd', ['/c', 'start', '', url], { stdio: 'ignore', detached: true }).unref();
+    spawn('cmd', ['/c', 'start', '', `"${url}"`], { stdio: 'ignore', detached: true }).unref();
     return;
   }
 
@@ -203,7 +203,9 @@ function bindChildLifecycle(child: ReturnType<typeof spawn>): void {
 
   process.once('SIGINT', () => forwardSignal('SIGINT'));
   process.once('SIGTERM', () => forwardSignal('SIGTERM'));
-  process.once('SIGHUP', () => forwardSignal('SIGHUP'));
+  if (process.platform !== 'win32') {
+    process.once('SIGHUP', () => forwardSignal('SIGHUP'));
+  }
 
   child.on('close', (code, signal) => {
     if (signal) {
@@ -292,7 +294,7 @@ program
 
     console.log(colorize(`Starting AgentLens dashboard (${dashboardMode}) on http://localhost:${port}...`, 'cyan'));
 
-    const child = spawn(process.execPath, [nextBin, usingProductionRuntime ? 'start' : 'dev', '--hostname', '127.0.0.1', '--port', port], {
+    const child = spawn(process.execPath, [path.normalize(nextBin), usingProductionRuntime ? 'start' : 'dev', '--hostname', '127.0.0.1', '--port', port], {
       cwd: dashboardDir,
       stdio: 'inherit',
       env: {
@@ -316,8 +318,8 @@ program
           console.log(colorize(`Opening ${dashboardUrl} ...`, 'blue'));
           openBrowser(dashboardUrl);
         })
-        .catch(() => {
-          console.log(colorize(`Dashboard is running at ${dashboardUrl}`, 'yellow'));
+        .catch((err: any) => {
+          console.log(colorize(`Dashboard may be starting at ${dashboardUrl} — ${err.message}`, 'yellow'));
         });
     }
   });

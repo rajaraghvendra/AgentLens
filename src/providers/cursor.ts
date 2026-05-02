@@ -239,15 +239,27 @@ export class CursorProvider implements IProvider {
     const [dbPath, sessionId] = identifier.split('::');
     const db = await openReadonly(dbPath);
     if (!db) {
-      throw new Error('SQLite not available or database could not be opened');
+      if (process.env.AGENTLENS_DEBUG) {
+        console.warn(`[agentlens] Cursor data unavailable: better-sqlite3 not installed. Install Visual Studio Build Tools on Windows.`);
+      }
+      return {
+        id: identifier,
+        provider: this.id,
+        project: 'cursor',
+        timestamp: Date.now(),
+        durationMs: 0,
+        messages: [],
+      };
     }
 
     const messages: Message[] = [];
     let project = 'cursor';
 
     // Try to infer project from path if it's in ~/.cursor/projects
-    if (dbPath.includes('.cursor/projects/')) {
-      const parts = dbPath.split('.cursor/projects/')[1].split('/');
+    // Normalize to forward slashes for cross-platform comparison
+    const normalizedDbPath = dbPath.replace(/\\/g, '/');
+    if (normalizedDbPath.includes('.cursor/projects/')) {
+      const parts = normalizedDbPath.split('.cursor/projects/')[1].split('/');
       if (parts.length > 0) {
         project = parts[0].replace(/Users-[\w-]+-Documents-/, '');
       }

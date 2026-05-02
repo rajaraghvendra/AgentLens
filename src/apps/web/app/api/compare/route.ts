@@ -17,8 +17,14 @@ async function GET(request: Request): Promise<NextResponse> {
     const { sessions } = await CoreEngine.run(parsePeriod(period), 'USD', filters);
     
     // Use enhanced compare module
-    const models = analyzeModels(sessions);
-    const totalCost = models.reduce((sum, m) => sum + m.costUSD, 0);
+    const rawModels = analyzeModels(sessions);
+    const totalCost = rawModels.reduce((sum, m) => sum + m.costUSD, 0);
+
+    // Normalize: ensure each model entry has a `name` field (dashboard reads model.name)
+    const models = rawModels.map((m) => ({
+      ...m,
+      name: m.model || 'unknown',
+    }));
     
     const result: any = {
       models,
