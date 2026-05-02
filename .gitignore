@@ -50,3 +50,4 @@ docs/
 # Build output and large reports
 report.json
 *.tgz
+src/apps/web/.agentlens-next/
