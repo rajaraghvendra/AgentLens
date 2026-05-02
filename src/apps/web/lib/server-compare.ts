@@ -1,1 +1,1 @@
-export { analyzeModels, compareModels, getModelSessions } from '../../../../dist/core/compare.js';
+export { analyzeModels, compareModels, getModelSessions } from '@agentlens/core/compare';
