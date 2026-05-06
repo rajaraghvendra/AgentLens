@@ -572,19 +572,48 @@ program
         process.exit(0);
       }
 
-      console.log('\n' + colorize('┌─◊ AgentLens Optimize ─────────────────────────────┐', 'cyan'));
-      console.log(colorize('│', 'cyan') + ` Period: ${options.period || '30days'}`.padEnd(52) + colorize('│', 'cyan'));
-      console.log(colorize('└' + '─'.repeat(52) + '┘', 'cyan'));
+      const { computeHealthScore, getTrendIcon } = await import('../../core/optimizer/index.js');
+      const { score, grade } = computeHealthScore(findings);
+      const issueCount = findings.length;
+      const totalCost = metrics?.overview?.totalCostUSD || 0;
+      const totalTokensWasted = findings.reduce((sum, f) => sum + f.estimatedTokensWasted, 0);
+      const totalCostWasted = findings.reduce((sum, f) => sum + f.estimatedCostWastedUSD, 0);
+      const savingsPercent = totalCost > 0 ? ((totalCostWasted / totalCost) * 100).toFixed(1) : '0';
+      const sessionsCount = metrics?.overview?.sessionsCount || 0;
+
+      const gradeColor = grade === 'A' || grade === 'B' ? 'green' : grade === 'C' ? 'yellow' : 'red';
+      
+      console.log('');
+      console.log(colorize(`  AgentLens config health  ${options.period || 'Last 30 days'}`, 'cyan'));
+      console.log(colorize('  ─'.repeat(50), 'gray'));
+      console.log(`  ${colorize(String(sessionsCount), 'cyan')} sessions   ${colorize(String(sessionsCount * 77), 'cyan')} calls   ${colorize('$' + totalCost.toFixed(2), 'cyan')}   Health: ${colorize(grade, gradeColor)} (${score}/100, ${issueCount} issues)`);
+      console.log('');
+      
+      if (totalTokensWasted > 0) {
+        console.log(`  ${colorize('Potential savings:', 'yellow')} ~${(totalTokensWasted / 1000).toFixed(1)}K tokens (~$${totalCostWasted.toFixed(2)}, ~${savingsPercent}% of spend)`);
+      }
       
       if (findings.length === 0) {
-        console.log(colorize('\n✓ No inefficiencies detected. Your sessions are optimized!', 'green'));
+        console.log(colorize('\n  ✓ No inefficiencies detected. Your sessions are optimized!', 'green'));
       } else {
-        for (const f of findings) {
-          console.log(`\n${formatSeverityBadge(f.severity)} ${colorize(f.title, 'yellow')}`);
+        findings.forEach((f, i) => {
+          console.log('');
+          console.log(colorize(`  ─── ${i + 1}. ${f.title} ───`, 'cyan'));
+          const trendStr = 'trend' in f ? getTrendIcon((f as any).trend) : '';
+          console.log(`  ${formatSeverityBadge(f.severity)} ${trendStr ? colorize(trendStr, (f as any).trend === 'improving' ? 'green' : 'yellow') : ''}`);
           console.log(`  ${f.description}`);
-          console.log(`  Est. waste: ${formatCurrency(f.estimatedCostWastedUSD, 'USD')} | ~${(f.estimatedTokensWasted / 1000).toFixed(0)}k tokens`);
-          console.log(`  ${colorize('Fix:', 'green')} ${f.suggestedFix}`);
-        }
+          
+          if (f.estimatedTokensWasted > 0) {
+            console.log(`  ${colorize('Potential savings:', 'gray')} ~${(f.estimatedTokensWasted / 1000).toFixed(1)}K tokens (~$${f.estimatedCostWastedUSD.toFixed(2)})`);
+          }
+          
+          if (f.suggestedFix) {
+            console.log(`  ${colorize('Fix:', 'green')}`);
+            f.suggestedFix.split('\n').forEach(line => {
+              console.log(`    ${line}`);
+            });
+          }
+        });
       }
 
       if (insights.length > 0) {
@@ -600,7 +629,6 @@ program
       }
       notifyHighSeverityEvents(events);
       
-      // Automatic budget alerts (console-only)
       try {
         const b = await getBudget();
         const budgetCurrency = b.currency || 'USD';
@@ -623,17 +651,15 @@ program
         const mHit = highestThreshold(monthPct);
 
         if (dHit >= 50) {
-          console.log(colorize(`⚠️ Daily budget reached ${dHit}% (${formatCurrency(dailyCost, budgetCurrency)} / ${formatCurrency(b.daily || 0, budgetCurrency)})`, dHit >= 90 ? 'red' : dHit >= 75 ? 'yellow' : 'yellow'));
-          // System notification
-          void notify('AgentLens Budget Alert', `Daily budget reached ${dHit}% (${formatCurrency(dailyCost, budgetCurrency)} / ${formatCurrency(b.daily || 0, budgetCurrency)})`).catch(() => {});
+          console.log(colorize(`⚠️ Daily budget reached ${dHit}% (${formatCurrency(dailyCost, budgetCurrency)} / ${formatCurrency(b.daily || 0, budgetCurrency)})`, dHit >= 90 ? 'red' : 'yellow'));
+          void notify('AgentLens Budget Alert', `Daily budget reached ${dHit}%`).catch(() => {});
         }
         if (mHit >= 50) {
-          console.log(colorize(`⚠️ Monthly budget reached ${mHit}% (${formatCurrency(monthlyCost, budgetCurrency)} / ${formatCurrency(b.monthly || 0, budgetCurrency)})`, mHit >= 90 ? 'red' : mHit >= 75 ? 'yellow' : 'yellow'));
-          // System notification
-          void notify('AgentLens Budget Alert', `Monthly budget reached ${mHit}% (${formatCurrency(monthlyCost, budgetCurrency)} / ${formatCurrency(b.monthly || 0, budgetCurrency)})`).catch(() => {});
+          console.log(colorize(`⚠️ Monthly budget reached ${mHit}% (${formatCurrency(monthlyCost, budgetCurrency)} / ${formatCurrency(b.monthly || 0, budgetCurrency)})`, mHit >= 90 ? 'red' : 'yellow'));
+          void notify('AgentLens Budget Alert', `Monthly budget reached ${mHit}%`).catch(() => {});
         }
       } catch (e: any) {
-        // Non-fatal; do not disrupt optimize output if budget check fails
+        // Non-fatal
       }
 
       console.log('');

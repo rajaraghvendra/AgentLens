@@ -73,7 +73,7 @@ export function Dashboard({ data, period }: DashboardProps) {
           <ActivityBreakdown metrics={metrics} />
         </Box>
         <Box flexGrow={1}>
-          <OptimizationFindings findings={findings} />
+          <OptimizationFindings findings={findings} width={40} />
         </Box>
       </Box>
 

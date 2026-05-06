@@ -1,16 +1,36 @@
 // ─────────────────────────────────────────────────────────────
-// AgentLens – Optimizer
+// AgentLens – Optimizer (Enhanced)
 // ─────────────────────────────────────────────────────────────
 
 import type { Session, WasteFinding, Metrics } from '../../types/index.js';
 import config from '../../config/env.js';
+import {
+  detectJunkReads,
+  detectDuplicateReads,
+  detectReadEditRatio,
+  detectCacheBloat,
+  detectUnusedMcpServers,
+  detectGhostAgents,
+} from './detectors.js';
+import { detectTrends, filterActiveFindings, getTrendIcon } from './trend.js';
+import { scoreFindings } from './urgency.js';
+import type { ScoredFinding } from './urgency.js';
+import type { FindingWithTrend } from './trend.js';
 
-export function analyzeInefficiencies(sessions: Session[], metrics?: Metrics): WasteFinding[] {
+export interface OptimizeOptions {
+  configuredMcpServers?: string[];
+  configuredAgents?: string[];
+}
+
+export function analyzeInefficiencies(
+  sessions: Session[],
+  metrics?: Metrics,
+  opts?: OptimizeOptions
+): ScoredFinding[] {
   const findings: WasteFinding[] = [];
   
-  if (sessions.length === 0) return findings;
+  if (sessions.length === 0) return [];
 
-  // Trackers
   const allBashOutputs: number[] = [];
   let continuousEditTurns = 0;
   let maxContinuousEditTurns = 0;
@@ -31,12 +51,10 @@ export function analyzeInefficiencies(sessions: Session[], metrics?: Metrics): W
       for (const tool of tools) {
         const tName = tool.name;
 
-        // Rule 1 Tracker
         if (tName === 'Bash' && typeof tool.outputLength === 'number') {
           allBashOutputs.push(tool.outputLength);
         }
 
-        // Rule 2 Tracker (Edit retries)
         if (hasEdit && tool.input && typeof tool.input === 'object' && (tool.input as any).path) {
           const path = String((tool.input as any).path);
           if (path === currentFileEditTarget) {
@@ -48,20 +66,16 @@ export function analyzeInefficiencies(sessions: Session[], metrics?: Metrics): W
           maxContinuousEditTurns = Math.max(maxContinuousEditTurns, continuousEditTurns);
         }
 
-        // Rule 3 Tracker (MCP)
         if (tName.toLowerCase().includes('mcp') || (typeof tool.input === 'object' && (tool.input as any)?.server_name)) {
           mcpUses++;
           if (tool.isError) mcpErrors++;
         }
-
-        // Rule 4 Tracker (Excessive Reads)
       }
 
       if (!hasEdit) {
         continuousEditTurns = 0;
       }
 
-      // Read-only turn streak better reflects "lost in context" than raw tool-call count.
       if (hasRead && !hasEdit) {
         sessionReadOnlyTurns++;
         maxReadOnlyTurns = Math.max(maxReadOnlyTurns, sessionReadOnlyTurns);
@@ -71,11 +85,9 @@ export function analyzeInefficiencies(sessions: Session[], metrics?: Metrics): W
     }
   }
 
-  // Evaluate Rule 1: High Bash Output Waste
   const heavyBashOps = allBashOutputs.filter(len => len > config.maxBashOutput);
   if (heavyBashOps.length > 5) {
     const totalWastedChars = heavyBashOps.reduce((sum, val) => sum + val, 0);
-    // Rough estimate: ~4 chars per token. Claude inputs are ~$3 / 1M tokens.
     const tokenEst = Math.floor(totalWastedChars / 4);
     findings.push({
       kind: 'bash-output-waste',
@@ -92,7 +104,6 @@ export function analyzeInefficiencies(sessions: Session[], metrics?: Metrics): W
     });
   }
 
-  // Evaluate Rule 2: Edit Retry Loops
   if (maxContinuousEditTurns > 3) {
     findings.push({
       kind: 'edit-retry-loop',
@@ -109,7 +120,6 @@ export function analyzeInefficiencies(sessions: Session[], metrics?: Metrics): W
     });
   }
 
-  // Evaluate Rule 3: Unused/Failing MCP Servers
   if (mcpUses > 0 && mcpErrors / mcpUses > 0.8) {
     findings.push({
       kind: 'mcp-server-failure',
@@ -126,7 +136,6 @@ export function analyzeInefficiencies(sessions: Session[], metrics?: Metrics): W
     });
   }
 
-  // Evaluate Rule 4: Excessive File Reads
   if (maxReadOnlyTurns > 10) {
     findings.push({
       kind: 'context-blindness',
@@ -159,16 +168,42 @@ export function analyzeInefficiencies(sessions: Session[], metrics?: Metrics): W
     });
   }
 
-  return findings;
+  const junkReads = detectJunkReads(sessions);
+  if (junkReads) findings.push(junkReads);
+
+  const duplicateReads = detectDuplicateReads(sessions);
+  if (duplicateReads) findings.push(duplicateReads);
+
+  const readEditRatio = detectReadEditRatio(sessions);
+  if (readEditRatio) findings.push(readEditRatio);
+
+  const cacheBloat = detectCacheBloat(sessions);
+  if (cacheBloat) findings.push(cacheBloat);
+
+  const unusedMcp = detectUnusedMcpServers(sessions, opts?.configuredMcpServers);
+  if (unusedMcp) findings.push(unusedMcp);
+
+  const ghostAgents = detectGhostAgents(sessions, opts?.configuredAgents);
+  if (ghostAgents) findings.push(ghostAgents);
+
+  const withTrends = detectTrends(sessions, findings);
+  const activeFindings = filterActiveFindings(withTrends);
+  
+  return scoreFindings(activeFindings);
 }
 
-export function computeHealthScore(findings: WasteFinding[]): { score: number; grade: string } {
+export function computeHealthScore(findings: WasteFinding[]): { score: number; grade: string; breakdown: Record<string, number> } {
   const weights = { High: 15, Medium: 7, Low: 3 };
-  const maxPenalty = 80;
+  const maxPenalty = 100;
   
   let penalty = 0;
+  const breakdown: Record<string, number> = {};
+
   for (const f of findings) {
-    penalty += weights[f.severity] || 0;
+    const weight = weights[f.severity as keyof typeof weights] || 0;
+    penalty += weight;
+    const kind = f.kind || 'unknown';
+    breakdown[kind] = (breakdown[kind] || 0) + weight;
   }
   
   const score = Math.max(0, 100 - Math.min(maxPenalty, penalty));
@@ -180,5 +215,9 @@ export function computeHealthScore(findings: WasteFinding[]): { score: number; g
   else if (score >= 30) grade = 'D';
   else grade = 'F';
   
-  return { score, grade };
+  return { score, grade, breakdown };
 }
+
+export { getTrendIcon };
+export type { ScoredFinding, FindingWithTrend };
+export type { TrendStatus } from './trend.js';

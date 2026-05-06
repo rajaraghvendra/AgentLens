@@ -227,6 +227,87 @@ export function getCodexDataDirCandidates(): string[] {
   ]);
 }
 
+export function getKiroDataDir(): string {
+  const home = homedir();
+
+  if (isWindows()) {
+    return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'kiro', 'sessions');
+  }
+
+  if (isMac()) {
+    return join(home, '.kiro', 'sessions');
+  }
+
+  return join(home, '.kiro', 'sessions');
+}
+
+export function getKiroDataDirCandidates(): string[] {
+  const home = homedir();
+  return uniquePaths([
+    join(home, '.kiro', 'sessions'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'kiro', 'sessions'),
+  ]);
+}
+
+export function getKiroVSCodeAgentDir(): string {
+  const home = homedir();
+
+  if (isWindows()) {
+    return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Kiro', 'User', 'globalStorage', 'kiro.kiroagent');
+  }
+
+  if (isMac()) {
+    return join(home, 'Library', 'Application Support', 'Kiro', 'User', 'globalStorage', 'kiro.kiroagent');
+  }
+
+  return join(home, '.config', 'Kiro', 'User', 'globalStorage', 'kiro.kiroagent');
+}
+
+export function getKiroVSCodeWorkspaceDir(): string {
+  const home = homedir();
+
+  if (isWindows()) {
+    return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Kiro', 'User', 'workspaceStorage');
+  }
+
+  if (isMac()) {
+    return join(home, 'Library', 'Application Support', 'Kiro', 'User', 'workspaceStorage');
+  }
+
+  return join(home, '.config', 'Kiro', 'User', 'workspaceStorage');
+}
+
+export function getKiroVSCodeAgentDirCandidates(): string[] {
+  const home = homedir();
+  return uniquePaths([
+    join(home, 'Library', 'Application Support', 'Kiro', 'User', 'globalStorage', 'kiro.kiroagent'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Kiro', 'User', 'globalStorage', 'kiro.kiroagent'),
+    join(home, '.config', 'Kiro', 'User', 'globalStorage', 'kiro.kiroagent'),
+  ]);
+}
+
+export function getGeminiDataDir(): string {
+  const home = homedir();
+
+  if (isWindows()) {
+    return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'gemini', 'tmp');
+  }
+
+  if (isMac()) {
+    return join(home, '.gemini', 'tmp');
+  }
+
+  return join(home, '.gemini', 'tmp');
+}
+
+export function getGeminiDataDirCandidates(): string[] {
+  const home = homedir();
+  return uniquePaths([
+    join(home, '.gemini', 'tmp'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'gemini', 'tmp'),
+  ]);
+}
+
 export function getOmpDataDir(): string {
   const home = homedir();
   

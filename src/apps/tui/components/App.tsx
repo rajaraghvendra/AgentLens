@@ -4,8 +4,12 @@ import { CoreEngine } from '../../../core/engine.js';
 import { getAllProviders } from '../../../providers/index.js';
 import { getHomeDir } from '../../../utils/paths.js';
 
+import { HealthPanel } from './HealthPanel.js';
+import { OptimizationFindings } from './OptimizationFindings.js';
+import type { WasteFinding } from '../../../types/index.js';
+
 type Period = 'today' | 'week' | '30days' | 'month' | 'all';
-type Mode = 'dashboard' | 'compare' | 'detail';
+type Mode = 'dashboard' | 'compare' | 'detail' | 'optimize';
 type DashboardFocus = 'daily' | 'projects' | 'models';
 type CompareFocus = 'models' | 'providers';
 type SortMode = 'cost' | 'tokens' | 'sessions' | 'messages' | 'name';
@@ -37,6 +41,9 @@ const PROVIDER_COLORS: Record<string, string> = {
   opencode: PINK,
   pi: AMBER,
   copilot: RED,
+  kiro: '#7C3AED',
+  'kiro-vscode': '#6D28D9',
+  gemini: '#4285F4',
   all: VIOLET,
 };
 
@@ -57,6 +64,9 @@ const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
   opencode: 'OpenCode',
   pi: 'Pi',
   copilot: 'Copilot',
+  kiro: 'Kiro',
+  'kiro-vscode': 'Kiro VSCode',
+  gemini: 'Gemini',
 };
 
 const SPARKS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
@@ -242,6 +252,8 @@ function StatusBar({
         <Text dimColor> sort   </Text>
         <Text color={VIOLET} bold>c</Text>
         <Text dimColor> compare   </Text>
+        <Text color={VIOLET} bold>o</Text>
+        <Text dimColor> optimize   </Text>
         <Text color={VIOLET} bold>r</Text>
         <Text dimColor> refresh   </Text>
         <Text color={VIOLET} bold>q</Text>
@@ -437,14 +449,35 @@ function FindingsPanel({
       {topFindings.length === 0 ? (
         <Text dimColor>No active findings. Session behavior looks stable.</Text>
       ) : (
-        topFindings.map((finding, index) => (
-          <Box key={`${finding.title}-${index}`} flexDirection="column" marginBottom={index === topFindings.length - 1 && topInsights.length === 0 ? 0 : 1}>
-            <Text color={finding.severity?.toLowerCase() === 'high' ? RED : AMBER} bold wrap="truncate-end">
-              {(finding.severity || 'info').toUpperCase()} {finding.title}
-            </Text>
-            <Text dimColor wrap="truncate-end">{finding.description}</Text>
-          </Box>
-        ))
+        topFindings.map((finding, index) => {
+          const trendStr = 'trend' in finding ? (finding as any).trend : null;
+          const urgency = 'urgencyScore' in finding ? (finding as any).urgencyScore : null;
+          return (
+            <Box key={`${finding.title}-${index}`} flexDirection="column" marginBottom={index === topFindings.length - 1 && topInsights.length === 0 ? 0 : 1}>
+              <Box gap={1}>
+                <Text color={finding.severity?.toLowerCase() === 'high' ? RED : AMBER} bold wrap="truncate-end">
+                  {(finding.severity || 'info').toUpperCase()} {finding.title}
+                </Text>
+                {trendStr && (
+                  <Text dimColor color={trendStr === 'improving' ? MINT : SOFT}>
+                    {trendStr === 'improving' ? '↓' : '●'}
+                  </Text>
+                )}
+                {urgency != null && (
+                  <Text dimColor color={urgency > 20 ? RED : AMBER}>
+                    U:{urgency.toFixed(0)}
+                  </Text>
+                )}
+              </Box>
+              <Text dimColor wrap="truncate-end">{finding.description}</Text>
+              {finding.estimatedCostWastedUSD > 0 && (
+                <Text color={AMBER} dimColor wrap="truncate-end">
+                  ~${finding.estimatedCostWastedUSD.toFixed(2)} waste
+                </Text>
+              )}
+            </Box>
+          );
+        })
       )}
       {topInsights.length > 0 && (
         <Box flexDirection="column" marginTop={topFindings.length > 0 ? 1 : 0}>
@@ -525,6 +558,7 @@ export const App: React.FC = () => {
   const [currentProvider, setCurrentProvider] = useState<string>('all');
   const [dashboardFocus, setDashboardFocus] = useState<DashboardFocus>('daily');
   const [compareFocus, setCompareFocus] = useState<CompareFocus>('models');
+  const [optimizeIndex, setOptimizeIndex] = useState(0);
   const [dailyIndex, setDailyIndex] = useState(0);
   const [projectIndex, setProjectIndex] = useState(0);
   const [modelIndex, setModelIndex] = useState(0);
@@ -557,7 +591,7 @@ export const App: React.FC = () => {
         sessionCount: result.providers.find((item) => item.id === provider.id)?.sessionCount ?? 0,
       }));
 
-      const selectableProviders = allProviders.filter((provider) => (provider.sessionCount ?? 0) > 0);
+      const selectableProviders = allProviders.filter((provider) => provider.available || (provider.sessionCount ?? 0) > 0);
       if (prov === 'all' || providersListRef.current.length === 0) {
         providersListRef.current = selectableProviders;
       } else {
@@ -812,6 +846,7 @@ export const App: React.FC = () => {
     if (input === 'r') { fetchData(period, currentProvider); return; }
     if (input === 'p') { switchProvider(); return; }
     if (input === 'c') { setDetail(null); setMode((value) => value === 'compare' ? 'dashboard' : 'compare'); return; }
+    if (input === 'o') { setDetail(null); setMode((value) => value === 'optimize' ? 'dashboard' : 'optimize'); return; }
     if (input === 's') { cycleSort(); return; }
     if (key.return) { if (mode === 'detail') { setMode('dashboard'); setDetail(null); } else { buildDetail(); } return; }
     if (key.escape) { if (mode === 'detail') { setMode('dashboard'); setDetail(null); } return; }
@@ -847,7 +882,9 @@ export const App: React.FC = () => {
     if (input === '5') { setPeriod('all'); setMode('dashboard'); setDetail(null); fetchData('all', currentProvider); return; }
 
     if (key.upArrow) {
-      if (mode === 'dashboard') {
+      if (mode === 'optimize') {
+        setOptimizeIndex((value) => Math.max(0, value - 1));
+      } else if (mode === 'dashboard') {
         if (dashboardFocus === 'daily') setDailyIndex((value) => Math.max(0, value - 1));
         else if (dashboardFocus === 'projects') setProjectIndex((value) => Math.max(0, value - 1));
         else setModelIndex((value) => Math.max(0, value - 1));
@@ -859,7 +896,9 @@ export const App: React.FC = () => {
     }
 
     if (key.downArrow && data) {
-      if (mode === 'dashboard') {
+      if (mode === 'optimize') {
+        setOptimizeIndex((value) => Math.min(findings.length - 1, value + 1));
+      } else if (mode === 'dashboard') {
         if (dashboardFocus === 'daily') {
           const rows = sortRows((data.daily ?? []).slice(-7).map((day: any) => ({
             label: day.date.slice(5),
@@ -915,7 +954,9 @@ export const App: React.FC = () => {
       ? `${dashboardFocus} sort:${dashboardFocus === 'daily' ? dailySort : dashboardFocus === 'projects' ? projectSort : modelSort}`
       : mode === 'compare'
         ? `${compareFocus} sort:${compareFocus === 'models' ? compareModelSort : compareProviderSort}`
-        : 'enter/esc back';
+        : mode === 'optimize'
+          ? `${findings.length} findings`
+          : 'enter/esc back';
 
   return (
     <Box flexDirection="column" width={dashWidth}>
@@ -1003,6 +1044,16 @@ export const App: React.FC = () => {
         </>
       )}
 
+      {mode === 'optimize' && (
+        <OptimizeView
+          findings={findings}
+          insights={insights}
+          metrics={metrics}
+          width={dashWidth}
+          selectedIndex={optimizeIndex}
+        />
+      )}
+
       {mode === 'detail' && detail && <DetailPanel detail={detail} width={dashWidth} />}
 
       <StatusBar
@@ -1017,6 +1068,98 @@ export const App: React.FC = () => {
     </Box>
   );
 };
+
+function OptimizeView({ findings, insights, metrics, width, selectedIndex }: { findings: any[]; insights: string[]; metrics: any; width: number; selectedIndex: number }) {
+  const totalCost = metrics?.overview?.totalCostUSD || 0;
+  const sessionsCount = metrics?.overview?.sessionsCount || 0;
+  const totalTokensWasted = findings.reduce((sum: number, f: any) => sum + (f.estimatedTokensWasted || 0), 0);
+  const totalCostWasted = findings.reduce((sum: number, f: any) => sum + (f.estimatedCostWastedUSD || 0), 0);
+  const savingsPercent = totalCost > 0 ? ((totalCostWasted / totalCost) * 100).toFixed(1) : '0';
+
+  let score = 100;
+  for (const f of findings) {
+    if (f.severity === 'High') score -= 15;
+    else if (f.severity === 'Medium') score -= 7;
+    else score -= 3;
+  }
+  score = Math.max(0, score);
+  const grade = score >= 90 ? 'A' : score >= 75 ? 'B' : score >= 55 ? 'C' : score >= 30 ? 'D' : 'F';
+  const gradeColor = grade === 'A' || grade === 'B' ? MINT : grade === 'C' ? AMBER : RED;
+
+  return (
+    <Box flexDirection="column" width={width}>
+      <Box flexDirection="column" borderStyle="round" borderColor={gradeColor} paddingX={1}>
+        <Box>
+          <Text bold color={gradeColor}>{` ${grade} `}</Text>
+          <Text> Health Score: {score}/100</Text>
+          <Text dimColor> ({findings.length} issues)</Text>
+        </Box>
+        <Box marginTop={1} gap={1}>
+          <Text>{sessionsCount} sessions</Text>
+          <Text dimColor>·</Text>
+          <Text>${totalCost.toFixed(2)}</Text>
+        </Box>
+        {totalTokensWasted > 0 && (
+          <Box marginTop={1}>
+            <Text color={AMBER}>Potential savings: </Text>
+            <Text>~{(totalTokensWasted / 1000).toFixed(1)}K tokens (~${totalCostWasted.toFixed(2)}, ~{savingsPercent}%)</Text>
+          </Box>
+        )}
+      </Box>
+
+      {findings.length === 0 ? (
+        <Box flexDirection="column" borderStyle="round" borderColor={MINT} paddingX={1} marginTop={1}>
+          <Text color={MINT}>✓ No inefficiencies detected. Your sessions are optimized!</Text>
+        </Box>
+      ) : (
+        <Box flexDirection="column" borderStyle="round" borderColor={RED} paddingX={1} marginTop={1}>
+          <Text bold color={RED}>Optimization Findings</Text>
+          {findings.map((finding: any, index: number) => {
+            const selected = index === selectedIndex;
+            const sevColor = finding.severity === 'High' ? RED : finding.severity === 'Medium' ? AMBER : CYAN;
+            const trendStr = 'trend' in finding ? (finding as any).trend : null;
+            const urgency = 'urgencyScore' in finding ? (finding as any).urgencyScore : null;
+            return (
+              <Box key={`${finding.title}-${index}`} flexDirection="column" marginTop={1} backgroundColor={selected ? '#1E1E2A' : undefined}>
+                <Box gap={1}>
+                  <Text color={selected ? '#FFFFFF' : sevColor} bold>
+                    {selected ? '› ' : '  '}{finding.severity.toUpperCase()}
+                  </Text>
+                  <Text color={selected ? '#FFFFFF' : SOFT}>{finding.title}</Text>
+                  {trendStr && (
+                    <Text dimColor color={trendStr === 'improving' ? MINT : SOFT}>
+                      {trendStr === 'improving' ? '↓ improving' : '● active'}
+                    </Text>
+                  )}
+                  {urgency != null && (
+                    <Text dimColor color={urgency > 20 ? RED : AMBER}>
+                      U:{urgency.toFixed(0)}
+                    </Text>
+                  )}
+                </Box>
+                {selected && (
+                  <>
+                    <Text dimColor wrap="truncate-end">{finding.description}</Text>
+                    {finding.estimatedTokensWasted > 0 && (
+                      <Text color={AMBER} dimColor>
+                        ~{(finding.estimatedTokensWasted / 1000).toFixed(1)}K tokens (~${finding.estimatedCostWastedUSD.toFixed(2)})
+                      </Text>
+                    )}
+                    {finding.suggestedFix && (
+                      <Text color={MINT}>
+                        Fix: {finding.suggestedFix.split('\n')[0]}
+                      </Text>
+                    )}
+                  </>
+                )}
+              </Box>
+            );
+          })}
+        </Box>
+      )}
+    </Box>
+  );
+}
 
 function CompactCompareSummary({ models, providers, width }: { models: any[]; providers: any[]; width: number }) {
   const topModel = models[0];

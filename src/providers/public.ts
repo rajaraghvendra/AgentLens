@@ -6,3 +6,6 @@ export { CodexProvider } from './codex.js';
 export { OpencodeProvider } from './opencode.js';
 export { PiProvider } from './pi.js';
 export { CopilotProvider } from './copilot.js';
+export { KiroProvider } from './kiro.js';
+export { KiroVSCodeProvider } from './kiro-vscode.js';
+export { GeminiProvider } from './gemini.js';

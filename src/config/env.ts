@@ -9,6 +9,9 @@ import {
   getClaudeProjectsDir, 
   getCodexDataDir, 
   getDataDir,
+  getGeminiDataDir,
+  getKiroDataDir,
+  getKiroVSCodeAgentDir,
   isWindows 
 } from '../utils/paths.js';
 
@@ -29,6 +32,12 @@ export interface AppConfig {
   claudeProjectsDir: string;
   /** Codex directory */
   codexDir: string;
+  /** Kiro directory */
+  kiroDir: string;
+  /** Kiro VS Code extension directory */
+  kiroVSCodeDir: string;
+  /** Gemini CLI directory */
+  geminiDir: string;
   /** Path to custom pricing override JSON file */
   pricingOverridePath?: string;
 }
@@ -59,6 +68,9 @@ export const config: AppConfig = {
   cacheMaxAgeMs: envInt('AGENTLENS_CACHE_MAX_AGE_MS', 24 * 60 * 60 * 1000),
   claudeProjectsDir: env('AGENTLENS_CLAUDE_DIR', getClaudeProjectsDir()),
   codexDir: env('AGENTLENS_CODEX_DIR', getCodexDataDir()),
+  kiroDir: env('AGENTLENS_KIRO_DIR', getKiroDataDir()),
+  kiroVSCodeDir: env('AGENTLENS_KIRO_VSCODE_DIR', getKiroVSCodeAgentDir()),
+  geminiDir: env('AGENTLENS_GEMINI_DIR', getGeminiDataDir()),
   budgetUSD: envFloat('AGENTLENS_BUDGET_USD', 0),
   pricingOverridePath: env('AGENTLENS_PRICING_OVERRIDE', ''),
 };

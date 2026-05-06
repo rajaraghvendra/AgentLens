@@ -124,6 +124,9 @@ const PROVIDER_LABELS: Record<string, string> = {
   opencode: "OpenCode",
   pi: "Pi",
   copilot: "Copilot",
+  kiro: "Kiro",
+  "kiro-vscode": "Kiro VSCode",
+  gemini: "Gemini",
 };
 
 const DASHBOARD_SNAPSHOT_VERSION = 1;
@@ -610,7 +613,7 @@ export default function Dashboard({
             </div>
 
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              {(["all", ...providers.slice(0, 6).map((provider) => provider.id)] as string[]).map((providerId) => (
+              {(["all", ...providers.slice(0, 10).map((provider) => provider.id)] as string[]).map((providerId) => (
                 <button
                   key={providerId}
                   onClick={() => setSelectedProvider(providerId)}
