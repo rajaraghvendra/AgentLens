@@ -12,15 +12,29 @@ import { CopilotProvider } from './copilot.js';
 import { KiroProvider } from './kiro.js';
 import { KiroVSCodeProvider } from './kiro-vscode.js';
 import { GeminiProvider } from './gemini.js';
+import { OpenClawProvider } from './openclaw.js';
+import { RooCodeProvider } from './roo-code.js';
+import { KiloCodeProvider } from './kilocode.js';
 import type { Session, DateRange } from '../types/index.js';
 import { deduplicateSessions } from '../core/parser/dedup.js';
 import { loadSessionsIncrementally, type ProcessingOptions } from '../core/processing/index.js';
 
-export type ProviderFilter = 'all' | 'claude' | 'codex' | 'cursor' | 'opencode' | 'pi' | 'omp' | 'copilot' | 'kiro' | 'kiro-vscode' | 'gemini';
+export type ProviderFilter =
+  | 'all'
+  | 'claude'
+  | 'codex'
+  | 'cursor'
+  | 'opencode'
+  | 'pi'
+  | 'omp'
+  | 'copilot'
+  | 'kiro'
+  | 'kiro-vscode'
+  | 'gemini'
+  | 'openclaw'
+  | 'roo-code'
+  | 'kilocode';
 
-/**
- * Instantiate and return all supported providers.
- */
 export function getAllProviders(): IProvider[] {
   return [
     new ClaudeProvider(),
@@ -33,26 +47,21 @@ export function getAllProviders(): IProvider[] {
     new KiroProvider(),
     new KiroVSCodeProvider(),
     new GeminiProvider(),
+    new OpenClawProvider(),
+    new RooCodeProvider(),
+    new KiloCodeProvider(),
   ];
 }
 
-/**
- * Return only providers whose storage directories currently
- * exist on the local machine and are readable.
- */
 export function getAvailableProviders(filter?: ProviderFilter): IProvider[] {
   const providers = getAllProviders();
   if (!filter || filter === 'all') {
-    return providers.filter(p => p.isAvailable());
+    return providers.filter((provider) => provider.isAvailable());
   }
-  const specific = providers.find(p => p.id === filter);
+  const specific = providers.find((provider) => provider.id === filter);
   return specific && specific.isAvailable() ? [specific] : [];
 }
 
-/**
- * Discovers and parses sessions across all available providers
- * within the optional date range, deduplicating the results.
- */
 export async function getAllSessions(
   dateRange?: DateRange,
   providerFilter?: ProviderFilter,

@@ -4,7 +4,7 @@ import { dirname, resolve as pathResolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const DEFAULT_TIMEOUT_MS = 20_000;
-const VALID_PROVIDERS = new Set(['all', 'claude', 'codex', 'cursor', 'opencode', 'pi', 'copilot']);
+const VALID_PROVIDERS = new Set(['all', 'claude', 'codex', 'cursor', 'opencode', 'pi', 'omp', 'copilot', 'kiro', 'kiro-vscode', 'gemini', 'openclaw', 'roo-code', 'kilocode']);
 
 export function getAgentLensRoot(): string {
   if (process.env.AGENTLENS_ROOT && existsSync(process.env.AGENTLENS_ROOT)) {

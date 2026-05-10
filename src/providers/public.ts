@@ -9,3 +9,6 @@ export { CopilotProvider } from './copilot.js';
 export { KiroProvider } from './kiro.js';
 export { KiroVSCodeProvider } from './kiro-vscode.js';
 export { GeminiProvider } from './gemini.js';
+export { OpenClawProvider } from './openclaw.js';
+export { RooCodeProvider } from './roo-code.js';
+export { KiloCodeProvider } from './kilocode.js';

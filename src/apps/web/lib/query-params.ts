@@ -1,6 +1,21 @@
 import type { ProviderFilter } from '../../../providers/index.js';
 
-const VALID_PROVIDERS = new Set<ProviderFilter>(['all', 'claude', 'codex', 'cursor', 'opencode', 'pi', 'copilot', 'kiro', 'kiro-vscode', 'gemini']);
+const VALID_PROVIDERS = new Set<ProviderFilter>([
+  'all',
+  'claude',
+  'codex',
+  'cursor',
+  'opencode',
+  'pi',
+  'omp',
+  'copilot',
+  'kiro',
+  'kiro-vscode',
+  'gemini',
+  'openclaw',
+  'roo-code',
+  'kilocode',
+]);
 
 export function sanitizePeriod(value: string | null, fallback: string): string {
   if (!value) return fallback;

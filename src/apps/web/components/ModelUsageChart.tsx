@@ -1,6 +1,7 @@
 "use client";
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
+import { getModelDisplayName } from "../../../utils/model-display.js";
 
 interface ModelUsageChartProps {
   data: any[];
@@ -19,7 +20,7 @@ const COLORS = [
 export function ModelUsageChart({ data }: ModelUsageChartProps) {
   // Prepare data for the bar chart
   const chartData = data.map((item: any) => ({
-    name: item.model || "Unknown",
+    name: getModelDisplayName(item.model || "Unknown"),
     tokens: item.totalTokens,
     cost: item.costUSD,
     messages: item.messageCount,

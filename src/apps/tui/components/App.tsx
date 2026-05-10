@@ -3,6 +3,7 @@ import { Box, Text, useInput, useApp, useWindowSize } from 'ink';
 import { CoreEngine } from '../../../core/engine.js';
 import { getAllProviders } from '../../../providers/index.js';
 import { getHomeDir } from '../../../utils/paths.js';
+import { getModelDisplayName } from '../../../utils/model-display.js';
 
 import { HealthPanel } from './HealthPanel.js';
 import { OptimizationFindings } from './OptimizationFindings.js';
@@ -40,10 +41,14 @@ const PROVIDER_COLORS: Record<string, string> = {
   cursor: CYAN,
   opencode: PINK,
   pi: AMBER,
+  omp: '#F97316',
   copilot: RED,
   kiro: '#7C3AED',
   'kiro-vscode': '#6D28D9',
   gemini: '#4285F4',
+  openclaw: '#14B8A6',
+  'roo-code': '#0EA5E9',
+  kilocode: '#A855F7',
   all: VIOLET,
 };
 
@@ -63,10 +68,14 @@ const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
   cursor: 'Cursor',
   opencode: 'OpenCode',
   pi: 'Pi',
+  omp: 'OMP',
   copilot: 'Copilot',
   kiro: 'Kiro',
   'kiro-vscode': 'Kiro VSCode',
   gemini: 'Gemini',
+  openclaw: 'OpenClaw',
+  'roo-code': 'Roo Code',
+  kilocode: 'KiloCode',
 };
 
 const SPARKS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
@@ -610,7 +619,7 @@ export const App: React.FC = () => {
       }));
 
       const modelRows = Object.values(result.metrics?.byModel ?? {}).map((model: any) => ({
-        label: model.model || model.name || model.id || 'Unknown',
+        label: getModelDisplayName(model.model || model.name || model.id || 'Unknown'),
         cost: model.costUSD || 0,
         tokens: model.totalTokens || 0,
         messages: model.messageCount || 0,

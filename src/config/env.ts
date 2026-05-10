@@ -2,43 +2,27 @@
 // AgentLens – Configuration & Environment
 // ─────────────────────────────────────────────────────────────
 
-import { homedir } from 'os';
-import { join } from 'path';
-import { 
-  getCacheDir, 
-  getClaudeProjectsDir, 
-  getCodexDataDir, 
-  getDataDir,
+import {
+  getCacheDir,
+  getClaudeProjectsDir,
+  getCodexDataDir,
   getGeminiDataDir,
   getKiroDataDir,
   getKiroVSCodeAgentDir,
-  isWindows 
 } from '../utils/paths.js';
 
 export interface AppConfig {
-  /** Directory for cached pricing, currency, and parsed session data */
   cacheDir: string;
-  /** Default time window in days for reports */
   defaultPeriodDays: number;
-  /** Target currency code (ISO 4217) for cost display */
   currency: string;
-  /** Target tracking budget in USD. If 0, disabled. */
   budgetUSD: number;
-  /** Max bash output length (chars) before flagging as waste */
   maxBashOutput: number;
-  /** Max age of cached data in milliseconds (24h) */
   cacheMaxAgeMs: number;
-  /** Claude projects directory */
   claudeProjectsDir: string;
-  /** Codex directory */
   codexDir: string;
-  /** Kiro directory */
   kiroDir: string;
-  /** Kiro VS Code extension directory */
   kiroVSCodeDir: string;
-  /** Gemini CLI directory */
   geminiDir: string;
-  /** Path to custom pricing override JSON file */
   pricingOverridePath?: string;
 }
 
@@ -50,14 +34,14 @@ function envInt(key: string, fallback: number): number {
   const val = process.env[key];
   if (val === undefined) return fallback;
   const parsed = parseInt(val, 10);
-  return isNaN(parsed) ? fallback : parsed;
+  return Number.isNaN(parsed) ? fallback : parsed;
 }
 
 function envFloat(key: string, fallback: number): number {
   const val = process.env[key];
   if (val === undefined) return fallback;
   const parsed = parseFloat(val);
-  return isNaN(parsed) ? fallback : parsed;
+  return Number.isNaN(parsed) ? fallback : parsed;
 }
 
 export const config: AppConfig = {

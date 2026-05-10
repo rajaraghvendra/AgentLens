@@ -1,6 +1,6 @@
 # AgentLens
 
-**Local-first AI developer analytics for Claude Code, Cursor, Codex, OpenCode, Pi, and GitHub Copilot.**
+**Local-first AI developer analytics for Claude Code, Cursor, Codex, OpenCode, Pi, GitHub Copilot, Gemini CLI, Kiro, OpenClaw, Roo Code, and KiloCode.**
 
 AgentLens parses your local AI coding session history, computes cost and token usage, surfaces retry loops and waste patterns, and now adds incremental processing, active optimization alerts, tool/MCP intelligence, and actionable advice across CLI, TUI, web, and VS Code.
 
@@ -9,7 +9,7 @@ AgentLens parses your local AI coding session history, computes cost and token u
 
 ## What It Does
 
-- **Cross-provider analytics** for Claude Code, Cursor, Codex, OpenCode, Pi, and GitHub Copilot.
+- **Cross-provider analytics** for Claude Code, Cursor, Codex, OpenCode, Pi, OMP, GitHub Copilot, Gemini CLI, Kiro, Kiro (VS Code), OpenClaw, Roo Code, and KiloCode.
 - **Exact token accounting** for input, output, cache read, and cache write where provider data supports it.
 - **Cost tracking** with pricing lookup, currency conversion, and provider/model breakdowns.
 - **Incremental session processing** with local cache/index reuse so unchanged session files are not reparsed every time.
@@ -118,17 +118,31 @@ agentlens tui                    # Terminal UI
 
 ## Supported Providers
 
-| Provider | Discovery |
-|----------|-----------|
-| Claude Code | Auto-discovered on macOS, Linux, and Windows |
-| Claude Desktop | Auto-discovered on macOS, Linux, and Windows |
-| Codex | Auto-discovered on macOS, Linux, and Windows |
-| Cursor | Auto-discovered on macOS, Linux, and Windows |
-| OpenCode | Auto-discovered on macOS, Linux, and Windows |
-| Pi | Auto-discovered on macOS, Linux, and Windows |
-| GitHub Copilot | Auto-discovered on macOS, Linux, and Windows |
+| Provider | Local Source | Tokens | Notes |
+|----------|--------------|--------|-------|
+| Claude Code | `~/.claude/projects`, Claude Desktop local-agent-mode sessions | Exact when present | `CLAUDE_CONFIG_DIRS` can merge multiple Claude config roots in one run. |
+| Cursor | Local SQLite (`state.vscdb`, newer `store.db` chats) | Exact when stored, otherwise estimated | `cursor-auto` is displayed as `Auto (Sonnet est.)` and uses Sonnet fallback pricing when Cursor hides the real model. |
+| Codex | `~/.codex/sessions` | Exact when present | Auto-discovered on macOS, Linux, and Windows. |
+| OpenCode | Local OpenCode session store | Exact when present | Auto-discovered on macOS, Linux, and Windows. |
+| Pi / OMP | Local agent session directories | Exact when present | Auto-discovered on macOS, Linux, and Windows. |
+| GitHub Copilot | Legacy `~/.copilot/session-state/` and VS Code `workspaceStorage/*/GitHub.copilot-chat/transcripts/` | Estimated for transcript format | Transcript models are inferred from tool-call ID prefixes. |
+| Gemini CLI | Session JSON / JSONL under `~/.gemini/tmp/*/chats/` | Exact | Cached input is separated before pricing so cached tokens are not double charged. |
+| Kiro | Local `.jsonl` session store | Estimated | Sessions are labeled `kiro-auto` when the model is hidden and priced at Sonnet fallback rates. |
+| Kiro (VS Code) | `.chat` files from Kiro VS Code storage | Estimated | Uses `.chat` transcripts and generic model labeling when the exact model is not exposed. |
+| OpenClaw | `~/.openclaw/agents/` plus legacy `.clawdbot`, `.moltbot`, `.moldbot` | Estimated | Reads JSONL agent logs and normalizes tool usage. |
+| Roo Code | VS Code-family `ui_messages.json` task logs | Exact when `api_req_started` usage exists, otherwise estimated | Separate provider ID: `roo-code`. |
+| KiloCode | VS Code-family `ui_messages.json` task logs | Exact when `api_req_started` usage exists, otherwise estimated | Separate provider ID: `kilocode`. |
 
 AgentLens uses platform-specific local data directories internally, so the same commands work across supported operating systems without changing flags.
+
+## Provider Notes
+
+- **Claude multi-profile support:** set `CLAUDE_CONFIG_DIRS=~/.claude-work:~/.claude-personal agentlens report` on macOS/Linux, or use `;` on Windows. Missing or unreadable roots are skipped.
+- **Cursor:** usage is read from local SQLite. When Cursor reports `default`/`Auto` instead of a concrete model, AgentLens keeps the internal model id as `cursor-auto` and displays it as `Auto (Sonnet est.)`.
+- **Gemini CLI:** Gemini stores full token counts per message, including cached and thoughts tokens. AgentLens subtracts cached input from billable input before pricing and records cached tokens separately.
+- **GitHub Copilot:** the legacy CLI format and VS Code transcript format are both supported. VS Code transcripts do not carry token counts, so AgentLens estimates them from content length.
+- **Kiro:** Kiro VS Code uses `.chat` files with estimated token counts and an automatic `kiro-auto` label when the backing model is hidden.
+- **OpenClaw / Cursor caveat:** if native SQLite support is unavailable on Windows, install `better-sqlite3` prerequisites locally so SQLite-backed providers can open their databases.
 
 ## Public Core Boundaries
 

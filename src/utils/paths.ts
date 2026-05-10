@@ -27,16 +27,15 @@ export function isLinux(): boolean {
 
 export function getDataDir(appName: string): string {
   const home = homedir();
-  
+
   if (isWindows()) {
     return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), appName);
   }
-  
+
   if (isMac()) {
     return join(home, 'Library', 'Application Support', appName);
   }
-  
-  // Linux
+
   return join(home, '.config', appName);
 }
 
@@ -44,24 +43,14 @@ export function getCacheDir(appName: string): string {
   const home = homedir();
 
   if (isWindows()) {
-    // Windows standard: %LOCALAPPDATA%\<app>\cache
-    return join(
-      process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'),
-      appName,
-      'cache',
-    );
+    return join(process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'), appName, 'cache');
   }
 
   if (isMac()) {
-    // macOS standard: ~/Library/Caches/<app>
     return join(home, 'Library', 'Caches', appName);
   }
 
-  // Linux: respect XDG_CACHE_HOME, fall back to ~/.cache
-  return join(
-    process.env.XDG_CACHE_HOME || join(home, '.cache'),
-    appName,
-  );
+  return join(process.env.XDG_CACHE_HOME || join(home, '.cache'), appName);
 }
 
 function uniquePaths(paths: string[]): string[] {
@@ -77,18 +66,17 @@ export function getPathLeaf(targetPath: string): string {
   return segments[segments.length - 1] || '';
 }
 
+export function splitPathList(value: string | undefined): string[] {
+  if (!value) return [];
+  const separator = isWindows() ? ';' : ':';
+  return value
+    .split(separator)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
 export function getClaudeProjectsDir(): string {
-  const home = homedir();
-  
-  if (isWindows()) {
-    return join(home, '.claude', 'projects');
-  }
-  
-  if (isMac()) {
-    return join(home, '.claude', 'projects');
-  }
-  
-  return join(home, '.claude', 'projects');
+  return join(homedir(), '.claude', 'projects');
 }
 
 export function getClaudeProjectsDirCandidates(): string[] {
@@ -99,20 +87,20 @@ export function getClaudeProjectsDirCandidates(): string[] {
     candidates.push(join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Claude', 'projects'));
   }
 
-  return Array.from(new Set(candidates));
+  return uniquePaths(candidates);
 }
 
 export function getCursorDataDir(): string {
   const home = homedir();
-  
+
   if (isWindows()) {
     return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Cursor', 'User', 'globalStorage');
   }
-  
+
   if (isMac()) {
     return join(home, 'Library', 'Application Support', 'Cursor', 'User', 'globalStorage');
   }
-  
+
   return join(home, '.config', 'Cursor', 'User', 'globalStorage');
 }
 
@@ -122,7 +110,6 @@ export function getCursorDataDirCandidates(): string[] {
     join(home, 'Library', 'Application Support', 'Cursor', 'User', 'globalStorage'),
     join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Cursor', 'User', 'globalStorage'),
     join(home, '.config', 'Cursor', 'User', 'globalStorage'),
-    // Legacy fallback paths
     join(home, '.cursor'),
     join(process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'), 'Cursor'),
   ]);
@@ -130,17 +117,16 @@ export function getCursorDataDirCandidates(): string[] {
 
 export function getOpencodeDataDir(): string {
   const home = homedir();
-  
+
   if (isWindows()) {
     return join(process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'), 'opencode');
   }
-  
-  // Respect XDG_DATA_HOME on Linux/macOS (matches opencode's own data dir resolution)
+
   const xdgData = process.env.XDG_DATA_HOME;
   if (xdgData) {
     return join(xdgData, 'opencode');
   }
-  
+
   return join(home, '.local', 'share', 'opencode');
 }
 
@@ -152,7 +138,6 @@ export function getOpencodeDataDirCandidates(): string[] {
     join(home, '.local', 'share', 'opencode'),
     join(home, '.opencode'),
   ];
-  // Respect XDG_DATA_HOME (standard on Linux, sometimes used on macOS)
   const xdgData = process.env.XDG_DATA_HOME;
   if (xdgData) {
     candidates.unshift(join(xdgData, 'opencode'));
@@ -162,15 +147,11 @@ export function getOpencodeDataDirCandidates(): string[] {
 
 export function getCopilotDataDir(): string {
   const home = homedir();
-  
+
   if (isWindows()) {
     return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'copilot', 'session-state');
   }
-  
-  if (isMac()) {
-    return join(home, '.copilot', 'session-state');
-  }
-  
+
   return join(home, '.copilot', 'session-state');
 }
 
@@ -185,15 +166,11 @@ export function getCopilotDataDirCandidates(): string[] {
 
 export function getPiDataDir(): string {
   const home = homedir();
-  
+
   if (isWindows()) {
     return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'pi', 'agent', 'sessions');
   }
-  
-  if (isMac()) {
-    return join(home, '.pi', 'agent', 'sessions');
-  }
-  
+
   return join(home, '.pi', 'agent', 'sessions');
 }
 
@@ -207,15 +184,11 @@ export function getPiDataDirCandidates(): string[] {
 
 export function getCodexDataDir(): string {
   const home = homedir();
-  
+
   if (isWindows()) {
     return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'codex', 'sessions');
   }
-  
-  if (isMac()) {
-    return join(home, '.codex', 'sessions');
-  }
-  
+
   return join(home, '.codex', 'sessions');
 }
 
@@ -232,10 +205,6 @@ export function getKiroDataDir(): string {
 
   if (isWindows()) {
     return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'kiro', 'sessions');
-  }
-
-  if (isMac()) {
-    return join(home, '.kiro', 'sessions');
   }
 
   return join(home, '.kiro', 'sessions');
@@ -293,10 +262,6 @@ export function getGeminiDataDir(): string {
     return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'gemini', 'tmp');
   }
 
-  if (isMac()) {
-    return join(home, '.gemini', 'tmp');
-  }
-
   return join(home, '.gemini', 'tmp');
 }
 
@@ -308,17 +273,42 @@ export function getGeminiDataDirCandidates(): string[] {
   ]);
 }
 
+export function getOpenClawAgentDirCandidates(): string[] {
+  const home = homedir();
+  return uniquePaths([
+    join(home, '.openclaw', 'agents'),
+    join(home, '.clawdbot'),
+    join(home, '.moltbot'),
+    join(home, '.moldbot'),
+  ]);
+}
+
+export function getVSCodeWorkspaceStorageDirCandidates(): string[] {
+  const home = homedir();
+  return uniquePaths([
+    join(home, 'Library', 'Application Support', 'Code', 'User', 'workspaceStorage'),
+    join(home, 'Library', 'Application Support', 'Code - Insiders', 'User', 'workspaceStorage'),
+    join(home, 'Library', 'Application Support', 'VSCodium', 'User', 'workspaceStorage'),
+    join(home, 'Library', 'Application Support', 'Cursor', 'User', 'workspaceStorage'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Code', 'User', 'workspaceStorage'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Code - Insiders', 'User', 'workspaceStorage'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'VSCodium', 'User', 'workspaceStorage'),
+    join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'Cursor', 'User', 'workspaceStorage'),
+    join(home, '.config', 'Code', 'User', 'workspaceStorage'),
+    join(home, '.config', 'Code - Insiders', 'User', 'workspaceStorage'),
+    join(home, '.config', 'VSCodium', 'User', 'workspaceStorage'),
+    join(home, '.config', 'Cursor', 'User', 'workspaceStorage'),
+    join(home, '.vscode-server', 'data', 'User', 'workspaceStorage'),
+  ]);
+}
+
 export function getOmpDataDir(): string {
   const home = homedir();
-  
+
   if (isWindows()) {
     return join(process.env.APPDATA || join(home, 'AppData', 'Roaming'), 'omp', 'agent', 'sessions');
   }
-  
-  if (isMac()) {
-    return join(home, '.omp', 'agent', 'sessions');
-  }
-  
+
   return join(home, '.omp', 'agent', 'sessions');
 }
 

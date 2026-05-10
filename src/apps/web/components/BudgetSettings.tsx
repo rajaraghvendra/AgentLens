@@ -31,6 +31,14 @@ const PROVIDERS = [
   { id: "codexBudget", name: "Codex", key: "codex" },
   { id: "cursorBudget", name: "Cursor", key: "cursor" },
   { id: "copilotBudget", name: "Copilot", key: "copilot" },
+  { id: "piBudget", name: "Pi", key: "pi" },
+  { id: "ompBudget", name: "OMP", key: "omp" },
+  { id: "kiroBudget", name: "Kiro", key: "kiro" },
+  { id: "kiroVSCodeBudget", name: "Kiro VS Code", key: "kiro-vscode" },
+  { id: "geminiBudget", name: "Gemini", key: "gemini" },
+  { id: "openclawBudget", name: "OpenClaw", key: "openclaw" },
+  { id: "rooCodeBudget", name: "Roo Code", key: "roo-code" },
+  { id: "kilocodeBudget", name: "KiloCode", key: "kilocode" },
 ];
 
 export default function BudgetSettings({ isOpen, onClose }: BudgetSettingsProps) {

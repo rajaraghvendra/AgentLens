@@ -6,6 +6,7 @@ import {
   ResponsiveContainer, Cell as RechartsCell, ScatterChart
 } from "recharts";
 import { useState } from "react";
+import { getModelDisplayName } from "../../../utils/model-display.js";
 
 interface EnhancedModelUsageChartProps {
   data: any[];
@@ -25,7 +26,7 @@ const COLORS = [
 export function EnhancedModelUsageChart({ data, chartType = "bar" }: EnhancedModelUsageChartProps) {
   // Prepare data for charts
   const chartData = data.map((item: any) => ({
-    name: item.model || "Unknown",
+    name: getModelDisplayName(item.model || "Unknown"),
     tokens: item.totalTokens,
     cost: item.costUSD,
     messages: item.messageCount,

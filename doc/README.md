@@ -134,13 +134,27 @@ AgentLens classifies each session turn into one of these categories:
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `AGENTLENS_CACHE_DIR` | Cache directory | `~/.cache/agentlens` |
-| `AGENTLENS_CLAUDE_DIR` | Claude data directory | `~/.claude` |
-| `AGENTLENS_CODEX_DIR` | Codex data directory | `~/.codex` |
+| `AGENTLENS_CLAUDE_DIR` | Claude projects directory override | `~/.claude/projects` |
+| `CLAUDE_CONFIG_DIR` | Single Claude config root override | `~/.claude` |
+| `CLAUDE_CONFIG_DIRS` | Multiple Claude config roots (`:` on POSIX, `;` on Windows) | unset |
+| `AGENTLENS_CODEX_DIR` | Codex data directory | `~/.codex/sessions` |
+| `AGENTLENS_GEMINI_DIR` | Gemini CLI session directory | `~/.gemini/tmp` |
+| `AGENTLENS_KIRO_DIR` | Kiro session directory | `~/.kiro/sessions` |
+| `AGENTLENS_KIRO_VSCODE_DIR` | Kiro VS Code extension directory | platform-specific |
+| `AGENTLENS_OPENCLAW_DIR` | OpenClaw agents directory override | `~/.openclaw/agents` |
+| `AGENTLENS_ROO_CODE_DIR` | Roo Code task-log root override | auto-discovered VS Code workspace storage |
+| `AGENTLENS_KILOCODE_DIR` | KiloCode task-log root override | auto-discovered VS Code workspace storage |
 | `AGENTLENS_CURRENCY` | Display currency | `USD` |
 | `AGENTLENS_PERIOD_DAYS` | Default period | `7` |
 | `AGENTLENS_MAX_BASH_OUTPUT` | Max bash output chars | `5000` |
 
----
+## Provider Notes
+
+- **Cursor:** reads token usage from local SQLite. When Cursor hides the real model behind `Auto`, AgentLens displays `cursor-auto` as `Auto (Sonnet est.)` and prices it with Sonnet fallback rates.
+- **Gemini CLI:** sessions are stored as single JSON or JSONL files with exact input/output/cached token counts. Cached input is removed from billable input before pricing.
+- **Kiro / Kiro VS Code:** Kiro local sessions and `.chat` transcripts are both supported. `.chat` token counts are estimated from content length, and hidden models are surfaced as `kiro-auto`.
+- **GitHub Copilot:** both legacy `~/.copilot/session-state/` and VS Code transcript storage are supported. Transcript tokens are estimated and models are inferred from tool-call IDs.
+- **OpenClaw / Roo Code / KiloCode:** OpenClaw parses JSONL agent logs; Roo Code and KiloCode parse Cline-family `ui_messages.json` task logs and extract exact usage from `api_req_started` when present.
 
 ## Architecture
 

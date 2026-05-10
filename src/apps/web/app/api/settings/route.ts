@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getBudget, setBudget } from '../../../lib/server-core';
 
-const ALLOWED_PROVIDER_KEYS = new Set(['claude', 'opencode', 'codex', 'cursor', 'copilot']);
+const ALLOWED_PROVIDER_KEYS = new Set(['claude', 'opencode', 'codex', 'cursor', 'copilot', 'pi', 'omp', 'kiro', 'kiro-vscode', 'gemini', 'openclaw', 'roo-code', 'kilocode']);
 
 async function GET(): Promise<NextResponse> {
   try {

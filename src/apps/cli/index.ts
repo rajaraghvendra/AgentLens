@@ -17,6 +17,7 @@ import type { OptimizationEvent, ToolAdvice } from '../../types/index.js';
 import config from '../../config/env.js';
 import { analyzeModels, compareModels, getModelSessions } from '../../core/compare.js';
 import { detectWaste, calculateHealthScore } from '../../core/waste-detector.js';
+import { getModelDisplayName } from '../../utils/model-display.js';
 
 interface CLIOptions {
   period?: string;
@@ -341,7 +342,7 @@ program
   .command('report')
   .description('Generate a detailed usage and cost report')
   .option('-p, --period <period>', 'Time period: today, week, month, all, or number of days', 'week')
-  .option('--provider <provider>', 'Filter by provider: claude, codex, cursor, opencode, pi, copilot, all')
+  .option('--provider <provider>', 'Filter by provider: claude, codex, cursor, opencode, pi, omp, copilot, kiro, kiro-vscode, gemini, openclaw, roo-code, kilocode, all')
   .option('--project <name>', 'Show only projects matching name (repeatable)', collect, [])
   .option('--exclude <name>', 'Exclude projects matching name (repeatable)', collect, [])
   .option('--format <type>', 'Output format: text, json', 'text')
@@ -370,7 +371,7 @@ program
             projects: exportData.byProject,
             models: Object.values(result.metrics.byModel).map((m: any) => ({
               id: m.model,
-              name: m.model,
+              name: getModelDisplayName(m.model),
               costUSD: m.costUSD,
               totalTokens: m.totalTokens,
               inputTokens: m.inputTokens,
@@ -426,7 +427,7 @@ program
         const models = Object.values(metrics.byModel).sort((a, b) => b.costUSD - a.costUSD);
         for (const m of models.slice(0, 5)) {
           const est = m.isEstimated ? ' (est.)' : '';
-          console.log(`  ${(m.model || 'unknown').padEnd(25)} ${formatCurrency(m.costUSD, 'USD')}${est}`);
+          console.log(`  ${getModelDisplayName(m.model || 'unknown').padEnd(25)} ${formatCurrency(m.costUSD, 'USD')}${est}`);
         }
       }
 

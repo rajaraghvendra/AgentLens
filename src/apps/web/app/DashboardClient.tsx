@@ -123,10 +123,14 @@ const PROVIDER_LABELS: Record<string, string> = {
   cursor: "Cursor",
   opencode: "OpenCode",
   pi: "Pi",
+  omp: "OMP",
   copilot: "Copilot",
   kiro: "Kiro",
   "kiro-vscode": "Kiro VSCode",
   gemini: "Gemini",
+  openclaw: "OpenClaw",
+  "roo-code": "Roo Code",
+  kilocode: "KiloCode",
 };
 
 const DASHBOARD_SNAPSHOT_VERSION = 1;
